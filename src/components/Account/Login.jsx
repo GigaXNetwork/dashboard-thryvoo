@@ -34,7 +34,7 @@ export default function LoginPage() {
   
       if (response.ok) {
         console.log("Login successful", data);
-        window.open("http://localhost:5173/","_self")
+        window.open("https://deskboard.thryvoo.com/","_self")
         setError(null); // Clear any previous error messages
         setLoading(false); // Reset loading state
       } else {
