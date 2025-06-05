@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CreateCard from "./CreateCard";
-import QRCodeGenerator from "./QrCodeGenerator";
+import QRCodeGenerator from "./QRCodeGenerator";
 import { Badge, CheckCircle, ExternalLink, Plus } from "lucide-react";
 
 function GetMyCard({role}) {
