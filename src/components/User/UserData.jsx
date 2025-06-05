@@ -21,7 +21,9 @@ const menuItems = [
 function UserData() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
-  const { userId } = useParams();
+  const { userId , id} = useParams();
+  console.log(userId, id);
+  
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -57,10 +59,10 @@ function UserData() {
   if (loading) return <p>Loading user...</p>;
 
   return (
-    <div className="flex min-h-screen pt-4 px-4">
+    <div className="flex">
       {/* Sidebar with Sticky UserCard */}
-      <div className="sticky top-[90px] h-fit w-[250px]">
-        <div className="w-full p-6 rounded-2xl shadow-lg text-center bg-white">
+      <div className=" border-r h-min sticky top-[90px]  w-[250px]">
+        <div className="w-full p-6 rounded-2xl text-center">
           <img
             src={user.photo || "https://picsum.photos/200"}
             alt="Profile"
@@ -79,7 +81,7 @@ function UserData() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all ${
                     isActive
-                      ? "bg-violet-100 text-violet-700"
+                      ? "bg-blue-100 text-blue-700"
                       : "text-gray-800 hover:bg-gray-100"
                   }`
                 }

@@ -107,7 +107,7 @@ function App() {
                         {
                           element: <ScrollToTop />,
                           children: [
-                            { path: 'card', element: <GetMyCard />},
+                            { path: 'card', element: <GetMyCard role={role} />},
                             { path: 'coupon', element: <Coupon user={role} /> },
                             { path: 'enquary', element: <Enquary /> },
                             { path: 'reviews', element: <Reviews /> },
@@ -125,7 +125,7 @@ function App() {
                   : [
                     { path: '/', element: <User /> },
                     { path: 'me', element: <Me /> },
-                    { path: 'card', element: <GetMyCard /> },
+                    { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
                     { path: 'coupon', element: <Coupon /> },
                     { path: 'reviews', element: <Reviews role={role}/> },
