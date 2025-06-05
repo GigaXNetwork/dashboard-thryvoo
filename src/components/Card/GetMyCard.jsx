@@ -144,7 +144,7 @@ console.log(card);
                 onSubmit={(newCard) => {
                   setCard(newCard); // Update the card state with the newly created card
                   if (newCard.slug) {
-                    setCardUrl(`https://thryvoo.com/b/${newCard.slug}`);
+                    setcardUrl(`https://thryvoo.com/b/${newCard.slug}`);
                   }
                   setIsCreateCardForm(false);
                 }}
