@@ -12,7 +12,7 @@ export default function UpdateNameModal({ onClose, onSubmit }) {
         const accountToken = Cookies.get("accountToken");
 
         try {
-            const response = await fetch("https://api.thryvoo.com/account/upadateprofile", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/account/upadateprofile`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

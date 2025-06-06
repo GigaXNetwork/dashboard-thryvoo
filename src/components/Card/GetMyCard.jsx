@@ -3,28 +3,30 @@ import { useParams } from "react-router-dom";
 import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
 import { Badge, CheckCircle, ExternalLink, Plus } from "lucide-react";
+import Active from "./Active";
 
-function GetMyCard({role}) {
+function GetMyCard({ role }) {
   const { userId } = useParams(); // assumes route like /card/:userId
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCreateCardForm, setIsCreateCardForm] = useState(false);
   const [cardUrl, setcardUrl] = useState();
+  const [activeTab, setActiveTab] = useState("card");
 
   console.log("user card ", userId);
-  
+
 
   let url;
-  if(role==="admin"){
+  if (role === "admin") {
     console.log("this is admin");
-    
-    url=`https://api.thryvoo.com/api/admin/user/${userId}/card`
+
+    url = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`
   }
-  else{
+  else {
     console.log("this is user");
-    
-    url="https://api.thryvoo.com/api/user/card"
+
+    url = `${import.meta.env.VITE_API_URL}/api/user/card`
   }
 
   useEffect(() => {
@@ -39,7 +41,7 @@ function GetMyCard({role}) {
           credentials: "include",
         });
         console.log(response);
-        
+
         if (response.status === 404) {
           setCard(null);
         } else if (!response.ok) {
@@ -58,7 +60,7 @@ function GetMyCard({role}) {
 
     fetchCard();
   }, [userId]);
-console.log(card);
+  console.log(card);
 
   const handleCreateCard = () => {
     // Navigate to card creation page or open modal
@@ -67,9 +69,10 @@ console.log(card);
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
-
+  console.log("card ", card);
+  
   return (
-<div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white border rounded-sm p-4 ">
           <div className="p-8">
@@ -114,6 +117,12 @@ console.log(card);
                 <div className="pt-4 border-t border-gray-200">
                   <QRCodeGenerator url={cardUrl} />
                 </div>
+
+                {activeTab && (<Active card={{
+                  _id: card._id,
+                  status: card.status,
+                  expireAt: card.expire
+                }} />)}
               </div>
             ) : (
               <div className="text-center space-y-6">
@@ -137,27 +146,25 @@ console.log(card);
                 </button>
 
                 {/* Create Card Form */}
-                            {isCreateCardForm && (
-              <CreateCard
-                userId={userId}
-                onClose={() => setIsCreateCardForm(false)}
-                onSubmit={(newCard) => {
-                  setCard(newCard); // Update the card state with the newly created card
-                  if (newCard.slug) {
-                    setcardUrl(`https://thryvoo.com/b/${newCard.slug}`);
-                  }
-                  setIsCreateCardForm(false);
-                }}
-              />
-            )}
+                {isCreateCardForm && (
+                  <CreateCard
+                    userId={userId}
+                    onClose={() => setIsCreateCardForm(false)}
+                    onSubmit={(newCard) => {
+                      setCard(newCard); // Update the card state with the newly created card
+                      if (newCard.slug) {
+                        setcardUrl(`https://thryvoo.com/b/${newCard.slug}`);
+                      }
+                      setIsCreateCardForm(false);
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6">
-        </div>
+
       </div>
     </div>
   );

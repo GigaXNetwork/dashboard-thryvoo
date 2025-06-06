@@ -43,17 +43,17 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Ensure auth check is complete before rendering
   const [role, setRole] = useState("user")
-
+  
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await fetch('https://api.thryvoo.com/api/user/isAuthenticated', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
           method: 'GET',
           credentials: 'include',
         });
 
         const data = await response.json();
-
+        
         if (data.isAuthenticated) {
           setIsAuthenticated(true);
           setRole(data.user.role)

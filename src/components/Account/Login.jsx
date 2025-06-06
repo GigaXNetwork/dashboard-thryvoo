@@ -14,14 +14,14 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     // Replace with actual Google OAuth logic
-    window.open("https://api.thryvoo.com/auth/google/callback","_self")
+    window.open(`${import.meta.env.VITE_API_URL}/auth/google/callback`,"_self")
     console.log("Logging in with Google...");
   };
   const handleSubmit=async(e)=>{
     e.preventDefault();
     setLoading(true); // Optional: set loading state
     try {
-      const response = await fetch("https://api.thryvoo.com/api/user/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

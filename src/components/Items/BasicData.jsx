@@ -33,10 +33,10 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
             }));
 
             if (cardData.logo && typeof cardData.logo === "string") {
-                setLogoPreview(cardData.logo.startsWith('http') ? cardData.logo : `https://api.thryvoo.com/${cardData.logo}`);
+                setLogoPreview(cardData.logo.startsWith('http') ? cardData.logo : `${import.meta.env.VITE_API_URL}/${cardData.logo}`);
             }
             if (cardData.photo && typeof cardData.photo === "string") {
-                setPhotoPreview(cardData.photo.startsWith('http') ? cardData.photo : `https://api.thryvoo.com/${cardData.photo}`);
+                setPhotoPreview(cardData.photo.startsWith('http') ? cardData.photo : `${import.meta.env.VITE_API_URL}/${cardData.photo}`);
             }
         }
     }, [cardData]);
@@ -73,10 +73,10 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
 
         let url;
         if(role==="admin"){
-            url=`https://api.thryvoo.com/api/admin/card/${cardId}/basic`
+            url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/basic`
         }
         else{
-            url=`https://api.thryvoo.com/api/user/card/${cardId}/basic`
+            url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/basic`
         }
 
         try {

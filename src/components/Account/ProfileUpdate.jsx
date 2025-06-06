@@ -38,7 +38,7 @@ export default function ProfileUpdate({ handleNext, handleBack }) {
         }
 
         try {
-            const response = await fetch("https://api.thryvoo.com/account/onboard", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/account/onboard`, {
                 method: "PATCH",
                 body: data,
                 headers: {

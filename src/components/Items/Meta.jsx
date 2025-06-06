@@ -53,10 +53,10 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
 
         let url;
         if(role==="admin"){
-            url=`https://api.thryvoo.com/api/admin/card/${cardId}/meta`
+            url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/meta`
         }
         else{
-            url=`https://api.thryvoo.com/api/user/card/${cardId}/meta`
+            url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/meta`
         }
 
         try {

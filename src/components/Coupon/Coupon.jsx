@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams } from 'react-router';
+import SetCoupon from './SetCoupon';
 
 function Coupon({user}) {
   const [search, setSearch] = useState('');
@@ -10,16 +11,18 @@ function Coupon({user}) {
   const [coupons, setCoupons] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [setcouponOpen, setSetCouponOpen] = useState(false);
+
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
   const itemsPerPage = 3;
   let apiUrl;
   if(user==="admin"){
     const {userId}=useParams()
-    apiUrl=`https://api.thryvoo.com/api/admin/coupons?user=${userId}`
+    apiUrl=`${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
   }
   else{
-    apiUrl="https://api.thryvoo.com/api/user/mycoupons"
+    apiUrl=`${import.meta.env.VITE_API_URL}/api/user/mycoupons`
   }
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -57,7 +60,7 @@ function Coupon({user}) {
     if (!selectedCoupon) return;
     try {
       await axios.patch(
-        `https://api.thryvoo.com/api/coupon/${selectedCoupon._id}/redeem`,
+        `${import.meta.env.VITE_API_URL}/api/coupon/${selectedCoupon._id}/redeem`,
         {},
         { withCredentials: true }
       );
@@ -120,56 +123,66 @@ function Coupon({user}) {
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Coupon Management</h1>
 
-<div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">
-  <div className="relative w-full sm:w-64">
-    <input
-      type="text"
-      placeholder="Search by code..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-    />
-    <svg
-      className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
-      />
-    </svg>
-  </div>
+      <div className="flex justify-end mb-4">
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+          onClick={() => {
+            setSetCouponOpen(true);
+          }}
+        >
+          Set Coupon
+        </button>
+      </div>
 
-  <div className="relative w-full sm:w-52">
-    <select
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-      className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all appearance-none"
-    >
-      <option value="">All Statuses</option>
-      <option value="active">Active</option>
-      <option value="redeemed">Redeemed</option>
-    </select>
-    <svg
-      className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M5 12h14M12 5l7 7-7 7"
-      />
-    </svg>
-  </div>
-</div>
+      <div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">
+        <div className="relative w-full sm:w-64">
+          <input
+            type="text"
+            placeholder="Search by code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+          />
+          <svg
+            className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
+            />
+          </svg>
+        </div>
 
+        <div className="relative w-full sm:w-52">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all appearance-none"
+          >
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="redeemed">Redeemed</option>
+          </select>
+          <svg
+            className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 12h14M12 5l7 7-7 7"
+            />
+          </svg>
+        </div>
+      </div>
 
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full text-sm text-left bg-white">
@@ -202,6 +215,7 @@ function Coupon({user}) {
           </tbody>
         </table>
       </div>
+
 
       {/* Redeem Dialog */}
       {dialogOpen && selectedCoupon && (
@@ -277,6 +291,10 @@ function Coupon({user}) {
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
+
+      {
+        setcouponOpen && <SetCoupon onClose={() => setSetCouponOpen(false)} />
+      }
     </div>
   );
 }

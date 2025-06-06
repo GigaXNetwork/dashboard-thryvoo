@@ -23,7 +23,7 @@ function AllCoupon() {
         if (search.trim()) params.code = search.trim();
         if (statusFilter) params.status = statusFilter;
 
-        const res = await axios.get('https://api.thryvoo.com/api/admin/coupons', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/coupons`, {
           params,
           withCredentials: true,
         });
@@ -48,7 +48,7 @@ function AllCoupon() {
     if (!selectedCoupon) return;
     try {
       await axios.patch(
-        `https://api.thryvoo.com/api/coupon/${selectedCoupon._id}/redeem`,
+        `${import.meta.env.VITE_API_URL}/api/coupon/${selectedCoupon._id}/redeem`,
         {},
         { withCredentials: true }
       );

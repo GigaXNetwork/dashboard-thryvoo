@@ -45,10 +45,10 @@ export default function Social({ handleBack, handleNext, cardId, role }) {
         const authToken = Cookies.get("authToken");
         let url;
         if(role==="admin"){
-            url=`https://api.thryvoo.com/api/admin/card/${cardId}/social`
+            url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/social`
         }
         else{
-            url=`https://api.thryvoo.com/api/user/card/${cardId}/social`
+            url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/social`
         }
 
         try {

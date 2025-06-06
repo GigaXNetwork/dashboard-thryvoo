@@ -11,10 +11,10 @@ export const CardProvider = ({ children, cardId,role }) => {
     if (!cardId) return;
     let url;
     if(role==="admin"){
-      url=`https://api.thryvoo.com/api/admin/card/${cardId}`
+      url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}`
     }
     else{
-      url=`https://api.thryvoo.com/api/user/card/${cardId}`
+      url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}`
     }
 
     const fetchData = async () => {

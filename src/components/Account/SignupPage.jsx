@@ -48,7 +48,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("https://api.thryvoo.com/api/user/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

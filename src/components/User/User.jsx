@@ -24,7 +24,7 @@ function User() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://api.thryvoo.com/api/admin/users", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +84,7 @@ function User() {
     }
 
     try {
-      const response = await fetch("https://api.thryvoo.com/api/admin/users", {
+      const response = await fetch("${import.meta.env.VITE_API_URL}/api/admin/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

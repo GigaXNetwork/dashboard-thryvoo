@@ -16,7 +16,7 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
     setMessage("");
 
     try {
-      const response = await fetch(`https://api.thryvoo.com/api/admin/user/${userId}/createcard`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/createcard`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -29,7 +29,7 @@ function UserData() {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://api.thryvoo.com/api/admin/user/${userId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -9,7 +9,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://api.thryvoo.com/api/user/isAuthenticated', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
           method: 'GET',
           credentials: 'include', // Ensure cookies are sent
         });

@@ -41,7 +41,7 @@ export default function EmailVerificationPage({ email }) {
     try {
         console.log(email,code);
         
-      const res = await fetch("https://api.thryvoo.com/account/verify-email", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/account/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

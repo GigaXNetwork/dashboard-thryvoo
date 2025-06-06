@@ -10,8 +10,6 @@ function Header({ onToggleSidebar }) {
           loading,   // Loading state
           error      // Error state
         } = useUser();
-  console.log(userData);
-  
   return (
     <header className="w-full h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-[9999]">
       <div className="flex items-center gap-4">

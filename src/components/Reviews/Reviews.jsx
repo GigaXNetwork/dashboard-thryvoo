@@ -28,10 +28,10 @@ function Reviews({ role }) {
         let apiUrl;
         if (role === "admin") {
           const { userId } = useParams()
-          apiUrl = `https://api.thryvoo.com/api/admin/reviews?user=${userId}`
+          apiUrl = `${import.meta.env.VITE_API_URL}/api/admin/reviews?user=${userId}`
         }
         else {
-          apiUrl = "https://api.thryvoo.com/api/user/myreviews"
+          apiUrl = `${import.meta.env.VITE_API_URL}/api/user/myreviews`
         }
 
         const res = await axios.get(apiUrl, {

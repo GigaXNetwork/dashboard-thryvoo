@@ -25,7 +25,7 @@ function Card() {
           params.name = search.trim();
         }
 
-        const response = await axios.get("https://api.thryvoo.com/api/admin/cards", {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
           params,
           withCredentials: true,
         });

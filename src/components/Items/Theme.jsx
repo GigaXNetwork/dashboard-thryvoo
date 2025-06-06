@@ -111,7 +111,7 @@ export default function Theme({ handleNext, cardId }) {
         );
 
         try {
-            const response = await fetch(`https://api.thryvoo.com/card/${cardId}/theme`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/card/${cardId}/theme`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
