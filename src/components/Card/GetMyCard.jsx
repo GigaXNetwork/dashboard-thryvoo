@@ -118,7 +118,7 @@ function GetMyCard({ role }) {
                   <QRCodeGenerator url={cardUrl} />
                 </div>
 
-                {activeTab && (<Active card={{
+                {activeTab && role === "admin" && (<Active card={{
                   _id: card._id,
                   status: card.status,
                   expireAt: card.expire
