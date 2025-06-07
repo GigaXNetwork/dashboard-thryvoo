@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams } from 'react-router';
 import SetCoupon from './SetCoupon';
 
-function Coupon({user}) {
+function Coupon({ user }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,12 +17,12 @@ function Coupon({user}) {
 
   const itemsPerPage = 3;
   let apiUrl;
-  if(user==="admin"){
-    const {userId}=useParams()
-    apiUrl=`${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
+  if (user === "admin") {
+    const { userId } = useParams()
+    apiUrl = `${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
   }
-  else{
-    apiUrl=`${import.meta.env.VITE_API_URL}/api/user/mycoupons`
+  else {
+    apiUrl = `${import.meta.env.VITE_API_URL}/api/user/mycoupons`
   }
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -124,14 +124,14 @@ function Coupon({user}) {
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Coupon Management</h1>
 
       <div className="flex justify-end mb-4">
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
-          onClick={() => {
-            setSetCouponOpen(true);
-          }}
-        >
-          Set Coupon
-        </button>
+        {role !== 'admin' && (
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+            onClick={() => setSetCouponOpen(true)}
+          >
+            Set Coupon
+          </button>
+        )}
       </div>
 
       <div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">
@@ -272,11 +272,10 @@ function Coupon({user}) {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 rounded-md border text-sm shadow ${
-                page === currentPage
+              className={`px-3 py-1 rounded-md border text-sm shadow ${page === currentPage
                   ? 'bg-blue-600 text-white'
                   : 'bg-white hover:bg-blue-50 text-gray-700'
-              }`}
+                }`}
             >
               {page}
             </button>
@@ -293,7 +292,7 @@ function Coupon({user}) {
       </div>
 
       {
-        setcouponOpen && <SetCoupon onClose={() => setSetCouponOpen(false)} />
+        setcouponOpen && user !== "admin" && <SetCoupon onClose={() => setSetCouponOpen(false)} />
       }
     </div>
   );
