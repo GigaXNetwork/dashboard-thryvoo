@@ -141,6 +141,7 @@ function Card() {
               title={item.name}
               logo={item.logo || "/images/d.png"}
               img={item.photo || "/images/d.png"}
+              slug={item.slug}
             />
           ))}
         </div>

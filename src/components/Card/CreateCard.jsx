@@ -62,12 +62,12 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-600 mb-1 text-left">Full Name</label>
+            <label className="block text-sm text-gray-600 mb-1 text-left">Your Business Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="John Doe"
               required
             />
@@ -79,7 +79,7 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="john@example.com"
               required
             />
@@ -91,7 +91,7 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="+1 234 567 8900"
               required
             />
@@ -121,8 +121,8 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
             <button
               type="submit"
               disabled={submitting}
-              className={`bg-purple-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                submitting ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700"
+              className={`bg-[#3E82EB] text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                submitting ? "opacity-50 cursor-not-allowed" : "hover:bg-[#3E82EB]"
               }`}
             >
               {submitting ? "Creating..." : "Create Card"}

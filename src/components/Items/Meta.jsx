@@ -7,8 +7,8 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const { cardData, setCardData, error, loading } = useCard()
     const [formData, setFormData] = useState({
         videoUrl: "",
-        googleMap: "",
-        googleRating: "",
+        map: "",
+        gplaceid: "",
         desc: "",
         keyword: "",
     });
@@ -18,8 +18,8 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
             setFormData((prev) => ({
                 ...prev,
                 videoUrl: cardData.videoUrl || "",
-                googleMap: cardData.googleMap || "",
-                googleRating: cardData.googleRating || "",
+                map: cardData.map || "",
+                gplaceid: cardData.gplaceid || "",
                 desc: cardData.desc || "",
                 keyword: cardData.keyword || "",
             }));
@@ -91,8 +91,8 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
 
             {/* Text Inputs */}
             <TextInput label="videoUrl" name="videoUrl" value={formData.videoUrl} handleChange={handleChange} placeholder="youtube embed video url" />
-            <TextInput label="googleMap" name="googleMap" value={formData.googleMap} handleChange={handleChange} placeholder="google map place id" />
-            <TextInput label="googleRating" name="googleRating" value={formData.googleRating} handleChange={handleChange} placeholder="google map place id" />
+            <TextInput label="map" name="map" value={formData.map} handleChange={handleChange} placeholder="google map place id" />
+            <TextInput label="gplaceid" name="gplaceid" value={formData.gplaceid} handleChange={handleChange} placeholder="google map place id" />
             <TextArea label="desc" name="desc" value={formData.desc} handleChange={handleChange} placeholder="Write a short desc..." />
             <TextArea label="keyword" name="keyword" value={formData.keyword} handleChange={handleChange} placeholder="Write a short keyword..." />
 

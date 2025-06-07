@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
-import { Badge, CheckCircle, ExternalLink, Plus } from "lucide-react";
+import { Badge, CheckCircle, ExternalLink, Eye, Pencil, Plus } from "lucide-react";
 import Active from "./Active";
 
 function GetMyCard({ role }) {
@@ -70,7 +70,7 @@ function GetMyCard({ role }) {
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
   console.log("card ", card);
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -90,20 +90,10 @@ function GetMyCard({ role }) {
 
                 {/* Action buttons */}
                 <div className="space-y-3">
-                  <button
-                    asChild
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white
-                     py-2 text-lg font-medium"
-                    size="lg"
-                  >
-                    <a href={`/card/${card._id}`}>View Business Card</a>
-                  </button>
-
-                  <button
+                <button
                     asChild
                     variant="outline"
-                    className="w-full border-blue-600 rounded-sm text-blue-600
-                     hover:bg-blue-50 py-2 text-lg font-medium"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block"
                     size="lg"
                   >
                     <a href={cardUrl} className="flex items-center rounded-sm justify-center gap-2">
@@ -111,6 +101,16 @@ function GetMyCard({ role }) {
                       Visit Business Profile
                     </a>
                   </button>
+
+                  <a
+                    href={`/card/${card._id}`}
+                    className="inline-flex items-center gap-1.5 text-base font-normal text-black hover:text-blue-600 transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    Edit Business card
+                  </a>
+
+                  
                 </div>
 
                 {/* QR Code Section */}
@@ -138,10 +138,9 @@ function GetMyCard({ role }) {
                 {/* Create Card button */}
                 <button
                   onClick={handleCreateCard}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
-                  size="lg"
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                 >
-                  <Plus className="w-5 h-5 mr-2" />
+                  <Plus className="w-5 h-5" />
                   Create Business Card
                 </button>
 
