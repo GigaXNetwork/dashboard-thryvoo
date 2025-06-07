@@ -123,7 +123,7 @@ function App() {
                     { path: '/signup', element: <SignupPage /> },
                   ]
                   : [
-                    { path: '/', element: <User /> },
+                    { path: '/', element:<GetMyCard role={role} /> },
                     { path: 'me', element: <Me /> },
                     { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },

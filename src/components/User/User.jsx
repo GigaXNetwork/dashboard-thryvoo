@@ -84,7 +84,7 @@ function User() {
     }
 
     try {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/api/admin/users", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,6 +121,28 @@ function User() {
       setFormStatus({ type: "error", message: "An unexpected error occurred." });
     }
   };
+
+  const getPaginationNumbers = () => {
+    const delta = 2; // pages around current
+    const range = [];
+
+    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+      range.push(i);
+    }
+
+    if (currentPage - delta > 2) {
+      range.unshift("...");
+    }
+    if (currentPage + delta < totalPages - 1) {
+      range.push("...");
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) range.push(totalPages);
+
+    return range;
+  };
+
 
 
   if (loading) return <p>Loading users...</p>;
@@ -159,7 +181,7 @@ function User() {
             ))}
           </div>
 
-          <div className="mt-6 flex gap-2 justify-center items-center">
+          <div className="mt-6 flex flex-wrap gap-2 justify-center items-center">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
@@ -167,9 +189,24 @@ function User() {
             >
               Prev
             </button>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
+
+            {getPaginationNumbers().map((page, idx) =>
+              page === "..." ? (
+                <span key={idx} className="px-3 py-1">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={idx}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-1 border rounded ${currentPage === page ? "bg-blue-600 text-white" : ""
+                    }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
@@ -178,6 +215,7 @@ function User() {
               Next
             </button>
           </div>
+
         </>
       ) : (
         <p>No users found.</p>
@@ -185,7 +223,7 @@ function User() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999]">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Create New User</h2>
             <form onSubmit={handleCreateUser} className="space-y-3">
