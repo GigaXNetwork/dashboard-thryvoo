@@ -32,6 +32,7 @@ import Coupon from './components/Coupon/Coupon';
 import GetMyCard from './components/Card/GetMyCard';
 import LoadingAnimation from './components/Common/LoadingAnimation';
 import AllCoupon from './components/Coupon/AllCoupons';
+import MyProfile from './components/User/MyProfile';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -107,6 +108,7 @@ function App() {
                         {
                           element: <ScrollToTop />,
                           children: [
+                            { path: '', element: <MyProfile role={role} />},
                             { path: 'card', element: <GetMyCard role={role} />},
                             { path: 'coupon', element: <Coupon user={role} /> },
                             { path: 'enquary', element: <Enquary /> },

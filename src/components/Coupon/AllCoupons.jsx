@@ -178,7 +178,7 @@ function AllCoupon() {
                 <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 font-medium text-gray-900">{coupon.code}</td>
                 <td className="px-6 py-4 capitalize">{coupon.status}</td>
-                <td className="px-6 py-4 text-gray-700">{coupon.expirationDate}</td>
+                <td className="px-6 py-4 text-gray-700">{coupon.expirationDate.toLocaleDateString()}</td>
 
               </tr>
             ))}

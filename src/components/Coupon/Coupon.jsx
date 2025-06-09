@@ -12,6 +12,8 @@ function Coupon({ user }) {
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [setcouponOpen, setSetCouponOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [showReviewCard, setShowReviewCard] = useState(false);
 
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
@@ -192,6 +194,7 @@ function Coupon({ user }) {
               <th className="px-6 py-3">Code</th>
               <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Expiration Date</th>
+              <th className="px-6 py-3">View Review</th>
               <th className="px-6 py-3">Manage</th>
             </tr>
           </thead>
@@ -201,7 +204,42 @@ function Coupon({ user }) {
                 <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 font-medium text-gray-900">{coupon.code}</td>
                 <td className="px-6 py-4 capitalize">{coupon.status}</td>
-                <td className="px-6 py-4 text-gray-700">{coupon.expirationDate}</td>
+                <td className="px-6 py-4 text-gray-700">{new Date(coupon.expirationDate).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-gray-700">
+                  {showReviewCard && selectedReview && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999]">
+                      <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-md">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-800">Review Details</h2>
+                        <div className="space-y-2 text-gray-700">
+                          <p><span className="font-medium">Name:</span> {selectedReview.name}</p>
+                          <p><span className="font-medium">Review:</span> {selectedReview.review}</p>
+                          <p><span className="font-medium">Rating:</span> {selectedReview.rating}</p>
+                        </div>
+                        <div className="mt-6 text-right">
+                          <button
+                            onClick={() => {
+                              setShowReviewCard(false);
+                              setSelectedReview(null);
+                            }}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    className="text-blue-600 hover:underline font-medium"
+                    onClick={() => {
+                      setSelectedReview(coupon.review || { name: "N/A", review: "No review available", rating: "N/A" });
+                      setShowReviewCard(true);
+                    }}
+                  >
+                    see review
+                  </button>
+                </td>
                 <td className="px-6 py-4">
                   <button
                     className="text-blue-600 hover:underline font-medium"
@@ -273,8 +311,8 @@ function Coupon({ user }) {
               key={page}
               onClick={() => setCurrentPage(page)}
               className={`px-3 py-1 rounded-md border text-sm shadow ${page === currentPage
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white hover:bg-blue-50 text-gray-700'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white hover:bg-blue-50 text-gray-700'
                 }`}
             >
               {page}
