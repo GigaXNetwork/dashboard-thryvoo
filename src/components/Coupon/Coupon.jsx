@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams } from 'react-router';
 import SetCoupon from './SetCoupon';
+import CouponDetails from './CouponDetails';
 
 function Coupon({ user }) {
   const [search, setSearch] = useState('');
@@ -12,9 +13,9 @@ function Coupon({ user }) {
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [setcouponOpen, setSetCouponOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState(null);
-  const [showReviewCard, setShowReviewCard] = useState(false);
+  const [showReviewCard, setShowReviewCard] = useState({});
 
+  const [selectedReview, setSelectedReview] = useState({});
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
   const itemsPerPage = 3;
@@ -208,40 +209,44 @@ function Coupon({ user }) {
                   ? new Date(coupon.expirationDate).toLocaleDateString()
                   : ''}</td>
                 <td className="px-6 py-4 text-gray-700">
-                  {showReviewCard && selectedReview && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999]">
-                      <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-md">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-800">Review Details</h2>
-                        <div className="space-y-2 text-gray-700">
-                          <p><span className="font-medium">Name:</span> {selectedReview.name}</p>
-                          <p><span className="font-medium">Review:</span> {selectedReview.review}</p>
-                          <p><span className="font-medium">Rating:</span> {selectedReview.rating}</p>
-                        </div>
-                        <div className="mt-6 text-right">
-                          <button
-                            onClick={() => {
-                              setShowReviewCard(false);
-                              setSelectedReview(null);
-                            }}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                          >
-                            Close
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <button
                     className="text-blue-600 hover:underline font-medium"
                     onClick={() => {
-                      setSelectedReview(coupon.review || { name: "N/A", review: "No review available", rating: "N/A" });
-                      setShowReviewCard(true);
+                      setShowReviewCard(prev => ({
+                        ...prev,
+                        [coupon._id]: true,
+                      }));
+                      setSelectedReview({
+                        name: coupon.review?.name || "N/A",
+                        review: coupon.review?.review || "No review available",
+                        rating: coupon.review?.rating || "N/A",
+                        ...coupon, // optional: store full coupon data if needed
+                      });
                     }}
                   >
-                    see review
+                    See Review
                   </button>
+
+                  {showReviewCard[coupon._id] && (
+                    <CouponDetails
+                      review={coupon.review?.name || "N/A"}
+                      rating={coupon.review?.rating || "N/A"}
+                      code={coupon.code}
+                      discountType={coupon.discountType}
+                      discountAmount={coupon.discountAmount}
+                      maxDiscount={coupon.maxDiscount}
+                      minPurchase={coupon.minPurchase}
+                      expirationDate={coupon.expirationDate}
+                      usageLimit={coupon.usageLimit}
+                      usageCount={coupon.usageCount}
+                      status={coupon.status}
+                      setShowReviewCard={(visible) =>
+                        setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))
+                      }
+                    />
+                  )}
                 </td>
+
                 <td className="px-6 py-4">
                   <button
                     className="text-blue-600 hover:underline font-medium"
