@@ -45,7 +45,7 @@ function Items({role}) {
                 {step === 3 && "You're all set!"}
                 {step === 4 && "You're all set!"}
               </h2>
-              <p className="text-sm text-gray-500 mt-2">Step {step} of 5</p>
+              <p className="text-sm text-gray-500 mt-2">Step {step} of 4</p>
             </div>
 
 

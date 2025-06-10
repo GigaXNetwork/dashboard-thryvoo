@@ -112,16 +112,16 @@ function App() {
                             { path: 'card', element: <GetMyCard role={role} />},
                             { path: 'coupon', element: <Coupon user={role} /> },
                             { path: 'enquary', element: <Enquary /> },
-                            { path: 'reviews', element: <Reviews /> },
+                            { path: 'reviews', element: <Reviews role={role}/> },
                           ]
                         }
                       ]
                     },
                     { path: 'me', element: <Me /> },
                     { path: 'card', element: <Card /> },
-                    { path: 'card/:cardId', element: <ItemsWrapper /> },
-                    { path: 'coupon', element: <AllCoupon /> },
-                    { path: 'reviews', element: <Reviews /> },
+                    { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
+                    { path: 'coupon', element: <AllCoupon role={role} /> },
+                    { path: 'reviews', element: <Reviews role={role}/> },
                     { path: '/signup', element: <SignupPage /> },
                   ]
                   : [

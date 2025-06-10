@@ -52,11 +52,11 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
         console.log("social data", cleanedData);
 
         let url;
-        if(role==="admin"){
-            url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/meta`
+        if (role === "admin") {
+            url = `${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/meta`
         }
-        else{
-            url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/meta`
+        else {
+            url = `${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/meta`
         }
 
         try {
@@ -90,11 +90,20 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
         <div className="space-y-4">
 
             {/* Text Inputs */}
-            <TextInput label="videoUrl" name="videoUrl" value={formData.videoUrl} handleChange={handleChange} placeholder="youtube embed video url" />
-            <TextInput label="map" name="map" value={formData.map} handleChange={handleChange} placeholder="google map place id" />
-            <TextInput label="gplaceid" name="gplaceid" value={formData.gplaceid} handleChange={handleChange} placeholder="google map place id" />
-            <TextArea label="desc" name="desc" value={formData.desc} handleChange={handleChange} placeholder="Write a short desc..." />
-            <TextArea label="keyword" name="keyword" value={formData.keyword} handleChange={handleChange} placeholder="Write a short keyword..." />
+            <TextInput label="Video Url" name="videoUrl" value={formData.videoUrl} handleChange={handleChange} placeholder="youtube embed video url" />
+            <TextInput label="Google Map" name="map" value={formData.map} handleChange={handleChange} placeholder="google map place id" />
+            <TextInput label="Google Business Url" name="gplaceid" value={formData.gplaceid} handleChange={handleChange} placeholder="google map place id" />
+            <TextArea
+                label="Description (minimum 100 characters)"
+                name="desc"
+                value={formData.desc}
+                handleChange={handleChange}
+                placeholder="Write a short description..."
+                minLength={100}
+                showCharacterCount
+            />
+            <TextArea label="Keywords" name="keyword" value={formData.keyword} handleChange={handleChange} placeholder="Write a short keyword..." minLength={100}
+                showCharacterCount/>
 
             {/* Error */}
             {apperror && <p className="text-red-500 text-sm">{apperror}</p>}
@@ -153,18 +162,40 @@ function TextInput({ label, name, value, handleChange, placeholder }) {
     );
 }
 
-function TextArea({ label, name, value, handleChange, placeholder }) {
-    return (
-        <div>
-            <label className="block text-sm font-medium text-gray-700">{label}</label>
-            <textarea
-                name={name}
-                value={value}
-                onChange={handleChange}
-                rows={3}
-                className="mt-1 w-full border px-4 py-2 rounded-md"
-                placeholder={placeholder}
-            />
-        </div>
-    );
+function TextArea({
+  label,
+  name,
+  value,
+  handleChange,
+  placeholder,
+  minLength = 0,
+  showCharacterCount = false,
+}) {
+  const charCount = value.length;
+  const isNearMin = charCount < minLength;
+
+  return (
+    <div className="mb-4">
+      {label && (
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+      )}
+      <textarea
+        id={name}
+        name={name}
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        rows={5}
+        minLength={minLength}
+      />
+      {showCharacterCount && (
+        <p className="text-sm mt-1 text-gray-500">
+          {charCount} / {minLength} characters
+        </p>
+      )}
+    </div>
+  );
 }

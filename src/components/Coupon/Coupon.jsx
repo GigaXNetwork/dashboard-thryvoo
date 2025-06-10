@@ -204,7 +204,9 @@ function Coupon({ user }) {
                 <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 font-medium text-gray-900">{coupon.code}</td>
                 <td className="px-6 py-4 capitalize">{coupon.status}</td>
-                <td className="px-6 py-4 text-gray-700">{new Date(coupon.expirationDate).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-gray-700">{coupon.expirationDate
+                  ? new Date(coupon.expirationDate).toLocaleDateString()
+                  : ''}</td>
                 <td className="px-6 py-4 text-gray-700">
                   {showReviewCard && selectedReview && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999]">

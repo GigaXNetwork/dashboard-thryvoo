@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams } from 'react-router';
 
 function Reviews({ role }) {
+  const { userId } = useParams(); // ✅ moved to top-level
   const [search, setSearch] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
   const [reviews, setReviews] = useState([]);
@@ -11,7 +12,7 @@ function Reviews({ role }) {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -26,12 +27,14 @@ function Reviews({ role }) {
         if (ratingFilter) params.rating = ratingFilter;
 
         let apiUrl;
-        if (role === "admin") {
-          const { userId } = useParams()
-          apiUrl = `${import.meta.env.VITE_API_URL}/api/admin/reviews?user=${userId}`
-        }
-        else {
-          apiUrl = `${import.meta.env.VITE_API_URL}/api/user/myreviews`
+
+        if (role === 'admin') {
+          apiUrl = `${import.meta.env.VITE_API_URL}/api/admin/reviews`;
+          if (userId) {
+            params.user = userId;
+          }
+        } else {
+          apiUrl = `${import.meta.env.VITE_API_URL}/api/user/myreviews`;
         }
 
         const res = await axios.get(apiUrl, {
@@ -50,7 +53,7 @@ function Reviews({ role }) {
 
     const timeout = setTimeout(fetchReviews, 300);
     return () => clearTimeout(timeout);
-  }, [search, ratingFilter, currentPage]);
+  }, [search, ratingFilter, currentPage, role, userId]); // make sure to include dependencies
 
   const getPaginationRange = () => {
     const range = [];
@@ -103,7 +106,6 @@ function Reviews({ role }) {
         </div>
       ) : (
         <>
-          {/* Scrollable Table Container */}
           <div className="overflow-x-auto rounded-lg shadow ring-1 ring-black ring-opacity-5">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50 sticky top-0 z-10">
@@ -127,16 +129,15 @@ function Reviews({ role }) {
                   </tr>
                 ) : (
                   reviews.map((review) => (
-                    <tr
-                      key={review._id}
-                      className="hover:bg-blue-50 transition-colors duration-200"
-                    >
+                    <tr key={review._id} className="hover:bg-blue-50 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{review.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-700">{review.phone}</td>
                       <td className="px-6 py-4 max-w-xs break-words text-gray-700">{review.email}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-yellow-500 font-semibold">{review.rating} ★</td>
                       <td className="px-6 py-4 max-w-xs break-words text-gray-800">{review.review}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                        {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : '—'}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -163,8 +164,8 @@ function Reviews({ role }) {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`px-4 py-1 rounded-md border text-sm shadow min-w-[36px] ${page === currentPage
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white hover:bg-blue-50 text-gray-700 border-gray-300'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white hover:bg-blue-50 text-gray-700 border-gray-300'
                     }`}
                   aria-current={page === currentPage ? 'page' : undefined}
                 >
