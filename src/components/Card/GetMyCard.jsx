@@ -14,8 +14,6 @@ function GetMyCard({ role }) {
   const [cardUrl, setcardUrl] = useState();
   const [activeTab, setActiveTab] = useState("card");
 
-  console.log("user card ", userId);
-
 
   let url;
   if (role === "admin") {
@@ -40,7 +38,7 @@ function GetMyCard({ role }) {
           },
           credentials: "include",
         });
-        console.log(response);
+
 
         if (response.status === 404) {
           setCard(null);
@@ -60,7 +58,7 @@ function GetMyCard({ role }) {
 
     fetchCard();
   }, [userId]);
-  console.log(card);
+
 
   const handleCreateCard = () => {
     // Navigate to card creation page or open modal
@@ -69,7 +67,6 @@ function GetMyCard({ role }) {
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
-  console.log("card ", card);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

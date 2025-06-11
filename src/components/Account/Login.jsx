@@ -127,11 +127,11 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-        <div className="my-4 flex items-center justify-between">
+        {/* <div className="my-4 flex items-center justify-between">
           <span className="w-full border-t border-gray-300"></span>
           <span className="px-3 text-gray-500 text-sm">or</span>
           <span className="w-full border-t border-gray-300"></span>
-        </div>
+        </div> */}
         {/* <button
           onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-50 transition duration-200"
@@ -139,12 +139,12 @@ export default function LoginPage() {
           <FcGoogle className="text-xl" />
           <span className="text-sm font-medium text-gray-700">Login with Google</span>
         </button> */}
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <span className="text-sm text-gray-600">Don't have an account? </span>
           <Link to="/signup" className="text-sm text-blue-600 hover:underline">
             Create one
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );
