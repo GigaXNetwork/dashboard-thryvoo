@@ -59,12 +59,6 @@ const Me = () => {
             )}
 
             <div className="user-content min-h-28 max-w-screen-lg mx-auto">
-                <TopNav
-                    Maintitle="Menu"
-                    title="Menu"
-                    navLinks={[{ label: "home", path: "/" }]}
-                />
-
 
                 {/* account information */}
                 <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
@@ -95,7 +89,7 @@ const Me = () => {
                                 <ChevronRight className="w-5 h-5 text-primary" />
                             </div>
                         </div>
-                        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
+                        {/* <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center  gap-4 flex-wrap">
                                 <span className="text-gray-600 flex-1 basis-[100px]">Phone</span>
                                 <span className="text-gray-800 font-medium flex-1 basis-[100px]">{userData.user.phone}</span>
@@ -103,7 +97,7 @@ const Me = () => {
                             <div className="pl-4">
                                 <ChevronRight className="w-5 h-5 text-primary" onClick={() => setIsPhoneForm(true)} />
                             </div>
-                        </div>
+                        </div> */}
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <span className="text-gray-600 flex-1 basis-[100px]">Company</span>
@@ -127,7 +121,7 @@ const Me = () => {
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <span className="text-gray-600 flex-1 basis-[100px]">Email</span>
-                                <span className="text-gray-800 font-medium flex-1 basis-[100px]">debashishmeher955@gmail.com</span>
+                                <span className="text-gray-800 font-medium flex-1 basis-[100px]">{userData.user.email}</span>
                             </div>
                             <div className="pl-4">
                                 <ChevronRight className="w-5 h-5 text-primary" />
@@ -155,7 +149,7 @@ const Me = () => {
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <span className="text-gray-600 flex-1 basis-[100px]">Member since</span>
                                 <span className="text-gray-800 font-medium flex-1 basis-[100px]">
-                                    2024-03-20 20:36</span>
+                                    {new Date(userData.user.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div className="pl-4">
                                 <ChevronRight className="w-5 h-5 text-primary" />
@@ -165,7 +159,7 @@ const Me = () => {
                 </div>
 
                 {/* account setting */}
-                <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
+                {/* <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
                     <div className="flex items-center gap-4 mb-4 ">
                         <IoShareSocialOutline className="text-purple-500 text-xl" />
                         <h2 className="text-base font-semibold">Google Login</h2>
@@ -182,22 +176,22 @@ const Me = () => {
                         </div>
 
                     </div>
-                </div>
+                </div> */}
 
 
                 {/* social media tabs */}
                 <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
 
-                    {/* table head */}
+                    {/* table head
                     <div className="flex items-center gap-4 mb-4 ">
                         <IoShareSocialOutline className="text-purple-500 text-xl" />
                         <h2 className="text-base font-semibold">social media</h2>
                     </div>
 
-                    {/* body */}
+                    
                     <div className="divide-y divide-gray-200">
 
-                        {/* face book */}
+                        
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2 flex-1 basis-[100px]">
@@ -215,7 +209,7 @@ const Me = () => {
                             </div>
                         </div>
 
-                        {/* whatsapp */}
+                        
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2 flex-1 basis-[100px]">
@@ -233,7 +227,7 @@ const Me = () => {
                             </div>
                         </div>
 
-                        {/* instagram */}
+                        
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2 flex-1 basis-[100px]">
@@ -251,7 +245,7 @@ const Me = () => {
                             </div>
                         </div>
 
-                        {/* youtube */}
+                       
                         <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
                             <div className="flex-1 flex items-center gap-4 flex-wrap">
                                 <div className="flex items-center bg-gray-100 rounded-xl px-4 py-2 flex-1 basis-[100px]">
@@ -267,10 +261,10 @@ const Me = () => {
                                     Submit
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* meta setting */}
-                        <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
+                        {/* <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
                             <div className="flex items-center gap-4 mb-4 ">
                                 <VscSymbolKeyword className="text-purple-500 text-xl" />
                                 <h2 className="text-base font-semibold">meta data</h2>
@@ -278,7 +272,7 @@ const Me = () => {
 
 
                             <div className="divide-y divide-gray-200">
-                                {/* Meta data field */}
+                                
                                 <div className="flex flex-col gap-2 px-2">
                                     <label htmlFor="metadata" className="text-base font-semibold py-2">Meta keywords</label>
                                     <p className="text-sm text-gray-500 divide-y py-2 divide-gray-200">
@@ -297,7 +291,7 @@ const Me = () => {
                             </div>
 
                             <div className="divide-y divide-gray-200">
-                                {/* Meta data field */}
+                                
                                 <div className="flex flex-col gap-2 px-2">
                                     <label htmlFor="metadata" className="text-sm text-gray-700 font-medium py-2">Meta description</label>
                                     <textarea
@@ -311,11 +305,11 @@ const Me = () => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
                             <div className="flex items-center gap-4 mb-4 ">
                                 <VscSymbolKeyword className="text-purple-500 text-xl" />
-                                <h2 className="text-base font-semibold">meta data</h2>
+                                <h2 className="text-base font-semibold">Account Control</h2>
                             </div>
                             <div className="divide-y divide-gray-200"></div>
                             <p className="text-sm text-gray-500 divide-y py-4 divide-gray-200">
@@ -332,7 +326,7 @@ const Me = () => {
 
 
 
-        </div>
+        // </div>
 
     );
 };
