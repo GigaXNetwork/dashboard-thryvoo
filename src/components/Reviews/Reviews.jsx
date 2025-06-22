@@ -12,7 +12,7 @@ function Reviews({ role }) {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 3;
 
   useEffect(() => {
     const fetchReviews = async () => {

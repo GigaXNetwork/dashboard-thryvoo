@@ -129,7 +129,7 @@ function App() {
                     { path: 'me', element: <Me /> },
                     { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
-                    { path: 'coupon', element: <Coupon /> },
+                    { path: 'coupon', element: <Coupon user={role}/> },
                     { path: 'reviews', element: <Reviews role={role}/> },
                   ],
             },

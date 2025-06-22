@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react'; // Using lucide-react for the close icon
+import { useParams } from 'react-router';
 
-const SetCoupon = ({ onClose }) => {
+const SetCoupon = ({ onClose,user }) => {
+    console.log("this is coupon section",user);
+    
     const [form, setForm] = useState({
         discountType: 'percentage',
         discountAmount: '',
@@ -28,12 +31,26 @@ const SetCoupon = ({ onClose }) => {
             day: '',
             usageLimit: ''
         });
-    };
+    }
+
+    let geturl;
+    let seturl
+    if(user=== "admin"){
+        const { userId }=useParams()
+        geturl=`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/getDiscount`
+        seturl=`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/setDiscount`
+    }
+    else{
+        console.log("callled");
+        
+        geturl=`${import.meta.env.VITE_API_URL}/api/user/getCoupon`
+        seturl=`${import.meta.env.VITE_API_URL}/api/user/setCoupon`
+    }
 
     useEffect(() => {
         const fetchCoupon = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/getCoupon`, {
+                const res = await fetch(geturl, {
                     credentials: 'include'
                 });
                 if (res.ok) {
@@ -67,7 +84,7 @@ const SetCoupon = ({ onClose }) => {
         setMessage('');
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/setCoupon`, {
+            const res = await fetch(seturl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

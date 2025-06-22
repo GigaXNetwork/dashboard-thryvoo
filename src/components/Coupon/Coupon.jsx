@@ -127,14 +127,14 @@ function Coupon({ user }) {
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Coupon Management</h1>
 
       <div className="flex justify-end mb-4">
-        {user !== 'admin' && (
+        
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
             onClick={() => setSetCouponOpen(true)}
           >
             Set Coupon
           </button>
-        )}
+
       </div>
 
       <div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">
@@ -337,7 +337,7 @@ function Coupon({ user }) {
       </div>
 
       {
-        setcouponOpen && user !== "admin" && <SetCoupon onClose={() => setSetCouponOpen(false)} />
+        setcouponOpen && <SetCoupon onClose={() => setSetCouponOpen(false)} user={user} />
       }
     </div>
   );
