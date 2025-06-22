@@ -91,7 +91,7 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
 
             {/* Text Inputs */}
             <TextInput label="Video Url" name="videoUrl" value={formData.videoUrl} handleChange={handleChange} placeholder="youtube embed video url" />
-            <TextInput label="Google Map" name="map" value={formData.map} handleChange={handleChange} placeholder="google map place id" />
+            <TextInput label="Google Map" name="map" value={formData.map} handleChange={handleChange} placeholder="google map url" />
             <TextInput label="Google Business Url" name="gplaceid" value={formData.gplaceid} handleChange={handleChange} placeholder="google map place id" />
             <TextArea
                 label="Description (minimum 100 characters)"
