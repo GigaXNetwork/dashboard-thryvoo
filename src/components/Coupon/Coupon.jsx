@@ -18,7 +18,7 @@ function Coupon({ user }) {
   const [selectedReview, setSelectedReview] = useState({});
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
   let apiUrl;
   if (user === "admin") {
     const { userId } = useParams()
