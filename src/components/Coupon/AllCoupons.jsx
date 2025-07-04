@@ -6,8 +6,8 @@ function AllCoupon() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [coupons, setCoupons] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [coupons, setCoupons] = useState([]);
     const [selectedReview, setSelectedReview] = useState(null);
     const [showReviewCard, setShowReviewCard] = useState(false);
 

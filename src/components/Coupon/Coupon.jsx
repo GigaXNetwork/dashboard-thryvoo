@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useParams } from 'react-router';
-import SetCoupon from './SetCoupon';
+import { Link, NavLink, useParams } from 'react-router';
 import CouponDetails from './CouponDetails';
 
 function Coupon({ user }) {
@@ -12,8 +11,11 @@ function Coupon({ user }) {
   const [coupons, setCoupons] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [setcouponOpen, setSetCouponOpen] = useState(false);
+
   const [showReviewCard, setShowReviewCard] = useState({});
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
 
   const [selectedReview, setSelectedReview] = useState({});
   const [selectedCoupon, setSelectedCoupon] = useState(null);
@@ -37,6 +39,8 @@ function Coupon({ user }) {
 
         if (search.trim()) params.code = search.trim();
         if (statusFilter) params.status = statusFilter;
+        if (startDate) params.startDate = startDate;
+        if (endDate) params.endDate = endDate;
 
         const res = await axios.get(apiUrl, {
           params,
@@ -123,28 +127,29 @@ function Coupon({ user }) {
   const paginationRange = getPaginationRange();
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Coupon Management</h1>
+    <div className="container p-2 sm:p-4 md:p-6 w-full mx-auto">
 
-      <div className="flex justify-end mb-4">
-        
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
-            onClick={() => setSetCouponOpen(true)}
-          >
-            Set Coupon
-          </button>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">Coupon Management</h1>
 
+      <div className="flex flex-col sm:flex-row justify-end mb-4 gap-2 sm:gap-0">
+
+        <NavLink
+          to="/coupon/presets"
+          className="w-full sm:w-auto px-4 sm:px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-shadow shadow-md text-center"
+        >
+          Set Coupon
+        </NavLink>
       </div>
 
-      <div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">
-        <div className="relative w-full sm:w-64">
+      <div className="bg-white rounded-xl p-2 sm:p-4 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6 items-center">
+        {/* Search */}
+        <div className="relative col-span-1 sm:col-span-2">
           <input
             type="text"
             placeholder="Search by code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
           />
           <svg
             className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
@@ -161,11 +166,12 @@ function Coupon({ user }) {
           </svg>
         </div>
 
-        <div className="relative w-full sm:w-52">
+        {/* Filter */}
+        <div className="relative col-span-1 sm:col-span-1">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all appearance-none"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all appearance-none text-sm"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -185,42 +191,53 @@ function Coupon({ user }) {
             />
           </svg>
         </div>
+
+        {/* Date Range Filters */}
+        <div className="col-span-1 sm:col-span-1 grid grid-cols-2 gap-2">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Start date"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="End date"
+          />
+        </div>
+
       </div>
 
-      <div className="overflow-x-auto rounded-lg shadow">
-        <table className="min-w-full text-sm text-left bg-white">
+      {/* Table */}
+      <div className="max-w-[100%] overflow-x-auto rounded-lg shadow custom-scrollbar min-w-0">
+        <table className="min-w-[600px] sm:min-w-[800px] w-full text-sm text-left bg-white">
           <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
             <tr>
-              <th className="px-6 py-3">Sl. No</th>
-              <th className="px-6 py-3">Code</th>
-              <th className="px-6 py-3">Status</th>
-              <th className="px-6 py-3">Expiration Date</th>
-              <th className="px-6 py-3">View Review</th>
-              <th className="px-6 py-3">Manage</th>
+              {["Sl. No", "Code", "Status", "Expiration Date", "View Review", "Manage"].map((heading, i) => (
+                <th key={i} className="px-3 sm:px-6 py-3 whitespace-nowrap">{heading}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {coupons.map((coupon, index) => (
-              <tr key={coupon._id} className="border-b hover:bg-gray-50">
-                <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="px-6 py-4 font-medium text-gray-900">{coupon.code}</td>
-                <td className="px-6 py-4 capitalize">{coupon.status}</td>
-                <td className="px-6 py-4 text-gray-700">{coupon.expirationDate
-                  ? new Date(coupon.expirationDate).toLocaleDateString()
-                  : ''}</td>
-                <td className="px-6 py-4 text-gray-700">
+              <tr key={coupon._id} className="border-b hover:bg-gray-50 transition">
+                <td className="px-3 sm:px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td className="px-3 sm:px-6 py-4 font-medium text-gray-900 break-all">{coupon.code}</td>
+                <td className="px-3 sm:px-6 py-4 capitalize">{coupon.status}</td>
+                <td className="px-3 sm:px-6 py-4 text-gray-700">{coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : ''}</td>
+                <td className="px-3 sm:px-6 py-4 text-blue-600 hover:underline cursor-pointer font-medium">
                   <button
-                    className="text-blue-600 hover:underline font-medium"
                     onClick={() => {
-                      setShowReviewCard(prev => ({
-                        ...prev,
-                        [coupon._id]: true,
-                      }));
+                      setShowReviewCard(prev => ({ ...prev, [coupon._id]: true }));
                       setSelectedReview({
                         name: coupon.review?.name || "N/A",
                         review: coupon.review?.review || "No review available",
                         rating: coupon.review?.rating || "N/A",
-                        ...coupon, // optional: store full coupon data if needed
+                        ...coupon,
                       });
                     }}
                   >
@@ -246,13 +263,12 @@ function Coupon({ user }) {
                     />
                   )}
                 </td>
-
-                <td className="px-6 py-4">
+                <td className="px-3 sm:px-6 py-4">
                   <button
                     className="text-blue-600 hover:underline font-medium"
                     onClick={() => handleRedeemClick(coupon)}
                   >
-                    redeem
+                    Redeem
                   </button>
                 </td>
               </tr>
@@ -261,17 +277,49 @@ function Coupon({ user }) {
         </table>
       </div>
 
+      {/* Pagination */}
+      <div className="flex flex-wrap justify-center mt-4 sm:mt-6 gap-1 sm:gap-2">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          disabled={currentPage === 1}
+          className="p-2 rounded border bg-white shadow disabled:opacity-40 hover:bg-gray-50"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
 
-      {/* Redeem Dialog */}
+        {paginationRange.map((page, idx) =>
+          typeof page === "string" ? (
+            <span key={idx} className="px-2 sm:px-3 py-1 text-gray-500 select-none">…</span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-2 sm:px-3 py-1 rounded-md border text-sm shadow ${page === currentPage ? "bg-blue-600 text-white" : "bg-white hover:bg-blue-50 text-gray-700"
+                }`}
+            >
+              {page}
+            </button>
+          )
+        )}
+
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="p-2 rounded border bg-white shadow disabled:opacity-40 hover:bg-gray-50"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Dialog */}
       {dialogOpen && selectedCoupon && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md mx-auto">
             <h2 className="text-lg font-semibold mb-4">Redeem Coupon</h2>
-            <div className="mb-4">
-              <div className="mb-2"><span className="font-medium">Code:</span> {selectedCoupon.code}</div>
-              <div className="mb-2"><span className="font-medium">Status:</span> {selectedCoupon.status}</div>
-              <div className="mb-2"><span className="font-medium">Expiration Date:</span> {selectedCoupon.expirationDate}</div>
-              {/* Add more fields if needed */}
+            <div className="mb-4 space-y-2 text-sm">
+              <p><strong>Code:</strong> {selectedCoupon.code}</p>
+              <p><strong>Status:</strong> {selectedCoupon.status}</p>
+              <p><strong>Expiration:</strong> {selectedCoupon.expirationDate}</p>
             </div>
             <div className="flex justify-end gap-2">
               <button
@@ -291,55 +339,10 @@ function Coupon({ user }) {
         </div>
       )}
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-6 space-x-2 items-center">
-        <button
-          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-          disabled={currentPage === 1}
-          className="p-2 rounded-md border bg-white shadow disabled:opacity-50"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+      {/* Set Coupon */}
 
-        {paginationRange.map((page, idx) => {
-          if (page === 'left-ellipsis' || page === 'right-ellipsis') {
-            return (
-              <span
-                key={page + idx}
-                className="px-3 py-1 text-gray-500 select-none"
-              >
-                ...
-              </span>
-            );
-          }
-
-          return (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 rounded-md border text-sm shadow ${page === currentPage
-                ? 'bg-blue-600 text-white'
-                : 'bg-white hover:bg-blue-50 text-gray-700'
-                }`}
-            >
-              {page}
-            </button>
-          );
-        })}
-
-        <button
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="p-2 rounded-md border bg-white shadow disabled:opacity-50"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-
-      {
-        setcouponOpen && <SetCoupon onClose={() => setSetCouponOpen(false)} user={user} />
-      }
     </div>
+
   );
 }
 

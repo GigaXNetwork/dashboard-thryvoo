@@ -33,6 +33,7 @@ import GetMyCard from './components/Card/GetMyCard';
 import LoadingAnimation from './components/Common/LoadingAnimation';
 import AllCoupon from './components/Coupon/AllCoupons';
 import MyProfile from './components/User/MyProfile';
+import SetDiscountPage from './components/Coupon/SetDiscountPage';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -130,6 +131,7 @@ function App() {
                     { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
                     { path: 'coupon', element: <Coupon user={role}/> },
+                    { path: 'coupon/presets', element: <SetDiscountPage role={role} /> },
                     { path: 'reviews', element: <Reviews role={role}/> },
                   ],
             },

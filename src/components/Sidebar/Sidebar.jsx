@@ -12,7 +12,15 @@ import "./Sidebar.css";
 const menuItems = [
   { to: "/", icon: <IoHomeOutline />, label: "Home" },
   { to: "/card", icon: <FaAddressCard />, label: "Card" },
-  { to: "/coupon", icon: <RiCoupon2Fill/>, label: "Coupons" },
+  {
+    to: "/coupon",
+    icon: <RiCoupon2Fill />,
+    label: "Coupons",
+    subItems: [
+      { to: "/coupon", label: "All Coupons" },
+      { to: "/coupon/presets", label: "All Presets" },
+    ],
+  },
   { to: "/reviews", icon: <FaStar />, label: "Reviews" },
 ];
 
@@ -21,7 +29,7 @@ function Sidebar({ onToggleSidebar }) {
 
   const toggleHandler = () => {
     console.log("Toggle Sidebar");
-    
+
     if (window.innerWidth < 750) {
       onToggleSidebar();
     }
@@ -35,9 +43,9 @@ function Sidebar({ onToggleSidebar }) {
     toggleHandler(); // always close sidebar on menu item click (mobile)
   };
 
-    const handleLogout = async () => {
-     Cookies.remove('authToken');
-     window.location.href = "/login";
+  const handleLogout = async () => {
+    Cookies.remove('authToken');
+    window.location.href = "/login";
   };
 
   return (
@@ -49,8 +57,7 @@ function Sidebar({ onToggleSidebar }) {
               to={item.to}
               onClick={(e) => handleMenuClick(item, e)}
               className={({ isActive }) =>
-                `flex items-center justify-between px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all ${
-                  isActive ? "bg-violet-100 text-violet-700" : "text-gray-800 hover:bg-gray-100"
+                `flex items-center justify-between px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all ${isActive ? "bg-violet-100 text-violet-700" : "text-gray-800 hover:bg-gray-100"
                 }`
               }
             >
@@ -61,9 +68,8 @@ function Sidebar({ onToggleSidebar }) {
 
               {item.subItems && (
                 <FiChevronDown
-                  className={`transform transition-transform duration-300 ${
-                    openMenu === item.to ? "rotate-180" : ""
-                  }`}
+                  className={`transform transition-transform duration-300 ${openMenu === item.to ? "rotate-180" : ""
+                    }`}
                 />
               )}
             </NavLink>
@@ -76,8 +82,7 @@ function Sidebar({ onToggleSidebar }) {
                     to={sub.to}
                     onClick={toggleHandler}
                     className={({ isActive }) =>
-                      `text-sm px-3 py-1 rounded-md transition ${
-                        isActive ? "bg-violet-50 text-violet-700" : "text-gray-600 hover:bg-gray-100"
+                      `text-sm px-3 py-1 rounded-md transition ${isActive ? "bg-violet-50 text-violet-700" : "text-gray-600 hover:bg-gray-100"
                       }`
                     }
                   >
