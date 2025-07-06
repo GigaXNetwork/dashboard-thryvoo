@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { X } from 'lucide-react';
+import MessagePopup from '../Common/MessagePopup';
 
 const SetDiscountPage = ({ user }) => {
     const [presets, setPresets] = useState([]);
@@ -176,7 +177,7 @@ const SetDiscountPage = ({ user }) => {
     const handleToggleActive = async (preset) => {
         try {
             let toggleUrl;
-            if(user=== "admin"){
+            if (user === "admin") {
                 toggleUrl = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/setActive`;
             } else {
                 toggleUrl = `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/setActive`;
@@ -216,7 +217,7 @@ const SetDiscountPage = ({ user }) => {
             maxDiscount: preset.maxDiscount || '',
             minPurchase: preset.minPurchase || '',
             day: preset.day || '',
-            usageLimit: preset.usageLimit || ''
+            usageLimit: preset.usageLimit || '',
         });
 
         setIsEditing(true);
@@ -227,7 +228,14 @@ const SetDiscountPage = ({ user }) => {
 
     return (
         <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md min-h-screen">
-            <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Discount Presets</h1>
+
+
+
+            {message && (
+                <MessagePopup message={message} type={`${message.includes('✅') ? 'success' : 'error'}`} onClose={() => setMessage('')} />
+            )}
+
+            <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Coupon Presets</h1>
             <div className="flex justify-end mb-6">
                 <button
                     onClick={() => setShowForm(true)}
@@ -319,10 +327,11 @@ const SetDiscountPage = ({ user }) => {
                                 {[
                                     { label: "Type", value: preset.discountType },
                                     { label: "Amount/Offer", value: preset.discountAmount },
-                                    { label: "Max Discount", value: preset.maxDiscount },
-                                    { label: "Min Purchase", value: preset.minPurchase },
-                                    { label: "Valid Days", value: preset.day },
-                                    { label: "Usage Limit", value: preset.usageLimit },
+                                    { label: "Max Discount", value: preset.maxDiscount || "N/A" },
+                                    { label: "Min Purchase", value: preset.minPurchase || "N/A" },
+                                    { label: "Valid Days", value: preset.day || "N/A" },
+                                    { label: "Usage Limit", value: preset.usageLimit || "N/A" },
+                                    { label: "Created At", value: preset?.createdAt ? new Date(preset.createdAt).toLocaleDateString() : 'N/A' },
                                 ].map((item, idx) => (
                                     <div
                                         key={idx}
@@ -413,7 +422,6 @@ const SetDiscountPage = ({ user }) => {
                                 id={name}
                                 name={name}
                                 type={type}
-                                required
                                 value={form[name]}
                                 onChange={handleChange}
                                 placeholder={`Enter ${label}`}
@@ -425,14 +433,7 @@ const SetDiscountPage = ({ user }) => {
                     ))}
 
                     {/* Status Message */}
-                    {message && (
-                        <p
-                            className={`text-center text-sm font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-500'
-                                }`}
-                        >
-                            {message}
-                        </p>
-                    )}
+
 
                     <div className="flex items-center justify-between gap-4">
                         <button
