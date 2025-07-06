@@ -10,7 +10,7 @@ function UserCard({name, profile, email, id}) {
         loading="lazy"
         draggable={false}
       />
-      <h2 className="text-xl font-semibold mb-1">{name}</h2>
+      <h2 className="text-xl font-semibold mb-1 capitalize">{name}</h2>
       <p className="text-gray-500 mb-4 max-w-[250px] mx-auto break-words ">{email}</p>
       <Link to={`/user/${id}`}
         type="button"

@@ -26,6 +26,9 @@ function Main({user}) {
     return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, []);
 
+  console.log("main",user);
+  
+
   return (
     <main className="main">
       <Header onToggleSidebar={toggleSidebar} />

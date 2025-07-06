@@ -170,6 +170,7 @@ function AllCoupon() {
             <tr>
               <th className="px-6 py-3">Sl. No</th>
               <th className="px-6 py-3">Code</th>
+              <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Expiration Date</th>
               <th className="px-6 py-3">Manage</th>
@@ -180,6 +181,7 @@ function AllCoupon() {
               <tr key={coupon._id} className="border-b hover:bg-gray-50">
                 <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 font-medium text-gray-900">{coupon.code}</td>
+                <td className="px-6 py-4 font-medium text-gray-900 capitalize">{coupon.review?.name || "N/A"}</td>
                 <td className="px-6 py-4 capitalize">{coupon.status}</td>
                 <td className="px-6 py-4 text-gray-700">{coupon.expirationDate
                   ? new Date(coupon.expirationDate).toLocaleDateString()
@@ -191,7 +193,7 @@ function AllCoupon() {
                         <h2 className="text-xl font-semibold mb-4 text-gray-800">Review Details</h2>
                         <div className="space-y-2 text-gray-700">
                           <p><span className="font-medium">Name:</span> {selectedReview.name}</p>
-                          <p><span className="font-medium">Review:</span> {selectedReview.review}</p>
+                          <p><span className="font-medium">Review:</span> {selectedReview.review || "N/A"}</p>
                           <p><span className="font-medium">Rating:</span> {selectedReview.rating}</p>
                         </div>
                         <div className="mt-6 text-right">
@@ -216,7 +218,7 @@ function AllCoupon() {
                       setShowReviewCard(true);
                     }}
                   >
-                    see review
+                    See Review
                   </button>
                 </td>
               </tr>

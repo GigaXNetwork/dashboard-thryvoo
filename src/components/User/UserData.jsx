@@ -70,7 +70,7 @@ function UserData() {
             loading="lazy"
             draggable={false}
           />
-          <h2 className="text-xl font-semibold mb-1">{user.name}</h2>
+          <h2 className="text-xl font-semibold mb-1 capitalize">{user.name}</h2>
           <p className="text-gray-500 mb-4 break-words">{user.email}</p>
 
           <div className="space-y-2">

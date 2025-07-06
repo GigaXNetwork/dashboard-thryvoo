@@ -4,7 +4,7 @@ import Header from "../Header/Header";
 import Sidebar from "../Sidebar/Sidebar";
 import { Outlet } from "react-router";
 
-function Admin() {
+function Admin({user}) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 750);
 
   // Toggle function for sidebar
@@ -35,7 +35,7 @@ function Admin() {
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <Sidebar isSidebarOpen={isSidebarOpen} onToggleSidebar={toggleSidebar}/>
+          <Sidebar isSidebarOpen={isSidebarOpen} onToggleSidebar={toggleSidebar} user={user}/>
         </div>
         <div
           className={`content flex-1 transition-all duration-300 ${

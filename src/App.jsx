@@ -90,7 +90,7 @@ function App() {
       path: '/',
       element: isAuthenticated ? (
         <UserProvider>
-          {role === 'admin' ? <Admin /> : <Main />}
+          {role === 'admin' ? <Admin user={role}/> : <Main user={role}/>}
         </UserProvider>
       ) : (
         <Login />
@@ -112,6 +112,7 @@ function App() {
                             { path: '', element: <MyProfile role={role} />},
                             { path: 'card', element: <GetMyCard role={role} />},
                             { path: 'coupon', element: <Coupon user={role} /> },
+                            { path: 'presets', element: <SetDiscountPage user={role} /> },
                             { path: 'enquary', element: <Enquary /> },
                             { path: 'reviews', element: <Reviews role={role}/> },
                           ]
@@ -131,7 +132,7 @@ function App() {
                     { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
                     { path: 'coupon', element: <Coupon user={role}/> },
-                    { path: 'coupon/presets', element: <SetDiscountPage role={role} /> },
+                    { path: 'presets', element: <SetDiscountPage role={role} /> },
                     { path: 'reviews', element: <Reviews role={role}/> },
                   ],
             },

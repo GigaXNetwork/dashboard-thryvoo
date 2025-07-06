@@ -22,8 +22,8 @@ function Coupon({ user }) {
 
   const itemsPerPage = 10;
   let apiUrl;
+  const { userId } = useParams()
   if (user === "admin") {
-    const { userId } = useParams()
     apiUrl = `${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
   }
   else {
@@ -134,7 +134,7 @@ function Coupon({ user }) {
       <div className="flex flex-col sm:flex-row justify-end mb-4 gap-2 sm:gap-0">
 
         <NavLink
-          to="/coupon/presets"
+          to={user === "admin" ? `/user/${userId}/presets` : "/presets"}
           className="w-full sm:w-auto px-4 sm:px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-shadow shadow-md text-center"
         >
           Set Coupon
@@ -217,7 +217,7 @@ function Coupon({ user }) {
         <table className="min-w-[600px] sm:min-w-[800px] w-full text-sm text-left bg-white">
           <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
             <tr>
-              {["Sl. No", "Code", "Status", "Expiration Date", "View Review", "Manage"].map((heading, i) => (
+              {["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Review", "Manage"].map((heading, i) => (
                 <th key={i} className="px-3 sm:px-6 py-3 whitespace-nowrap">{heading}</th>
               ))}
             </tr>
@@ -227,6 +227,7 @@ function Coupon({ user }) {
               <tr key={coupon._id} className="border-b hover:bg-gray-50 transition">
                 <td className="px-3 sm:px-6 py-4">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-3 sm:px-6 py-4 font-medium text-gray-900 break-all">{coupon.code}</td>
+                <td className="px-3 sm:px-6 py-4 font-medium text-gray-900 break-all capitalize">{coupon.review?.name || "N/A"}</td>
                 <td className="px-3 sm:px-6 py-4 capitalize">{coupon.status}</td>
                 <td className="px-3 sm:px-6 py-4 text-gray-700">{coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : ''}</td>
                 <td className="px-3 sm:px-6 py-4 text-blue-600 hover:underline cursor-pointer font-medium">

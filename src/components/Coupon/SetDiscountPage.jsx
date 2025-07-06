@@ -175,7 +175,12 @@ const SetDiscountPage = ({ user }) => {
     // set active status
     const handleToggleActive = async (preset) => {
         try {
-            const toggleUrl = `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/setActive`;
+            let toggleUrl;
+            if(user=== "admin"){
+                toggleUrl = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/setActive`;
+            } else {
+                toggleUrl = `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/setActive`;
+            }
             const res = await fetch(toggleUrl, {
                 method: 'PATCH', // Assuming PATCH is used for partial updates
                 credentials: 'include',
@@ -228,7 +233,7 @@ const SetDiscountPage = ({ user }) => {
                     onClick={() => setShowForm(true)}
                     className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
                 >
-                    + Create Preset
+                    + Create Coupon
                 </button>
             </div>
 
@@ -313,7 +318,7 @@ const SetDiscountPage = ({ user }) => {
                             <div className="text-sm text-gray-700">
                                 {[
                                     { label: "Type", value: preset.discountType },
-                                    { label: "Amount", value: preset.discountAmount },
+                                    { label: "Amount/Offer", value: preset.discountAmount },
                                     { label: "Max Discount", value: preset.maxDiscount },
                                     { label: "Min Purchase", value: preset.minPurchase },
                                     { label: "Valid Days", value: preset.day },
@@ -324,7 +329,7 @@ const SetDiscountPage = ({ user }) => {
                                         className="flex items-center justify-between py-2 border-b hover:bg-muted transition-colors"
                                     >
                                         <span className="font-medium text-gray-600">{item.label}:</span>
-                                        <span>{item.value}</span>
+                                        <span className='capitalize'>{item.value}</span>
                                     </div>
                                 ))}
                             </div>
@@ -391,9 +396,11 @@ const SetDiscountPage = ({ user }) => {
 
                     {/* Inputs */}
                     {[
-                        { label: 'Preset Name', name: 'presetName', type: 'text' },
-                        { label: 'Discount Amount', name: 'discountAmount', type: form.discountType === 'custom' ? 'text' : 'number' },
-                        { label: 'Max Discount', name: 'maxDiscount', type: 'number' },
+                        { label: 'Coupon Name', name: 'presetName', type: 'text' },
+                        { label: 'Discount Amount/Offer', name: 'discountAmount', type: form.discountType === 'custom' ? 'text' : 'number' },
+                        ...(form.discountType !== 'custom' ? [
+                            { label: 'Max Discount', name: 'maxDiscount', type: 'number' }
+                        ] : []),
                         { label: 'Min Purchase', name: 'minPurchase', type: 'number' },
                         { label: 'Valid Days', name: 'day', type: 'number' },
                         { label: 'Usage Limit', name: 'usageLimit', type: 'number' },

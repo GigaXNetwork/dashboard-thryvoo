@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { BiSolidFoodMenu } from "react-icons/bi";
+// import { BiSolidFoodMenu } from "react-icons/bi";
 import { RiCoupon2Fill } from "react-icons/ri";
 import { FaAddressCard, FaStar } from "react-icons/fa";
 import { IoHomeOutline } from "react-icons/io5";
@@ -9,22 +9,27 @@ import Cookies from 'js-cookie';
 
 import "./Sidebar.css";
 
-const menuItems = [
+
+
+function Sidebar({user, onToggleSidebar }) {
+  console.log(user);
+  
+  const menuItems = [
   { to: "/", icon: <IoHomeOutline />, label: "Home" },
   { to: "/card", icon: <FaAddressCard />, label: "Card" },
   {
-    to: "/coupon",
-    icon: <RiCoupon2Fill />,
-    label: "Coupons",
-    subItems: [
-      { to: "/coupon", label: "All Coupons" },
-      { to: "/coupon/presets", label: "All Presets" },
-    ],
-  },
+  to: "/coupon",
+  icon: <RiCoupon2Fill />,
+  label: "Coupons",
+  subItems: user === "user"
+    ? [
+        { to: "/coupon", label: "All Coupons" },
+        { to: "/presets", label: "All Presets" },
+      ]
+    : undefined, // or [] if you want it empty
+},
   { to: "/reviews", icon: <FaStar />, label: "Reviews" },
 ];
-
-function Sidebar({ onToggleSidebar }) {
   const [openMenu, setOpenMenu] = useState(null);
 
   const toggleHandler = () => {
