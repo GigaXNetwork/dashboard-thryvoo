@@ -19,6 +19,8 @@ function Coupon({ user }) {
   const [endDate, setEndDate] = useState('');
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [selectedReview, setSelectedReview] = useState({});
+  const [quickDateFilter, setQuickDateFilter] = useState('');
+
 
   const itemsPerPage = 10;
   const { userId } = useParams();
@@ -35,8 +37,8 @@ function Coupon({ user }) {
           limit: itemsPerPage,
           ...(search && { code: search.trim() }),
           ...(statusFilter && { status: statusFilter }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
+          ...(startDate && { 'createdAt[gt]': startDate }), // Greater than filter
+          ...(endDate && { 'createdAt[lt]': endDate }), // Less than filter
         };
 
         const res = await axios.get(apiUrl, { params, withCredentials: true });
@@ -109,67 +111,138 @@ function Coupon({ user }) {
     return range;
   };
 
+  const handleQuickDateFilterChange = (value) => {
+    setQuickDateFilter(value);
+
+    const today = new Date();
+    let start = '';
+    let end = today.toISOString().split('T')[0]; // format: yyyy-mm-dd
+
+    switch (value) {
+      case 'today':
+        start = end;
+        break;
+      case '7days':
+        start = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
+        break;
+      case '15days':
+        start = new Date(today.setDate(today.getDate() - 15)).toISOString().split('T')[0];
+        break;
+      case '1month':
+        start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
+        break;
+      default:
+        start = '';
+        end = '';
+    }
+
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+
   const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Review", "Manage"];
 
   return (
     <div className="container p-2 sm:p-4 md:p-6 mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Coupon Management</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  {/* Title */}
+  <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+    🎟️ Coupon Management
+  </h1>
 
-      {/* Set Coupon Button */}
-      <div className="flex justify-end mb-4">
-        <NavLink
-          to={user === "admin" ? `/user/${userId}/presets` : "/presets"}
-          className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-        >
-         Coupons
-        </NavLink>
-      </div>
+  {/* Action Button */}
+  <NavLink
+    to={user === "admin" ? `/user/${userId}/presets` : "/presets"}
+    className="inline-flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
+  >
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+    Coupons
+  </NavLink>
+</div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="relative col-span-2">
-          <input
-            type="text"
-            placeholder="Search by code..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 text-sm"
-          />
-          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
-          </svg>
-        </div>
+      <div className="bg-white rounded-2xl p-6 shadow-md space-y-6 mb-5">
 
-        <div className="relative">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 text-sm"
-          >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="redeemed">Redeemed</option>
-          </select>
-          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </div>
+  {/* 🔍 Search Bar */}
+  <div className="relative  mx-auto">
+    <input
+      type="text"
+      placeholder="🔍 Search by code..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+    />
+    <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+    </svg>
+  </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="px-3 py-2 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="px-3 py-2 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
+  {/* 🔧 Filters */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    {/* Status Filter */}
+    <div className="relative">
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+      >
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="redeemed">Redeemed</option>
+      </select>
+      <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </div>
+
+    {/* Start Date */}
+    <div className="relative">
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => {
+          setQuickDateFilter('');
+          setStartDate(e.target.value);
+        }}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+      />
+    </div>
+
+    {/* End Date */}
+    <div className="relative">
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => {
+          setQuickDateFilter('');
+          setEndDate(e.target.value);
+        }}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+      />
+    </div>
+
+    {/* Quick Filter Dropdown */}
+    <div className="relative">
+      <select
+        value={quickDateFilter}
+        onChange={(e) => handleQuickDateFilterChange(e.target.value)}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+      >
+        <option value="">Custom / All Time</option>
+        <option value="today">Today</option>
+        <option value="7days">Last 7 Days</option>
+        <option value="15days">Last 15 Days</option>
+        <option value="1month">Last 1 Month</option>
+      </select>
+    </div>
+
+  </div>
+</div>
+
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow min-w-0">
@@ -218,8 +291,7 @@ function Coupon({ user }) {
                       <CouponDetails
                         {...selectedReview}
                         setShowReviewCard={(visible) =>
-                          setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))
-                        }
+                          setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))}
                       />
                     )}
                   </td>
