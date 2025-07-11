@@ -35,7 +35,7 @@ function Admin({user}) {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`sidebar relative border-r border-gray-200 bg-white transition-all duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          className={`sidebar  relative z-[99999] border-r border-gray-200 bg-white transition-all duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
           <Sidebar
@@ -46,7 +46,7 @@ function Admin({user}) {
         </aside>
 
         {/* Content area */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto pt-4 px-4 md:px-6 transition-all duration-300 xl:ml-64">
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${isSidebarOpen ? "ml-[250px]" : "ml-0"}`}>
           <Outlet />
         </main>
       </div>

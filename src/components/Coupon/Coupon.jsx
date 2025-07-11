@@ -144,7 +144,7 @@ function Coupon({ user }) {
   const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Review", "Manage"];
 
   return (
-    <div className="p-2 max-w-full py-6">
+    <div className="p-2">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         {/* Title */}
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -246,9 +246,9 @@ function Coupon({ user }) {
 
       {/* Table */}
 
-      <div className="overflow-x-auto rounded-xl  border border-gray-200  max-w-full">
-        <div className="max-w-full overflow-x-hiden">
-          <table className="min-w-full w-max text-sm">
+      <div className="overflow-hidden rounded-xl  border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div className="max-w-full overflow-x-auto">
+          <table className="min-w-full w-max text-sm bg-white">
             <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
               <tr>
                 {tableHeaders.map((heading, i) => (
@@ -312,7 +312,6 @@ function Coupon({ user }) {
             </tbody>
           </table>
         </div>
-
 
       </div>
 

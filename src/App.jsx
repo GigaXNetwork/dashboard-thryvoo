@@ -34,6 +34,7 @@ import LoadingAnimation from './components/Common/LoadingAnimation';
 import AllCoupon from './components/Coupon/AllCoupons';
 import MyProfile from './components/User/MyProfile';
 import SetDiscountPage from './components/Coupon/SetDiscountPage';
+import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -45,7 +46,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Ensure auth check is complete before rendering
   const [role, setRole] = useState("user")
-  
+
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
@@ -55,7 +56,7 @@ function App() {
         });
 
         const data = await response.json();
-        
+
         if (data.isAuthenticated) {
           setIsAuthenticated(true);
           setRole(data.user.role)
@@ -75,7 +76,7 @@ function App() {
 
 
   // 🔁 Optional: loading indicator
-  if (loading) return <LoadingAnimation/>;
+  if (loading) return <LoadingAnimation />;
 
   const router = createBrowserRouter([
     // 🔓 Public Routes
@@ -90,7 +91,7 @@ function App() {
       path: '/',
       element: isAuthenticated ? (
         <UserProvider>
-          {role === 'admin' ? <Admin user={role}/> : <Main user={role}/>}
+          {role === 'admin' ? <Admin user={role} /> : <Main user={role} />}
         </UserProvider>
       ) : (
         <Login />
@@ -109,12 +110,13 @@ function App() {
                         {
                           element: <ScrollToTop />,
                           children: [
-                            { path: '', element: <MyProfile role={role} />},
-                            { path: 'card', element: <GetMyCard role={role} />},
+                            { path: '', element: <MyProfile role={role} /> },
+                            { path: 'card', element: <GetMyCard role={role} /> },
                             { path: 'coupon', element: <Coupon user={role} /> },
                             { path: 'presets', element: <SetDiscountPage user={role} /> },
                             { path: 'enquary', element: <Enquary /> },
-                            { path: 'reviews', element: <Reviews role={role}/> },
+                            { path: 'whatsapp', element: <WhatsAppTemplates /> },
+                            { path: 'reviews', element: <Reviews role={role} /> },
                           ]
                         }
                       ]
@@ -123,17 +125,19 @@ function App() {
                     { path: 'card', element: <Card /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
                     { path: 'coupon', element: <AllCoupon role={role} /> },
-                    { path: 'reviews', element: <Reviews role={role}/> },
+                    { path: 'reviews', element: <Reviews role={role} /> },
+                    { path: 'whatsapp', element: <WhatsAppTemplates /> },
                     { path: '/signup', element: <SignupPage /> },
                   ]
                   : [
-                    { path: '/', element:<GetMyCard role={role} /> },
+                    { path: '/', element: <GetMyCard role={role} /> },
                     { path: 'me', element: <Me /> },
                     { path: 'card', element: <GetMyCard role={role} /> },
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
-                    { path: 'coupon', element: <Coupon user={role}/> },
+                    { path: 'coupon', element: <Coupon user={role} /> },
                     { path: 'presets', element: <SetDiscountPage role={role} /> },
-                    { path: 'reviews', element: <Reviews role={role}/> },
+                    { path: 'whatsapp', element: <WhatsAppTemplates /> },
+                    { path: 'reviews', element: <Reviews role={role} /> },
                   ],
             },
           ]

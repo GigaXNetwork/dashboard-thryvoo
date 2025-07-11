@@ -38,7 +38,7 @@ function Main({ user }) {
         </aside>
 
         {/* Content area */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto pt-4 px-4 md:px-6 transition-all duration-300 xl:ml-64">
+        <main className="flex-1  overflow-y-auto pt-4 px-4 md:px-6 transition-all duration-300 xl:ml-64">
           <Outlet />
         </main>
       </div>

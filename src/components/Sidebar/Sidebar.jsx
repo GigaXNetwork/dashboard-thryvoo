@@ -29,6 +29,8 @@ function Sidebar({user, onToggleSidebar }) {
     : undefined, // or [] if you want it empty
 },
   { to: "/reviews", icon: <FaStar />, label: "Reviews" },
+  { to: "/whatsapp", icon: <FaStar />, label: "WhatApp" },
+
 ];
   const [openMenu, setOpenMenu] = useState(null);
 

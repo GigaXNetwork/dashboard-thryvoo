@@ -148,7 +148,7 @@ function User() {
   if (loading) return <p>Loading users...</p>;
 
   return (
-    <div className="py-10 px-4">
+    <div className="py-10 px-4 relative">
       {/* Header with search + button */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <input
