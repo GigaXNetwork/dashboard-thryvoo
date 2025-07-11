@@ -17,5 +17,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@theme {
+  --font-*: initial;
+  --font-outfit: Outfit, sans-serif;
+
+  --breakpoint-*: initial;
+  --breakpoint-2xsm: 375px;
+  --breakpoint-xsm: 425px;
+  --breakpoint-3xl: 2000px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
 
 

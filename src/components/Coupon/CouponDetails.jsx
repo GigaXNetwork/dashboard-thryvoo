@@ -16,6 +16,7 @@ const CouponDetails = ({
   usageCount,
   status,
   createdAt,
+  redeemedAt,
   setShowReviewCard,
 }) => {
   return (
@@ -63,6 +64,9 @@ const CouponDetails = ({
           <Detail label="Usage Limit" value={usageLimit} />
           <Detail label="Usage Count" value={usageCount} />
           <Detail label="Status" value={<StatusPill status={status} />} />
+          {redeemedAt && (
+            <Detail label="Redeemed At" value={new Date(redeemedAt).toLocaleDateString()} />
+          )}
         </div>
 
         {/* Footer */}
@@ -100,8 +104,8 @@ const StatusPill = ({ status }) => {
     normalizedStatus === 'active'
       ? 'bg-green-100 text-green-700'
       : normalizedStatus === 'redeemed'
-      ? 'bg-red-100 text-red-700'
-      : 'bg-gray-100 text-gray-700';
+        ? 'bg-red-100 text-red-700'
+        : 'bg-gray-100 text-gray-700';
 
   return (
     <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full capitalize ${statusStyles}`}>

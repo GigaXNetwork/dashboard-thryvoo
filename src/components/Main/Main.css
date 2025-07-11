@@ -1,6 +1,6 @@
 .main-child{
   display: flex;
-
+  max-width: 100%;
 }
 .sidebar{
   top: 4rem;

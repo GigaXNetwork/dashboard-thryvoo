@@ -144,172 +144,178 @@ function Coupon({ user }) {
   const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Review", "Manage"];
 
   return (
-    <div className="container p-2 sm:p-4 md:p-6 mx-auto">
+    <div className="p-2 max-w-full py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-  {/* Title */}
-  <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-    🎟️ Coupon Management
-  </h1>
+        {/* Title */}
+        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          🎟️ Coupon Management
+        </h1>
 
-  {/* Action Button */}
-  <NavLink
-    to={user === "admin" ? `/user/${userId}/presets` : "/presets"}
-    className="inline-flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
-  >
-    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-    </svg>
-    Coupons
-  </NavLink>
-</div>
+        {/* Action Button */}
+        <NavLink
+          to={user === "admin" ? `/user/${userId}/presets` : "/presets"}
+          className="inline-flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Coupons
+        </NavLink>
+      </div>
 
       {/* Filters */}
       <div className="bg-white rounded-2xl p-6 shadow-md space-y-6 mb-5">
 
-  {/* 🔍 Search Bar */}
-  <div className="relative  mx-auto">
-    <input
-      type="text"
-      placeholder="🔍 Search by code..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
-    />
-    <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
-    </svg>
-  </div>
+        {/* 🔍 Search Bar */}
+        <div className="relative  mx-auto">
+          <input
+            type="text"
+            placeholder="🔍 Search by code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+          />
+          <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+          </svg>
+        </div>
 
-  {/* 🔧 Filters */}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 🔧 Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-    {/* Status Filter */}
-    <div className="relative">
-      <select
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-        className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-      >
-        <option value="">All Statuses</option>
-        <option value="active">Active</option>
-        <option value="redeemed">Redeemed</option>
-      </select>
-      <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-      </svg>
-    </div>
+          {/* Status Filter */}
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="redeemed">Redeemed</option>
+            </select>
+            <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
 
-    {/* Start Date */}
-    <div className="relative">
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => {
-          setQuickDateFilter('');
-          setStartDate(e.target.value);
-        }}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-      />
-    </div>
+          {/* Start Date */}
+          <div className="relative">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setQuickDateFilter('');
+                setStartDate(e.target.value);
+              }}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
 
-    {/* End Date */}
-    <div className="relative">
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => {
-          setQuickDateFilter('');
-          setEndDate(e.target.value);
-        }}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-      />
-    </div>
+          {/* End Date */}
+          <div className="relative">
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setQuickDateFilter('');
+                setEndDate(e.target.value);
+              }}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
 
-    {/* Quick Filter Dropdown */}
-    <div className="relative">
-      <select
-        value={quickDateFilter}
-        onChange={(e) => handleQuickDateFilterChange(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-      >
-        <option value="">Custom / All Time</option>
-        <option value="today">Today</option>
-        <option value="7days">Last 7 Days</option>
-        <option value="15days">Last 15 Days</option>
-        <option value="1month">Last 1 Month</option>
-      </select>
-    </div>
+          {/* Quick Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={quickDateFilter}
+              onChange={(e) => handleQuickDateFilterChange(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              <option value="">Custom / All Time</option>
+              <option value="today">Today</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="15days">Last 15 Days</option>
+              <option value="1month">Last 1 Month</option>
+            </select>
+          </div>
 
-  </div>
-</div>
+        </div>
+      </div>
 
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg shadow min-w-0">
-        <table className="min-w-[800px] w-full text-sm bg-white">
-          <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
-            <tr>
-              {tableHeaders.map((heading, i) => (
-                <th key={i} className="px-6 py-3 text-center">{heading}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {coupons.map((coupon, index) => {
-              const statusColor = coupon.status === 'active'
-                ? 'text-green-600'
-                : coupon.status === 'redeemed'
-                  ? 'text-red-600'
-                  : 'text-gray-700';
 
-              return (
-                <tr key={coupon._id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td className="px-6 py-4 font-medium text-gray-900 break-all text-center">{coupon.code}</td>
-                  <td className="px-6 py-4 font-medium capitalize break-all text-center">{coupon.review?.name || "N/A"}</td>
-                  <td className={`px-6 py-4 font-medium capitalize text-center ${statusColor}`}>{coupon.status}</td>
-                  <td className="px-6 py-4 text-center text-gray-700">
-                    {coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : ''}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      className="text-blue-600 hover:underline font-medium"
-                      onClick={() => {
-                        setShowReviewCard(prev => ({ ...prev, [coupon._id]: true }));
-                        setSelectedReview({
-                          ...coupon.review,
-                          ...coupon,
-                          number: coupon.review?.phone || "N/A",
-                          name: coupon.review?.name || "N/A",
-                          review: coupon.review?.review || "No review available"
-                        });
-                      }}
-                    >
-                      See Review
-                    </button>
-                    {showReviewCard[coupon._id] && (
-                      <CouponDetails
-                        {...selectedReview}
-                        setShowReviewCard={(visible) =>
-                          setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))}
-                      />
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      className={`font-medium ${coupon.status === "redeemed" ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline"}`}
-                      onClick={() => coupon.status !== "redeemed" && handleRedeemClick(coupon)}
-                      disabled={coupon.status === "redeemed"}
-                    >
-                      Redeem
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="overflow-x-auto rounded-xl  border border-gray-200  max-w-full">
+        <div className="max-w-full overflow-x-hiden">
+          <table className="min-w-full w-max text-sm">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+              <tr>
+                {tableHeaders.map((heading, i) => (
+                  <th key={i} className="px-6 py-3 text-center">{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {coupons.map((coupon, index) => {
+                const statusColor = coupon.status === 'active'
+                  ? 'text-green-600'
+                  : coupon.status === 'redeemed'
+                    ? 'text-red-600'
+                    : 'text-gray-700';
+
+                return (
+                  <tr key={coupon._id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900 break-all text-center">{coupon.code}</td>
+                    <td className="px-6 py-4 font-medium capitalize break-all text-center">{coupon.review?.name || "N/A"}</td>
+                    <td className={`px-6 py-4 font-medium capitalize text-center ${statusColor}`}>{coupon.status}</td>
+                    <td className="px-6 py-4 text-center text-gray-700">
+                      {coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : ''}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        className="text-blue-600 hover:underline font-medium"
+                        onClick={() => {
+                          setShowReviewCard(prev => ({ ...prev, [coupon._id]: true }));
+                          setSelectedReview({
+                            ...coupon.review,
+                            ...coupon,
+                            number: coupon.review?.phone || "N/A",
+                            name: coupon.review?.name || "N/A",
+                            review: coupon.review?.review || "No review available"
+                          });
+                        }}
+                      >
+                        See Review
+                      </button>
+                      {showReviewCard[coupon._id] && (
+                        <CouponDetails
+                          {...selectedReview}
+                          setShowReviewCard={(visible) =>
+                            setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))}
+                        />
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        className={`font-medium ${coupon.status === "redeemed" ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline"}`}
+                        onClick={() => coupon.status !== "redeemed" && handleRedeemClick(coupon)}
+                        disabled={coupon.status === "redeemed"}
+                      >
+                        Redeem
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+
       </div>
+
 
       {/* Pagination */}
       <div className="flex justify-center mt-6 gap-2">

@@ -106,21 +106,21 @@ function Reviews({ role }) {
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg shadow ring-1 ring-black ring-opacity-5">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0 z-10">
+          <div className="overflow-x-auto rounded-xl shadow-md ring-1 ring-black ring-opacity-5">
+            <table className="min-w-full divide-y divide-gray-200 text-sm">
+              <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
                 <tr>
                   {['Name', 'Phone', 'Email', 'Rating', 'Review', 'Date'].map((header) => (
                     <th
                       key={header}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap"
+                      className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider whitespace-nowrap"
                     >
                       {header}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {reviews.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
@@ -128,13 +128,19 @@ function Reviews({ role }) {
                     </td>
                   </tr>
                 ) : (
-                  reviews.map((review) => (
-                    <tr key={review._id} className="hover:bg-blue-50 transition-colors duration-200">
+                  reviews.map((review, idx) => (
+                    <tr
+                      key={review._id}
+                      className={`transition-colors duration-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                        } hover:bg-blue-50`}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{review.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-700">{review.phone}</td>
-                      <td className="px-6 py-4 max-w-xs break-words text-gray-700">{review.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-yellow-500 font-semibold">{review.rating} ★</td>
-                      <td className="px-6 py-4 max-w-xs break-words text-gray-800">{review.review}</td>
+                      <td className="px-6 py-4 break-words text-gray-700">{review.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-yellow-500 font-bold">
+                        {review.rating} ★
+                      </td>
+                      <td className="px-6 py-4 break-words text-gray-800">{review.review}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                         {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : '—'}
                       </td>
@@ -144,6 +150,7 @@ function Reviews({ role }) {
               </tbody>
             </table>
           </div>
+
 
           {/* Pagination */}
           <div className="flex justify-center mt-6 space-x-2 items-center flex-wrap gap-2">
