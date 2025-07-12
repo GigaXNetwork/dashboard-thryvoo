@@ -54,8 +54,6 @@ function WhatsAppTemplates() {
         <div className="text-gray-500 py-10 text-center">Loading...</div>
       ) : (
         <>
-          <RegistrationInfo data={registration} onUpdate={(data) => console.log('Update clicked', data)}
-            onDelete={(data) => console.log('Delete clicked', data)} />
         <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm bg-white">
 
           <table className="min-w-full text-sm text-left">

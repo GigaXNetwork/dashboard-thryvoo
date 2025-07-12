@@ -35,6 +35,7 @@ import AllCoupon from './components/Coupon/AllCoupons';
 import MyProfile from './components/User/MyProfile';
 import SetDiscountPage from './components/Coupon/SetDiscountPage';
 import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
+import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -136,7 +137,8 @@ function App() {
                     { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
                     { path: 'coupon', element: <Coupon user={role} /> },
                     { path: 'presets', element: <SetDiscountPage role={role} /> },
-                    { path: 'whatsapp', element: <WhatsAppTemplates /> },
+                    { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
+                    { path: 'whatsapp/registration', element: <RegistrationInfo /> },
                     { path: 'reviews', element: <Reviews role={role} /> },
                   ],
             },
