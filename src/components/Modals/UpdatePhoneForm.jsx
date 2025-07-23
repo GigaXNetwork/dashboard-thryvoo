@@ -16,7 +16,7 @@ export default function UpdatePhoneModal({ onClose, onSubmit }) {
     setMessage("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/account/upadateprofile`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/updateuser`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -26,24 +26,27 @@ export default function UpdatePhoneModal({ onClose, onSubmit }) {
         body: JSON.stringify({ phone }),
       });
 
-      if (!response.ok) throw new Error("Failed to update phone");
+     if (!response.ok) throw new Error("Failed to update name");
 
       const result = await response.json();
-
-      // Update local context with new phone number
-      setUserData((prev) => ({
-        ...prev,
-        user: {
-          ...prev.user,
-          phone: result.user?.phone || phone,
-        },
-      }));
+      const updatedPhone = result?.user?.phone;
+      console.log(result?.user?.phone, "this is phone model");
+      
+      if (updatedPhone) {
+        setUserData((prev) => ({
+          ...prev,
+          user: {
+            ...prev?.user,
+            phone: updatedPhone,
+          },
+        }));
+      }
 
       if (onSubmit) onSubmit({ phone });
       setMessage("Phone number updated successfully!");
     } catch (err) {
       console.error("Error updating phone:", err.message);
-      setMessage("Something went wrong.");
+      setMessage(err.message);
     } finally {
       setSubmitting(false);
     }

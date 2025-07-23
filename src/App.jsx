@@ -25,7 +25,7 @@ import Me from './components/Account/Me';
 // 🌐 Common
 import ErrorHandler from './components/Common/ErrorHandler';
 import User from './components/User/User';
-import { UserProvider } from './Context/ContextApt';
+import { UserProvider, useUser } from './Context/ContextApt';
 import ItemsWrapper from './components/Items/ItemsWrapper';
 import UserData from './components/User/UserData';
 import Coupon from './components/Coupon/Coupon';
@@ -36,6 +36,8 @@ import MyProfile from './components/User/MyProfile';
 import SetDiscountPage from './components/Coupon/SetDiscountPage';
 import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
 import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
+import Dashboard from './components/Dashboard/Dashboard';
+
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -44,109 +46,83 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // Ensure auth check is complete before rendering
-  const [role, setRole] = useState("user")
+  const { userData, loading, error } = useUser();
 
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-
-        if (data.isAuthenticated) {
-          setIsAuthenticated(true);
-          setRole(data.user.role)
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuthentication();
-  }, []);
-
-
-  // 🔁 Optional: loading indicator
   if (loading) return <LoadingAnimation />;
 
+  if (error) {
+    console.error('Authentication error:', error);
+    // Optionally render an error page or redirect to login
+    return <ErrorHandler error={error} />;
+  }
+
+  const isAuthenticated = !!userData?.user;
+  const role = userData?.user?.role || 'user';
+
+  // Common protected routes for all authenticated users
+  const protectedRoutes = [
+    { path: 'me', element: <Me /> },
+    { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
+    { path: 'reviews', element: <Reviews role={role} /> },
+  ];
+
+  // Admin-only routes
+  const adminRoutes = [
+    { path: '/', element: <User /> },
+    { path: 'card', element: <Card /> },
+    { path: 'coupons', element: <AllCoupon role={role} /> },
+    { path: 'whatsapp', element: <WhatsAppTemplates /> },
+    { path: 'signup', element: <SignupPage /> },
+    {
+      path: 'user/:userId',
+      element: <UserData />,
+      children: [
+        { index: true, element: <MyProfile role={role} /> },
+        { path: 'card', element: <GetMyCard role={role} /> },
+        { path: 'coupon', element: <Coupon role={role} /> },
+        { path: 'presets', element: <SetDiscountPage role={role} /> },
+        { path: 'enquary', element: <Enquary /> },
+      ]
+    }
+  ];
+
+  // User-only routes
+  const userRoutes = [
+    { path: '/', element: <Dashboard /> },
+    { path: 'card', element: <GetMyCard role={role} /> },
+    { path: 'coupon', element: <Coupon role={role} /> },
+    { path: 'presets', element: <SetDiscountPage role={role} /> },
+    { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
+    { path: 'whatsapp/registration', element: <RegistrationInfo /> },
+  ];
+
   const router = createBrowserRouter([
-    // 🔓 Public Routes
+    // Public routes
     { path: '/login', element: <Login /> },
     { path: '/forgot', element: <ForgotPasswordPage /> },
     { path: '/resetpassword/:token', element: <ResetPasswordPage /> },
-    { path: '*', element: <ErrorHandler /> },
-
-    // 🔐 Protected Routes
-    // Assuming you have a `UserProvider` wrapping layout elements for shared context
+    
+    // Protected routes wrapper
     {
       path: '/',
       element: isAuthenticated ? (
-        <UserProvider>
-          {role === 'admin' ? <Admin user={role} /> : <Main user={role} />}
-        </UserProvider>
+        role === 'admin' ? <Admin /> : <Main />
       ) : (
         <Login />
       ),
-      children:
-        isAuthenticated && (
-          [
-            {
-              element: <ScrollToTop />,
-              children:
-                role === 'admin'
-                  ? [
-                    { path: '/', element: <User /> },
-                    {
-                      path: '/user/:userId', element: <UserData />, children: [
-                        {
-                          element: <ScrollToTop />,
-                          children: [
-                            { path: '', element: <MyProfile role={role} /> },
-                            { path: 'card', element: <GetMyCard role={role} /> },
-                            { path: 'coupon', element: <Coupon user={role} /> },
-                            { path: 'presets', element: <SetDiscountPage user={role} /> },
-                            { path: 'enquary', element: <Enquary /> },
-                            { path: 'whatsapp', element: <WhatsAppTemplates /> },
-                            { path: 'reviews', element: <Reviews role={role} /> },
-                          ]
-                        }
-                      ]
-                    },
-                    { path: 'me', element: <Me /> },
-                    { path: 'card', element: <Card /> },
-                    { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
-                    { path: 'coupon', element: <AllCoupon role={role} /> },
-                    { path: 'reviews', element: <Reviews role={role} /> },
-                    { path: 'whatsapp', element: <WhatsAppTemplates /> },
-                    { path: '/signup', element: <SignupPage /> },
-                  ]
-                  : [
-                    { path: '/', element: <GetMyCard role={role} /> },
-                    { path: 'me', element: <Me /> },
-                    { path: 'card', element: <GetMyCard role={role} /> },
-                    { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
-                    { path: 'coupon', element: <Coupon user={role} /> },
-                    { path: 'presets', element: <SetDiscountPage role={role} /> },
-                    { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
-                    { path: 'whatsapp/registration', element: <RegistrationInfo /> },
-                    { path: 'reviews', element: <Reviews role={role} /> },
-                  ],
-            },
+      children: isAuthenticated ? [
+        {
+          element: <ScrollToTop />,
+          children: [
+            ...protectedRoutes,
+            ...(role === 'admin' ? adminRoutes : userRoutes)
           ]
-        ),
-    }
-
-
+        }
+      ] : []
+    },
+    
+    // Error handling
+    { path: '*', element: <ErrorHandler /> }
   ]);
 
   return <RouterProvider router={router} />;

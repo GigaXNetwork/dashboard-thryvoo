@@ -139,12 +139,12 @@ export default function LoginPage() {
           <FcGoogle className="text-xl" />
           <span className="text-sm font-medium text-gray-700">Login with Google</span>
         </button> */}
-        {/* <div className="mt-6 text-center">
+        <div className="mt-6 text-center">
           <span className="text-sm text-gray-600">Don't have an account? </span>
           <Link to="/signup" className="text-sm text-blue-600 hover:underline">
             Create one
           </Link>
-        </div> */}
+        </div>
       </div>
     </div>
   );

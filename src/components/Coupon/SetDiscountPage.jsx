@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { X } from 'lucide-react';
 import MessagePopup from '../Common/MessagePopup';
+import PresetForm from './presetForm';
+import PresetToggle from './PresetToggle';
+import PresetCard from './PresetCard';
 
 const SetDiscountPage = ({ user }) => {
     const [presets, setPresets] = useState([]);
@@ -13,6 +15,7 @@ const SetDiscountPage = ({ user }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingPresetId, setEditingPresetId] = useState(null);
+    const [activeTab, setActiveTab] = useState("Own");
 
     const menuRefs = useRef([]);
 
@@ -28,8 +31,11 @@ const SetDiscountPage = ({ user }) => {
         maxDiscount: '',
         minPurchase: '',
         day: '',
-        usageLimit: ''
+        usageLimit: '',
+        type: 'own'
     });
+
+    const tabs = ["Own", "Cross Brand", "Offer"]
 
     const { userId } = useParams();
     const getUrl = user === 'admin'
@@ -54,9 +60,14 @@ const SetDiscountPage = ({ user }) => {
         }
     };
 
+
+
     useEffect(() => {
         fetchPresets();
     }, []);
+
+
+
 
 
     // handle change
@@ -73,62 +84,71 @@ const SetDiscountPage = ({ user }) => {
             maxDiscount: '',
             minPurchase: '',
             day: '',
-            usageLimit: ''
+            usageLimit: '',
+            type: 'own'
         });
     };
 
 
     // handle submit 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setMessage('');
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
 
-        const {
-            discountType, presetName, discountAmount,
-            maxDiscount, minPurchase, day, usageLimit
-        } = form;
+    const {
+        discountType, presetName, discountAmount,
+        maxDiscount, minPurchase, day, usageLimit, type
+    } = form;
 
-        try {
-            const method = isEditing ? 'PATCH' : 'POST';
-            const url = isEditing
-                ? `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${editingPresetId}`
-                : setUrl;
+    try {
+        const method = isEditing ? 'PATCH' : 'POST';
+        let url;
 
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    discountType,
-                    presetName,
-                    discountAmount,
-                    maxDiscount: parseFloat(maxDiscount),
-                    minPurchase: parseFloat(minPurchase),
-                    day: parseInt(day),
-                    usageLimit: parseInt(usageLimit)
-                })
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setMessage(isEditing ? '✅ Preset updated!' : '✅ Coupon set successfully!');
-                resetForm();
-                fetchPresets();
-                setShowForm(false);
-                setIsEditing(false);
-                setEditingPresetId(null);
-            } else {
-                setMessage(data.message || '❌ Failed to save preset.');
-            }
-        } catch (err) {
-            console.error(err);
-            setMessage('❌ Error saving preset.');
-        } finally {
-            setLoading(false);
+        if (isEditing) {
+            url = user === 'admin'
+                ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${editingPresetId}`
+                : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${editingPresetId}`;
+        } else {
+            url = setUrl;
         }
-    };
+
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                discountType,
+                presetName,
+                discountAmount,
+                maxDiscount: parseFloat(maxDiscount),
+                minPurchase: parseFloat(minPurchase),
+                day: parseInt(day),
+                usageLimit: parseInt(usageLimit),
+                type
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setMessage(isEditing ? '✅ Preset updated!' : '✅ Coupon set successfully!');
+            resetForm();
+            fetchPresets();
+            setShowForm(false);
+            setIsEditing(false);
+            setEditingPresetId(null);
+        } else {
+            setMessage(data.message || '❌ Failed to save preset.');
+        }
+    } catch (err) {
+        console.error(err);
+        setMessage('❌ Error saving preset.');
+    } finally {
+        setLoading(false);
+    }
+};
+
 
 
 
@@ -192,12 +212,15 @@ const SetDiscountPage = ({ user }) => {
             if (res.ok) {
                 // Update local state
 
-                setPresets(prev =>
-                    prev.map(p => ({
-                        ...p,
-                        isActive: p._id === preset._id
-                    }))
-                );
+                setPresets((prevPresets) =>
+                prevPresets.map((p) => ({
+                    ...p,
+                    isActive: p._id === preset._id, // Only one active at a time
+                }))
+            );
+
+            // ✅ Optional: ensure consistency with server
+            fetchPresets();
 
             } else {
                 setMessage(data.message || '❌ Failed to update status.');
@@ -210,33 +233,40 @@ const SetDiscountPage = ({ user }) => {
 
     // edit preset
     const handleEditPreset = (preset) => {
-        setForm({
-            discountType: preset.discountType || 'percentage',
-            presetName: preset.presetName || '',
-            discountAmount: preset.discountAmount || '',
-            maxDiscount: preset.maxDiscount || '',
-            minPurchase: preset.minPurchase || '',
-            day: preset.day || '',
-            usageLimit: preset.usageLimit || '',
-        });
+    setForm({
+        discountType: preset.discountType || 'percentage',
+        presetName: preset.presetName || '',
+        discountAmount: preset.discountAmount || '',
+        maxDiscount: preset.maxDiscount || '',
+        minPurchase: preset.minPurchase || '',
+        day: preset.day || '',
+        usageLimit: preset.usageLimit || '',
+        type: preset.type || 'own'
+    });
 
-        setIsEditing(true);
-        setEditingPresetId(preset._id);
-        setShowForm(true);
-    };
+    setIsEditing(true);
+    setEditingPresetId(preset._id);
+    setShowForm(true);
+};
 
+
+
+        const filteredPresets = presets.filter(preset => {
+        if (activeTab === 'Own') return preset.type === 'own';
+        if (activeTab === 'Cross Brand') return preset.type === 'cross';
+        if (activeTab === 'Offer') return preset.type === 'offer';
+        return false;
+    });
 
     return (
         <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md min-h-screen">
-
-
 
             {message && (
                 <MessagePopup message={message} type={`${message.includes('✅') ? 'success' : 'error'}`} onClose={() => setMessage('')} />
             )}
 
-            <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Coupon Presets</h1>
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
+                <h1 className="text-3xl font-bold text-gray-900">Coupon Presets</h1>
                 <button
                     onClick={() => setShowForm(true)}
                     className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
@@ -245,115 +275,47 @@ const SetDiscountPage = ({ user }) => {
                 </button>
             </div>
 
-
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {presets.map((preset, index) => (
-                    <div
-                        key={index}
-                        className="relative bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-6 transform hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-4 py-2 -mb-px text-sm font-medium border-b-2 transition-colors duration-200 ${activeTab === tab
+                            ? "border-indigo-600 text-indigo-600"
+                            : "border-transparent text-gray-500 hover:text-indigo-500 hover:border-gray-300"
+                            }`}
                     >
-
-                        {/* 3-dots menu */}
-                        <div className="absolute top-4 right-4">
-                            <button
-                                onClick={() => toggleMenu(index)}
-                                className="text-gray-500 hover:text-gray-700"
-                                aria-label="Options"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                >
-                                    <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
-                                </svg>
-                            </button>
-
-
-                            {/* Dropdown menu */}
-                            {openMenuIndex === index && (
-                                <div
-                                    key={index}
-                                    ref={(el) => (menuRefs.current[index] = el)}
-                                    className="absolute right-0 mt-2 w-48 bg-white z-10 bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-6 transform hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
-                                >
-
-                                    <button
-                                        onClick={() => {
-                                            handleEditPreset(preset)
-                                        }}
-                                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                                    >
-                                        ✏️ Edit
-                                    </button>
-
-                                    <button
-                                        onClick={() => {
-                                            setPresetToDelete(preset);
-                                            setShowDeleteModal(true);
-                                        }}
-                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                                    >
-                                        🗑️ Delete
-                                    </button>
-                                    <button
-                                        onClick={() => handleToggleActive(preset)}
-                                        disabled={preset.isActive} // disables when true
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${preset.isActive ? 'text-gray-400 cursor-not-allowed' : ''
-                                            }`}
-                                    >
-                                        ✅ Activate
-                                    </button>
-
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Preset Content */}
-                        <div className="mb-5">
-                            <h3 className="text-xl font-bold text-indigo-600 tracking-wide border-b-2 pb-2 border-indigo-200 flex items-center gap-2">
-                                <svg className="w-5 h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 2a1 1 0 00-.894.553L7.382 6H4a1 1 0 000 2h3a1 1 0 00.894-.553L9.618 4H16a1 1 0 100-2h-6z" />
-                                    <path d="M4 10a1 1 0 011-1h10a1 1 0 011 1v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6z" />
-                                </svg>
-                                {preset.presetName}
-                            </h3>
-                        </div>
-
-                        <div className="text-sm text-gray-700">
-                            <div className="text-sm text-gray-700">
-                                {[
-                                    { label: "Type", value: preset.discountType },
-                                    { label: "Amount/Offer", value: preset.discountAmount },
-                                    { label: "Max Discount", value: preset.maxDiscount || "N/A" },
-                                    { label: "Min Purchase", value: preset.minPurchase || "N/A" },
-                                    { label: "Valid Days", value: preset.day || "N/A" },
-                                    { label: "Usage Limit", value: preset.usageLimit || "N/A" },
-                                    { label: "Created At", value: preset?.createdAt ? new Date(preset.createdAt).toLocaleDateString() : 'N/A' },
-                                ].map((item, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center justify-between py-2 border-b hover:bg-muted transition-colors"
-                                    >
-                                        <span className="font-medium text-gray-600">{item.label}:</span>
-                                        <span className='capitalize'>{item.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Active badge */}
-                        <div className="mt-6 text-right">
-                            {preset.isActive && (
-                                <span className="inline-block bg-emerald-100 text-emerald-700 text-xs px-3 py-1 rounded-full font-semibold tracking-wide shadow-sm">
-                                    Active
-                                </span>
-                            )}
-                        </div>
-                    </div>
+                        {tab}
+                    </button>
                 ))}
+            </div>
+
+
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 my-6">
+                {filteredPresets.length > 0 ? (
+                    filteredPresets.map((preset, index) => (
+                        <PresetCard
+                            key={index}
+                            preset={preset}
+                            index={index}
+                            openMenuIndex={openMenuIndex}
+                            toggleMenu={toggleMenu}
+                            handleEditPreset={handleEditPreset}
+                            handleDeletePreset={handleDeletePreset}
+                            setPresetToDelete={setPresetToDelete}
+                            setShowDeleteModal={setShowDeleteModal}
+                            handleToggleActive={handleToggleActive}
+                            menuRefs={menuRefs}
+                        />
+                    ))
+                ) : (
+                    <div className="text-gray-500 col-span-full text-center py-10">
+                        No {activeTab} presets found.
+                    </div>
+                )}
+
             </div>
 
 
@@ -366,134 +328,24 @@ const SetDiscountPage = ({ user }) => {
             )}
 
             {/* Slide-In Form Drawer */}
-            <div
-                className={`fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${showForm ? 'translate-x-0' : 'translate-x-full'
-                    }`}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b bg-white sticky top-0 z-10">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Create Discount Preset</h2>
-                    <button
-                        onClick={() => setShowForm(false)}
-                        className="text-gray-500 hover:text-red-500 transition"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
+            <PresetForm
+                showForm={showForm}
+                setShowForm={setShowForm}
+                form={form}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                resetForm={resetForm}
+                loading={loading}
+                isEditing={isEditing}
+            />
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
-
-                    {/* Type Selector */}
-                    <div className="space-y-1">
-                        <label htmlFor="discountType" className="text-sm font-medium text-gray-700">
-                            Discount Type
-                        </label>
-                        <select
-                            id="discountType"
-                            name="discountType"
-                            value={form.discountType}
-                            onChange={handleChange}
-                            disabled={loading}
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="percentage">Percentage</option>
-                            <option value="fixed">Fixed</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                    </div>
-
-                    {/* Inputs */}
-                    {[
-                        { label: 'Coupon Name', name: 'presetName', type: 'text' },
-                        { label: 'Discount Amount/Offer', name: 'discountAmount', type: form.discountType === 'custom' ? 'text' : 'number' },
-                        ...(form.discountType !== 'custom' ? [
-                            { label: 'Max Discount', name: 'maxDiscount', type: 'number' }
-                        ] : []),
-                        { label: 'Min Purchase', name: 'minPurchase', type: 'number' },
-                        { label: 'Valid Days', name: 'day', type: 'number' },
-                        { label: 'Usage Limit', name: 'usageLimit', type: 'number' },
-                    ].map(({ label, name, type }) => (
-                        <div key={name} className="w-full">
-                            <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                                {label}
-                            </label>
-                            <input
-                                id={name}
-                                name={name}
-                                type={type}
-                                value={form[name]}
-                                onChange={handleChange}
-                                placeholder={`Enter ${label}`}
-                                disabled={loading}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 shadow-sm"
-                            />
-                        </div>
-
-                    ))}
-
-                    {/* Status Message */}
-
-
-                    <div className="flex items-center justify-between gap-4">
-                        <button
-                            type="button"
-                            disabled={loading}
-                            onClick={resetForm}
-                            className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg py-2.5 transition border border-gray-300 shadow-sm"
-                        >
-                            Reset
-                        </button>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2.5 transition flex items-center justify-center shadow-md"
-                        >
-                            {loading && (
-                                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                                </svg>
-                            )}
-                            {loading ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Coupon' : 'Create Coupon')}
-
-                        </button>
-                    </div>
-
-
-
-                </form>
-            </div>
-
-
-            {showDeleteModal && presetToDelete && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Delete Preset</h2>
-                        <p className="text-sm text-gray-700 mb-6">
-                            Are you sure you want to delete <strong>{presetToDelete.presetName}</strong>? This action cannot be undone.
-                        </p>
-                        <div className="flex justify-end gap-4">
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={async () => {
-                                    await handleDeletePreset(presetToDelete);
-                                    setShowDeleteModal(false);
-                                    setPresetToDelete(null);
-                                }}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {showDeleteModal && (
+                <PresetToggle
+                    presetToDelete={presetToDelete}
+                    setShowDeleteModal={setShowDeleteModal}
+                    handleDeletePreset={handleDeletePreset}
+                    setPresetToDelete={setPresetToDelete}
+                />
             )}
         </div>
     );
