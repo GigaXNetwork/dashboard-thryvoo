@@ -2,7 +2,7 @@ import { FaUser } from "react-icons/fa";
 import { ChevronRight } from "lucide-react"; // or from "react-icons/bs" if preferred
 import { useUser } from "../../Context/ContextApt";
 
-export default function AccountSettingsCard() {
+export default function AccountSettingsCard({setIsEmailUpdate}) {
   const { userData } = useUser();
   const email = userData?.user?.email;
   const createdAt = userData?.user?.createdAt;
@@ -20,10 +20,12 @@ export default function AccountSettingsCard() {
       {/* Settings List */}
       <div className="divide-y divide-gray-200">
         {/* Email */}
-        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
+        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors" onClick={()=>{
+          setIsEmailUpdate(true)
+        }}>
           <div className="flex-1 flex items-center gap-4 flex-wrap">
             <span className="text-gray-600 flex-1 basis-[100px]">Email</span>
-            <span className="text-gray-800 font-medium flex-1 basis-[100px]">
+            <span className="text-gray-800 font-medium flex-1 basis-[100px] truncate break-all">
               {email}
             </span>
           </div>

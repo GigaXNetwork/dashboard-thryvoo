@@ -1,19 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-// import { BiSolidFoodMenu } from "react-icons/bi";
 import { RiCoupon2Fill } from "react-icons/ri";
-import { FaAddressCard, FaStar,FaWhatsapp } from "react-icons/fa";
+import { FaAddressCard, FaStar, FaWhatsapp } from "react-icons/fa";
 import { IoHomeOutline } from "react-icons/io5";
 import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
 
-import "./Sidebar.css";
-
-
-
 function Sidebar({ user, onToggleSidebar }) {
-  console.log(user);
-
   const menuItems = [
     { to: "/", icon: <IoHomeOutline />, label: "Home" },
     { to: "/card", icon: <FaAddressCard />, label: "Card" },
@@ -26,24 +19,21 @@ function Sidebar({ user, onToggleSidebar }) {
           { to: "/coupon", label: "All Coupons" },
           { to: "/presets", label: "All Presets" },
         ]
-        : undefined, // or [] if you want it empty
+        : undefined,
     },
     {
-      to: "/whatsapp", icon: <FaWhatsapp />, label: "WhatApp",
+      to: "/whatsapp", icon: <FaWhatsapp />, label: "WhatsApp",
       subItems: [
         { to: "/whatsapp/registration", label: "Registration Info" },
         { to: "/whatsapp/templates", label: "Templates" },
       ]
     },
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },
-
-
   ];
+
   const [openMenu, setOpenMenu] = useState(null);
 
   const toggleHandler = () => {
-    console.log("Toggle Sidebar");
-
     if (window.innerWidth < 750) {
       onToggleSidebar();
     }
@@ -51,10 +41,13 @@ function Sidebar({ user, onToggleSidebar }) {
 
   const handleMenuClick = (item, e) => {
     if (item.subItems) {
-      e.preventDefault(); // prevent navigation if submenu exists
+      e.preventDefault();
       setOpenMenu(openMenu === item.to ? null : item.to);
+      // Don't close sidebar immediately for parent items on mobile
+      return;
     }
-    toggleHandler(); // always close sidebar on menu item click (mobile)
+    // Close sidebar for regular links and when clicking child items
+    toggleHandler();
   };
 
   const handleLogout = async () => {
@@ -63,66 +56,99 @@ function Sidebar({ user, onToggleSidebar }) {
   };
 
   return (
-    <aside className="h-full sticky shadow-sm w-[250px] bg-white">
-      <nav className="navbar mt-4 px-2 flex flex-col gap-1 min-h-[calc(100%-5rem)] max-h-[calc(90vh-6rem)] h-auto overflow-y-auto">
-        {menuItems.map((item) => (
-          <div key={item.to} className="flex flex-col">
-            <NavLink
-              to={item.to}
-              onClick={(e) => handleMenuClick(item, e)}
-              className={({ isActive }) =>
-                `flex items-center justify-between px-4 py-2 rounded-lg text-[0.9rem] font-medium transition-all ${isActive ? "bg-violet-100 text-violet-700" : "text-gray-800 hover:bg-gray-100"
-                }`
-              }
-            >
+    <aside className="sticky top-0 w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm"
+           style={{ height: 'calc(100vh - 4rem)' }}> {/* Subtract h-16 (4rem) */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <h2 className="text-xl font-semibold text-gray-800">YourLogo</h2>
+      </div>
+      
+      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+  <div className="flex flex-col gap-1.5">
+    {menuItems.map((item) => (
+      <div key={item.to} className="flex flex-col group">
+        <NavLink
+          to={item.to}
+          onClick={(e) => handleMenuClick(item, e)}
+          className={({ isActive }) => 
+            `flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out ${
+              isActive 
+                ? "bg-gradient-to-r from-violet-50 to-violet-100 text-violet-700 shadow-sm" 
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+            }`
+          }
+        >
+          {({ isActive }) => (
+            <>
               <div className="flex items-center gap-3">
-                <span className="text-[1rem]">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className={`text-lg p-1 rounded-md transition-all ${
+                  isActive 
+                    ? "text-violet-600 bg-violet-100/50" 
+                    : "text-gray-500 group-hover:bg-gray-200/30"
+                }`}>
+                  {item.icon}
+                </span>
+                <span className="relative">
+                  {item.label}
+                  
+                </span>
               </div>
 
               {item.subItems && (
                 <FiChevronDown
-                  className={`transform transition-transform duration-300 ${openMenu === item.to ? "rotate-180" : ""
-                    }`}
+                  className={`transform transition-transform duration-200 ${
+                    openMenu === item.to 
+                      ? "rotate-180 text-violet-500" 
+                      : "text-gray-400 group-hover:text-gray-600"
+                  }`}
+                  size={18}
                 />
               )}
-            </NavLink>
+            </>
+          )}
+        </NavLink>
 
-            {item.subItems && openMenu === item.to && (
-              <div className="ml-8 mt-1 flex flex-col gap-1">
-                {item.subItems.map((sub) => (
-                  <NavLink
-                    key={sub.to}
-                    to={sub.to}
-                    onClick={toggleHandler}
-                    className={({ isActive }) =>
-                      `text-sm px-3 py-1 rounded-md transition ${isActive ? "bg-violet-50 text-violet-700" : "text-gray-600 hover:bg-gray-100"
-                      }`
-                    }
-                  >
-                    {sub.label}
-                  </NavLink>
-                ))}
-              </div>
-            )}
+        {item.subItems && openMenu === item.to && (
+          <div className="ml-10 mt-1 mb-2 flex flex-col gap-1 animate-fadeIn">
+            {item.subItems.map((sub) => (
+              <NavLink
+                key={sub.to}
+                to={sub.to}
+                onClick={toggleHandler}
+                className={({ isActive }) =>
+                  `text-sm px-3 py-1.5 rounded-lg transition-all duration-150 ${
+                    isActive 
+                      ? "bg-violet-100/80 text-violet-700 font-medium pl-4 border-l-2 border-violet-500" 
+                      : "text-gray-500 hover:bg-gray-100 hover:pl-4 hover:border-l-2 hover:border-gray-300"
+                  }`
+                }
+              >
+                {sub.label}
+              </NavLink>
+            ))}
           </div>
-        ))}
-      </nav>
+        )}
+      </div>
+    ))}
+  </div>
+</nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t h-20 flex flex-col justify-center" onClick={toggleHandler}>
-        <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-100 text-red-600 px-4 py-2 rounded-md hover:bg-red-200 transition">
+      <div className="p-4 border-t border-gray-100"> 
+        <button 
+          onClick={handleLogout} 
+          className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-md transition-all"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            strokeWidth={2}
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"
             />
           </svg>

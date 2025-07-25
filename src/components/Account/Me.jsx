@@ -8,6 +8,7 @@ import AccountSettingsCard from './AccountSettingsCard';
 import PersonalInformationCard from './PersonalInformationCard';
 import AddressModal from '../Modals/AddressModal';
 import ChangePhotoModal from "./ChangePhotoModel";
+import EmailUpdateModal from "../Modals/EmailUpdateModal";
 
 
 const Me = () => {
@@ -15,6 +16,7 @@ const Me = () => {
     const [isPhotoUpload, setIsPhotoUpload] = useState(false);
     const [isAddressForm, setIsAddressForm] = useState(false);
     const [isPhoneForm, setIsPhoneForm] = useState(false);
+    const [isEmailUpdate, setIsEmailUpdate] = useState(false);
     return (
 
         <div className="relative mt-10">
@@ -56,7 +58,9 @@ const Me = () => {
                     setIsPhoneForm={setIsPhoneForm}
                 />
 
-                <AccountSettingsCard />
+                <AccountSettingsCard 
+                    setIsEmailUpdate={setIsEmailUpdate}
+                />
 
 
                 {/* social media tabs */}
@@ -84,6 +88,9 @@ const Me = () => {
             )}
             {isAddressForm && (
                 <AddressModal onClose={() => setIsAddressForm(false)} />
+            )}
+            {isEmailUpdate && (
+                <EmailUpdateModal onClose={() => setIsEmailUpdate(false)} />
             )}
         </div>
 

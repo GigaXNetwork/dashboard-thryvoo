@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
@@ -46,82 +46,87 @@ function ScrollToTop() {
 }
 
 function App() {
-  const { userData, loading, error } = useUser();
+  const { userData, loading } = useUser();
 
   if (loading) return <LoadingAnimation />;
-
-  if (error) {
-    console.error('Authentication error:', error);
-    // Optionally render an error page or redirect to login
-    return <ErrorHandler error={error} />;
-  }
 
   const isAuthenticated = !!userData?.user;
   const role = userData?.user?.role || 'user';
 
-  // Common protected routes for all authenticated users
-  const protectedRoutes = [
-    { path: 'me', element: <Me /> },
-    { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
-    { path: 'reviews', element: <Reviews role={role} /> },
-  ];
-
-  // Admin-only routes
-  const adminRoutes = [
-    { path: '/', element: <User /> },
-    { path: 'card', element: <Card /> },
-    { path: 'coupons', element: <AllCoupon role={role} /> },
-    { path: 'whatsapp', element: <WhatsAppTemplates /> },
-    { path: 'signup', element: <SignupPage /> },
-    {
-      path: 'user/:userId',
-      element: <UserData />,
-      children: [
-        { index: true, element: <MyProfile role={role} /> },
-        { path: 'card', element: <GetMyCard role={role} /> },
-        { path: 'coupon', element: <Coupon role={role} /> },
-        { path: 'presets', element: <SetDiscountPage role={role} /> },
-        { path: 'enquary', element: <Enquary /> },
-      ]
+  // Protected Route Wrapper Component
+  const ProtectedRoute = ({ children, roles }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
     }
-  ];
-
-  // User-only routes
-  const userRoutes = [
-    { path: '/', element: <Dashboard /> },
-    { path: 'card', element: <GetMyCard role={role} /> },
-    { path: 'coupon', element: <Coupon role={role} /> },
-    { path: 'presets', element: <SetDiscountPage role={role} /> },
-    { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
-    { path: 'whatsapp/registration', element: <RegistrationInfo /> },
-  ];
+    
+    if (roles && !roles.includes(role)) {
+      return <Navigate to="/" replace />;
+    }
+    
+    return children;
+  };
 
   const router = createBrowserRouter([
-    // Public routes
-    { path: '/login', element: <Login /> },
+    // Public Routes
+    { 
+      path: '/login', 
+      element: !isAuthenticated ? <Login /> : <Navigate to="/" replace />
+    },
     { path: '/forgot', element: <ForgotPasswordPage /> },
     { path: '/resetpassword/:token', element: <ResetPasswordPage /> },
     
-    // Protected routes wrapper
+    // Protected Routes
     {
       path: '/',
-      element: isAuthenticated ? (
-        role === 'admin' ? <Admin /> : <Main />
-      ) : (
-        <Login />
+      element: (
+        <ProtectedRoute>
+          {role === 'admin' ? <Admin /> : <Main />}
+        </ProtectedRoute>
       ),
-      children: isAuthenticated ? [
+      children: [
         {
           element: <ScrollToTop />,
           children: [
-            ...protectedRoutes,
-            ...(role === 'admin' ? adminRoutes : userRoutes)
+            // Common routes
+            { path: 'me', element: <Me /> },
+            { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
+            { path: 'reviews', element: <Reviews role={role} /> },
+            
+            // Admin-only routes
+            ...(role === 'admin' ? [
+              { index: true, element: <User /> },
+              { path: 'card', element: <Card /> },
+              { path: 'coupons', element: <AllCoupon role={role} /> },
+              { path: 'whatsapp', element: <WhatsAppTemplates /> },
+              { path: 'signup', element: <SignupPage /> },
+              {
+                path: 'user/:userId',
+                element: <UserData />,
+                children: [
+                  { index: true, element: <MyProfile role={role} /> },
+                  { path: 'card', element: <GetMyCard role={role} /> },
+                  { path: 'coupon', element: <Coupon role={role} /> },
+                  { path: 'presets', element: <SetDiscountPage role={role} /> },
+                  { path: 'enquary', element: <Enquary /> },
+                ]
+              }
+            ] : []),
+            
+            // User-only routes
+            ...(role !== 'admin' ? [
+              { index: true, element: <Dashboard /> },
+              { path: 'card', element: <GetMyCard role={role} /> },
+              { path: 'coupon', element: <Coupon role={role} /> },
+              { path: 'presets', element: <SetDiscountPage role={role} /> },
+              { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
+              { path: 'whatsapp/registration', element: <RegistrationInfo /> },
+            ] : [])
           ]
         }
-      ] : []
+      ]
     },
     
-    // Error handling
+    // Error Handling
     { path: '*', element: <ErrorHandler /> }
   ]);
 
