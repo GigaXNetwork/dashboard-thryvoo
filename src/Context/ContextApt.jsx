@@ -7,64 +7,69 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-useEffect(() => {
-  const fetchData = async () => {
-     const accountToken = Cookies.get("accountToken");
-    try {
-      // 1. First check authentication
-      const authResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
-        method: 'GET',
-        credentials: 'include',
-        headers:{
-          Authorization: `${accountToken}`
-        }
-      });
-
-      if (!authResponse.ok) {
-        throw new Error(`Authentication check failed: ${authResponse.status}`);
+  useEffect(() => {
+    const fetchData = async () => {
+      const authToken = Cookies.get("authToken");
+      
+      // If no authToken is found, skip the API calls
+      if (!authToken) {
+        setLoading(false);
+        return;
       }
 
-      const authData = await authResponse.json();
-      setUserData(authData);
-
-      // 2. Only fetch address if authentication was successful
-      if (authData.status === 'success' && authData.isAuthenticated) {
-        const addressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/user/getaddress`, {
+      try {
+        // 1. First check authentication
+        const authResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
           method: 'GET',
           credentials: 'include',
           headers: {
-            'Content-Type': 'application/json',
-          },
+            Authorization: `${authToken}`
+          }
         });
 
-        if (!addressResponse.ok) {
-          throw new Error(`Address fetch failed: ${addressResponse.status}`);
+        if (!authResponse.ok) {
+          throw new Error(`Authentication check failed: ${authResponse.status}`);
         }
 
-        const addressData = await addressResponse.json();
+        const authData = await authResponse.json();
+        setUserData(authData);
+
+        // 2. Only fetch address if authentication was successful
+        if (authData.status === 'success' && authData.isAuthenticated) {
+          const addressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/user/getaddress`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!addressResponse.ok) {
+            throw new Error(`Address fetch failed: ${addressResponse.status}`);
+          }
+
+          const addressData = await addressResponse.json();
+          
+          // Update user data with address information
+          setUserData((prev) => ({
+            ...prev,
+            user: {
+              ...prev.user,
+              address: addressData.data
+            },
+          }));
+        }
         
-        // Update user data with address information
-       setUserData((prev) => ({
-        ...prev,
-        user: {
-          ...prev.user,
-          address: addressData.data
-        },
-      }));
+      } catch (err) {
+        setError(err.message);
+        console.error('Fetch error:', err);
+      } finally {
+        setLoading(false);
       }
-      
-    } catch (err) {
-      setError(err.message);
-      console.error('Fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchData();
-}, []);
-
-console.log(userData);
+    fetchData();
+  }, []);
 
   return (
     <UserContext.Provider value={{ userData, setUserData, loading, error }}>
