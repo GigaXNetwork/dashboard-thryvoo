@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router";
 import { Loader2 } from "lucide-react";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [error, setError] = useState(null);
@@ -35,6 +36,7 @@ export default function LoginPage() {
       if (response.ok) {
         console.log("Login successful", data);
         window.open("https://deskboard.thryvoo.com/","_self")
+        Cookies.set('authToken', data.token, { expires: 30 });
         setError(null); // Clear any previous error messages
         setLoading(false); // Reset loading state
       } else {
