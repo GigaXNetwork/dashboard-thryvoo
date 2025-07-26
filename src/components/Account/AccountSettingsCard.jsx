@@ -1,13 +1,43 @@
 import { FaUser } from "react-icons/fa";
-import { ChevronRight } from "lucide-react"; // or from "react-icons/bs" if preferred
+import { ChevronRight } from "lucide-react";
 import { useUser } from "../../Context/ContextApt";
+import Cookies from 'js-cookie';
 
-export default function AccountSettingsCard({setIsEmailUpdate}) {
+export default function AccountSettingsCard({ setIsEmailUpdate, setIsPasswordUpdate, setIsVerificationOtp }) {
   const { userData } = useUser();
-  const email = userData?.user?.email;
+  const email = userData?.user?.email || "Not available";
   const createdAt = userData?.user?.createdAt;
-  console.log(email);
-  
+  const isEmailVerified = userData?.user?.email_verified || false;
+
+  const sendInitialOtp = async () => {
+    try {
+      const token = Cookies.get('authToken');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/send-verification-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to send OTP');
+      }
+      
+      // Success - the modal will handle showing the OTP field
+    } catch (err) {
+      console.error('Error sending verification OTP:', err.message);
+      // Error handling can be added here if needed
+    }
+  };
+
+  const handleVerifyEmailClick = async () => {
+    if (!isEmailVerified) {
+      await sendInitialOtp();
+      setIsVerificationOtp(true);
+    }
+  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
@@ -20,9 +50,10 @@ export default function AccountSettingsCard({setIsEmailUpdate}) {
       {/* Settings List */}
       <div className="divide-y divide-gray-200">
         {/* Email */}
-        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors" onClick={()=>{
-          setIsEmailUpdate(true)
-        }}>
+        <div 
+          className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors" 
+          onClick={() => setIsEmailUpdate(true)}
+        >
           <div className="flex-1 flex items-center gap-4 flex-wrap">
             <span className="text-gray-600 flex-1 basis-[100px]">Email</span>
             <span className="text-gray-800 font-medium flex-1 basis-[100px] truncate break-all">
@@ -35,7 +66,10 @@ export default function AccountSettingsCard({setIsEmailUpdate}) {
         </div>
 
         {/* Change Password */}
-        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
+        <div 
+          className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors" 
+          onClick={() => setIsPasswordUpdate(true)}
+        >
           <div className="flex-1 flex items-center gap-4 flex-wrap">
             <span className="text-gray-600 flex-1 basis-[100px]">Change password</span>
             <span className="text-gray-800 font-medium flex-1 basis-[100px]">
@@ -47,14 +81,21 @@ export default function AccountSettingsCard({setIsEmailUpdate}) {
           </div>
         </div>
 
-        {/* 2FA */}
-        <div className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors">
+        {/* Email Verification */}
+        <div
+          className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-muted transition-colors"
+          onClick={handleVerifyEmailClick}
+        >
           <div className="flex-1 flex items-center gap-4 flex-wrap">
-            <span className="text-gray-600 flex-1 basis-[100px]">Two-Factor Authentication</span>
-            <span className="text-gray-800 font-medium flex-1 basis-[100px]">Disabled</span>
+            <span className="text-gray-600 flex-1 basis-[100px]">Verify Email</span>
+            <span className={`font-semibold flex-1 basis-[100px] ${isEmailVerified ? 'text-green-600' : 'text-red-500'}`}>
+              {isEmailVerified ? 'Verified' : 'Not Verified'}
+            </span>
           </div>
           <div className="pl-4">
-            <ChevronRight className="w-5 h-5 text-primary" />
+            {!isEmailVerified && (
+              <ChevronRight className="w-5 h-5 text-purple-600" />
+            )}
           </div>
         </div>
 

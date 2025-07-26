@@ -9,6 +9,8 @@ import PersonalInformationCard from './PersonalInformationCard';
 import AddressModal from '../Modals/AddressModal';
 import ChangePhotoModal from "./ChangePhotoModel";
 import EmailUpdateModal from "../Modals/EmailUpdateModal";
+import UpdatePasswordModal from "../Modals/UpdatePasswordModal";
+import VerifyEmailModal from "../Modals/VerifyEmailModal";
 
 
 const Me = () => {
@@ -17,6 +19,8 @@ const Me = () => {
     const [isAddressForm, setIsAddressForm] = useState(false);
     const [isPhoneForm, setIsPhoneForm] = useState(false);
     const [isEmailUpdate, setIsEmailUpdate] = useState(false);
+    const [isPasswordUpdate, setIsPasswordUpdate] = useState(false);
+    const [isVerificationOtp, setIsVerificationOtp] = useState(false);
     return (
 
         <div className="relative mt-10">
@@ -60,6 +64,8 @@ const Me = () => {
 
                 <AccountSettingsCard 
                     setIsEmailUpdate={setIsEmailUpdate}
+                    setIsPasswordUpdate={setIsPasswordUpdate}
+                    setIsVerificationOtp={setIsVerificationOtp}
                 />
 
 
@@ -91,6 +97,12 @@ const Me = () => {
             )}
             {isEmailUpdate && (
                 <EmailUpdateModal onClose={() => setIsEmailUpdate(false)} />
+            )}
+            {isPasswordUpdate && (
+                <UpdatePasswordModal onClose={() => setIsPasswordUpdate(false)} />
+            )}
+            {isVerificationOtp && (
+                <VerifyEmailModal onClose={() => setIsVerificationOtp(false)} />
             )}
         </div>
 

@@ -10,7 +10,7 @@ export default function UpdatePhoneModal({ onClose, onSubmit }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const accountToken = Cookies.get("accountToken");
+    const authToken = Cookies.get("authToken");
 
     setSubmitting(true);
     setMessage("");
@@ -20,7 +20,7 @@ export default function UpdatePhoneModal({ onClose, onSubmit }) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${accountToken}`,
+          Authorization: `${authToken}`,
         },
         credentials: "include",
         body: JSON.stringify({ phone }),

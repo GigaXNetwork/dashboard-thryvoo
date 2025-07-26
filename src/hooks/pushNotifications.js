@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
+import Cookies from 'js-cookie';
 
 const PUBLIC_VAPID_KEY = 'BGGaz8v39wfwoxIwMc8xw8zSCMitviFqbkn9G_ccxrD18a0tCxVf-HEDhAYihvnfBvWNPtMD5DHA0M8SpZ450QM';
 
 export function usePushNotifications() {
   const subscribeToPush = useCallback(async () => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
+      const token = Cookies.get('authToken');
       try {
         // 1. Register service worker
         const registration = await navigator.serviceWorker.register('/sw.js');
@@ -26,7 +28,8 @@ export function usePushNotifications() {
         await fetch('http://localhost:5000/api/notifications/subscribe', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            authorization: `${token}`
           },
           credentials: 'include',
           body: JSON.stringify(subscription)

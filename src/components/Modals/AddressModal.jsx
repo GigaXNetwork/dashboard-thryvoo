@@ -55,14 +55,14 @@ export default function AddressModal({ onClose, onSubmit }) {
     }
 
     setIsSubmitting(true);
-    const accountToken = Cookies.get("accountToken");
+    const authToken = Cookies.get("authToken");
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/updatelocation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${accountToken}`,
+          Authorization: `${authToken}`,
         },
         credentials: "include",
         body: JSON.stringify({
