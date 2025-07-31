@@ -62,7 +62,7 @@ const Signup = () => {
       if (response.ok && result.status === "success") {
         setSuccess("Signup successful!");
         setTimeout(()=>{
-           window.open("https://deskboard.thryvoo.com/","_self")
+           window.open("https://dashboard.thryvoo.com/","_self")
         },1000)
       } else {
         setError(result.message || "Something went wrong.");

@@ -12,7 +12,7 @@ export default function Onboard() {
     };
 
     const handleSubmit = () => {
-        window.open("https://deskboard.thryvoo.com/", "_self");
+        window.open("https://dashboard.thryvoo.com/", "_self");
         // TODO: Send to server
     };
 
