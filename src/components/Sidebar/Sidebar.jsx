@@ -5,31 +5,41 @@ import { FaAddressCard, FaStar, FaWhatsapp } from "react-icons/fa";
 import { IoHomeOutline } from "react-icons/io5";
 import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
+import { useUser } from "../../Context/ContextApt";
 
-function Sidebar({ user, onToggleSidebar }) {
-  const menuItems = [
-    { to: "/", icon: <IoHomeOutline />, label: "Home" },
-    { to: "/card", icon: <FaAddressCard />, label: "Card" },
-    {
+function Sidebar({ onToggleSidebar }) {
+
+  const {userData} = useUser();
+  
+
+const menuItems = [
+  { to: "/", icon: <IoHomeOutline />, label: "Home" },
+  { to: "/card", icon: <FaAddressCard />, label: "Card" },
+  userData.user.role === "admin" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
+  userData.user.role === "admin" ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
+  :
+   {
       to: "/coupon",
       icon: <RiCoupon2Fill />,
       label: "Coupons",
-      subItems: user === "user"
-        ? [
+      subItems: [
           { to: "/coupon", label: "All Coupons" },
           { to: "/presets", label: "All Presets" },
         ]
-        : undefined,
+        
     },
-    {
-      to: "/whatsapp", icon: <FaWhatsapp />, label: "WhatsApp",
-      subItems: [
-        { to: "/whatsapp/registration", label: "Registration Info" },
-        { to: "/whatsapp/templates", label: "Templates" },
-      ]
-    },
-    { to: "/reviews", icon: <FaStar />, label: "Reviews" },
-  ];
+  userData.user.role === "user"  && {
+    to: "/whatsapp",
+    icon: <FaWhatsapp />,
+    label: "WhatsApp",
+    subItems: [
+      { to: "/whatsapp/registration", label: "Registration Info" },
+      { to: "/whatsapp/templates", label: "Templates" },
+    ]
+  },
+  { to: "/reviews", icon: <FaStar />, label: "Reviews" },
+].filter(Boolean); 
+
 
   const [openMenu, setOpenMenu] = useState(null);
 

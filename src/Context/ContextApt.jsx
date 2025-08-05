@@ -11,14 +11,14 @@ export const UserProvider = ({ children }) => {
     const fetchData = async () => {
       const authToken = Cookies.get("authToken");
       
-      // If no authToken is found, skip the API calls
+     
       if (!authToken) {
         setLoading(false);
         return;
       }
 
       try {
-        // 1. First check authentication
+       
         const authResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/user/isAuthenticated`, {
           method: 'GET',
           credentials: 'include',

@@ -16,6 +16,7 @@ const menuItems = [
   { to: "/", icon: <IoHomeOutline />, label: "Home" },
   { to: "card", icon: <FaAddressCard />, label: "Card" },
   { to: "coupon", icon: <RiCoupon2Fill />, label: "Coupons" },
+  { to: "presets", icon: <RiCoupon2Fill />, label: "Presets" },
   { to: "reviews", icon: <FaStar />, label: "Reviews" },
 ];
 

@@ -4,8 +4,9 @@ import MessagePopup from '../Common/MessagePopup';
 import PresetForm from './presetForm';
 import PresetToggle from './PresetToggle';
 import PresetCard from './PresetCard';
+import { useUser } from '../../Context/ContextApt';
 
-const SetDiscountPage = ({ user }) => {
+const SetDiscountPage = () => {
     const [presets, setPresets] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -18,6 +19,8 @@ const SetDiscountPage = ({ user }) => {
     const [activeTab, setActiveTab] = useState("Own");
 
     const menuRefs = useRef([]);
+      const { userData } = useUser();
+      const user = userData.user.role;
 
 
     const toggleMenu = (i) => {
@@ -112,6 +115,15 @@ const handleSubmit = async (e) => {
         } else {
             url = setUrl;
         }
+        console.log({discountType,
+                presetName,
+                discountAmount,
+                maxDiscount: parseFloat(maxDiscount),
+                minPurchase: parseFloat(minPurchase),
+                day: parseInt(day),
+                usageLimit: parseInt(usageLimit),
+                type
+            });
 
         const res = await fetch(url, {
             method,

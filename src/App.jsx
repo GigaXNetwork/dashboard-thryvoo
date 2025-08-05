@@ -37,6 +37,7 @@ import SetDiscountPage from './components/Coupon/SetDiscountPage';
 import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
 import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
 import Dashboard from './components/Dashboard/Dashboard';
+import BlogCreateForm from './components/Blog/Blog';
 
 
 // 🔁 Scroll Wrapper
@@ -97,7 +98,7 @@ function App() {
               { index: true, element: <User /> },
               { path: 'card', element: <Card /> },
               { path: 'coupons', element: <AllCoupon role={role} /> },
-              { path: 'whatsapp', element: <WhatsAppTemplates /> },
+              { path: 'blog', element: <BlogCreateForm /> },
               { path: 'signup', element: <SignupPage /> },
               {
                 path: 'user/:userId',

@@ -88,7 +88,6 @@ function GetMyCard({ role }) {
                 {/* Action buttons */}
                 <div className="space-y-3">
                 <button
-                    asChild
                     variant="outline"
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block"
                     size="lg"

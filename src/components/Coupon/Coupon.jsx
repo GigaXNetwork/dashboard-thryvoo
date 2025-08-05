@@ -4,8 +4,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NavLink, useParams } from 'react-router';
 import CouponDetails from './CouponDetails';
 import MessagePopup from '../Common/MessagePopup';
+import { useUser } from '../../Context/ContextApt';
 
-function Coupon({ user }) {
+function Coupon() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,6 +26,12 @@ function Coupon({ user }) {
   const itemsPerPage = 10;
   const { userId } = useParams();
 
+  const { userData } = useUser();
+
+  console.log(userData.user.role);
+  
+  const user = userData.user.role;
+
   const apiUrl = user === "admin"
     ? `${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
     : `${import.meta.env.VITE_API_URL}/api/user/mycoupons`;
@@ -41,7 +48,7 @@ function Coupon({ user }) {
           ...(endDate && { 'createdAt[lt]': endDate }), // Less than filter
         };
 
-        const res = await axios.get(apiUrl, { params, withCredentials: true });
+        const res = await axios.get(apiUrl, { params, withCredentials: true, headers: { 'Content-Type': 'application/json'} });
 
         setCoupons(res.data.data.coupons || []);
         setTotalPages(Math.ceil(res.data.results / itemsPerPage));

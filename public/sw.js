@@ -1,28 +1,23 @@
-self.addEventListener('push', (event) => {
+// sw.js
+self.addEventListener('push', function(event) {
   console.log('[Service Worker] Push Received');
+  console.log(`[Service Worker] Push data: "${event.data ? event.data.text() : 'no payload'}"`);
 
-  if (!event.data) {
-    console.warn('[Service Worker] No data in push event');
-    return;
-  }
-
-  let payload = {};
+  let data = {};
   try {
-    payload = event.data.json();
+    data = event.data.json(); // If you're sending JSON
   } catch (e) {
-    console.error('[Service Worker] Failed to parse push data:', e);
+    data = { title: 'Default Title', body: event.data.text() };
   }
 
-  const title = payload.title || 'New Notification';
+  const title = data.title || 'Notification Title';
   const options = {
-    body: payload.message || 'You have a new message.',
-    icon: '/favicon.png',
-    badge: '/favicon.png',
-    data: payload.data || {}
+    body: data.body || 'Default body',
+    icon: '/icon.png',
+    badge: '/badge.png'
   };
 
   event.waitUntil(
     self.registration.showNotification(title, options)
   );
 });
-
