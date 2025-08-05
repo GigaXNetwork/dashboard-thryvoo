@@ -25,7 +25,7 @@ export function usePushNotifications() {
         });
 
         // 4. Send subscription to backend
-        await fetch('http://localhost:5000/api/notifications/subscribe', {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/subscribe`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
