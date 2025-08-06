@@ -27,9 +27,6 @@ function Coupon() {
   const { userId } = useParams();
 
   const { userData } = useUser();
-
-  console.log(userData.user.role);
-  
   const user = userData.user.role;
 
   const apiUrl = user === "admin"

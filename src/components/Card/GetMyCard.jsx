@@ -6,25 +6,19 @@ import { Badge, CheckCircle, ExternalLink, Eye, Pencil, Plus } from "lucide-reac
 import Active from "./Active";
 
 function GetMyCard({ role }) {
-  const { userId } = useParams(); // assumes route like /card/:userId
+  const { userId } = useParams();
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCreateCardForm, setIsCreateCardForm] = useState(false);
-  const [cardUrl, setcardUrl] = useState();
+  const [cardUrl, setcardUrl] = useState("");
   const [activeTab, setActiveTab] = useState("card");
-
 
   let url;
   if (role === "admin") {
-    console.log("this is admin");
-
-    url = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`
-  }
-  else {
-    console.log("this is user");
-
-    url = `${import.meta.env.VITE_API_URL}/api/user/card`
+    url = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`;
+  } else {
+    url = `${import.meta.env.VITE_API_URL}/api/user/card`;
   }
 
   useEffect(() => {
@@ -39,7 +33,6 @@ function GetMyCard({ role }) {
           credentials: "include",
         });
 
-
         if (response.status === 404) {
           setCard(null);
         } else if (!response.ok) {
@@ -47,7 +40,9 @@ function GetMyCard({ role }) {
         } else {
           const data = await response.json();
           setCard(data.data.card);
-          setcardUrl(`https://thryvoo.com/b/${data.data.card.slug}`)
+          if (data.data.card?.slug) {
+            setcardUrl(`https://thryvoo.com/b/${data.data.card.slug}`);
+          }
         }
       } catch (err) {
         setError(err.message);
@@ -57,13 +52,11 @@ function GetMyCard({ role }) {
     };
 
     fetchCard();
-  }, [userId]);
-
+  }, [userId, url]);
 
   const handleCreateCard = () => {
-    // Navigate to card creation page or open modal
     setIsCreateCardForm(true);
-  }
+  };
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
@@ -75,9 +68,6 @@ function GetMyCard({ role }) {
           <div className="p-8">
             {card ? (
               <div className="text-center space-y-6">
-                {/* Success Header */}
-
-
                 {/* Card Details */}
                 <div className="space-y-4">
                   <div className="p-4 bg-gray-50 rounded-xl">
@@ -87,10 +77,8 @@ function GetMyCard({ role }) {
 
                 {/* Action buttons */}
                 <div className="space-y-3">
-                <button
-                    variant="outline"
+                  <button
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block"
-                    size="lg"
                   >
                     <a href={cardUrl} className="flex items-center rounded-sm justify-center gap-2">
                       <ExternalLink className="w-5 h-5" />
@@ -105,8 +93,6 @@ function GetMyCard({ role }) {
                     <Pencil className="w-4 h-4" />
                     Edit Business card
                   </a>
-
-                  
                 </div>
 
                 {/* QR Code Section */}
@@ -114,11 +100,14 @@ function GetMyCard({ role }) {
                   <QRCodeGenerator url={cardUrl} />
                 </div>
 
-                {activeTab && role === "admin" && (<Active card={{
-                  _id: card._id,
-                  status: card.status,
-                  expireAt: card.expire
-                }} />)}
+                {/* Safely render Active component only when needed */}
+                {activeTab && role === "admin" && card?._id && (
+                  <Active card={{
+                    _id: card._id,
+                    status: card.status || "active", // default value if undefined
+                    expireAt: card.expire || null    // default value if undefined
+                  }} />
+                )}
               </div>
             ) : (
               <div className="text-center space-y-6">
@@ -146,8 +135,8 @@ function GetMyCard({ role }) {
                     userId={userId}
                     onClose={() => setIsCreateCardForm(false)}
                     onSubmit={(newCard) => {
-                      setCard(newCard); // Update the card state with the newly created card
-                      if (newCard.slug) {
+                      setCard(newCard);
+                      if (newCard?.slug) {
                         setcardUrl(`https://thryvoo.com/b/${newCard.slug}`);
                       }
                       setIsCreateCardForm(false);
@@ -158,8 +147,6 @@ function GetMyCard({ role }) {
             )}
           </div>
         </div>
-
-
       </div>
     </div>
   );

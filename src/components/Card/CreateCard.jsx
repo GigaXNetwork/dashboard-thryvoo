@@ -2,16 +2,75 @@ import React, { useState } from "react";
 import Cookies from "js-cookie";
 import "./Card.css"
 
-export default function CreateCard({ onClose, onSubmit,userId }) {
+export default function CreateCard({ onClose, onSubmit, userId }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [category, setCategory] = useState(""); // Empty by default
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    category: ""
+  });
+
+  const categories = [
+    "Restaurants",
+    "Retail",
+    "Healthcare",
+    "Real Estate",
+    "Education",
+    "Banking",
+    "E-commerce",
+    "Hotels"
+  ];
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {
+      name: "",
+      email: "",
+      phone: "",
+      category: ""
+    };
+
+    if (!name.trim()) {
+      newErrors.name = "Business name is required";
+      valid = false;
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email";
+      valid = false;
+    }
+
+    if (!phone.trim()) {
+      newErrors.phone = "Phone number is required";
+      valid = false;
+    }
+
+    if (!category) {
+      newErrors.category = "Please select a category";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const accountToken = Cookies.get("accountToken");
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    const authToken = Cookies.get("authToken");
     setSubmitting(true);
     setMessage("");
 
@@ -20,10 +79,10 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${accountToken}`,
+          Authorization: `${authToken}`,
         },
         credentials: "include",
-        body: JSON.stringify({ name, email, phone }),
+        body: JSON.stringify({ name, email, phone, category }),
       });
 
       if (!response.ok) throw new Error("Failed to create card");
@@ -37,6 +96,13 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
       setName("");
       setEmail("");
       setPhone("");
+      setCategory("");
+      setErrors({
+        name: "",
+        email: "",
+        phone: "",
+        category: ""
+      });
     } catch (err) {
       console.error("Error creating card:", err.message);
       setMessage("❌ Something went wrong. Please try again.");
@@ -60,7 +126,7 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
           Create Your Card
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1 text-left">Your Business Name</label>
             <input
@@ -69,8 +135,8 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="John Doe"
-              required
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
 
           <div>
@@ -81,8 +147,8 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="john@example.com"
-              required
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
           <div>
@@ -93,8 +159,25 @@ export default function CreateCard({ onClose, onSubmit,userId }) {
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
               placeholder="+1 234 567 8900"
-              required
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1 text-left">Business Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3E82EB]"
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
           </div>
 
           {message && (

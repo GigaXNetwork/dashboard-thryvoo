@@ -2,12 +2,22 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useCard } from "../../Context/CardContext";
 
-
-export default function BasicData({ handleNext, handleBack, cardId ,role}) {
+export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const [apperror, setError] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
-    const { cardData, setCardData, error, loading } = useCard()
+    const { cardData, setCardData, error, loading } = useCard();
+
+    const categories = [
+        "Restaurants",
+        "Retail",
+        "Healthcare",
+        "Real Estate",
+        "Education",
+        "Banking",
+        "E-commerce",
+        "Hotels"
+    ];
 
     const [formData, setFormData] = useState({
         name: "",
@@ -15,11 +25,14 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
         email: "",
         bio: "",
         address: "",
+        category: "",
         logo: null,
         photo: null,
     });
 
     useEffect(() => {
+        console.log(cardData);
+        
         if (cardData) {
             setFormData((prev) => ({
                 ...prev,
@@ -28,6 +41,7 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
                 email: cardData.email || "",
                 bio: cardData.bio || "",
                 address: cardData.address || "",
+                category: cardData.category || "",
                 logo: cardData.logo || null,
                 photo: cardData.photo || null,
             }));
@@ -72,11 +86,10 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
         });
 
         let url;
-        if(role==="admin"){
-            url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/basic`
-        }
-        else{
-            url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/basic`
+        if (role === "admin") {
+            url = `${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/basic`;
+        } else {
+            url = `${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/basic`;
         }
 
         try {
@@ -122,13 +135,32 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
                 name="photo"
                 preview={photoPreview}
                 handleFileChange={handleFileChange}
-                previewClass=" w-full rounded object-cover border"
+                previewClass="w-full rounded object-cover border"
             />
 
             {/* Text Inputs */}
             <TextInput label="Full Name" name="name" value={formData.name} handleChange={handleChange} placeholder="John Doe" />
             <TextInput label="Phone" name="phone" value={formData.phone} handleChange={handleChange} placeholder="+1 234 567 890" />
             <TextInput label="Email" name="email" value={formData.email} handleChange={handleChange} placeholder="john@example.com" />
+            
+            {/* Category Dropdown */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="mt-1 w-full border px-4 py-2 rounded-md"
+                >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <TextArea label="Bio" name="bio" value={formData.bio} handleChange={handleChange} placeholder="Write a short bio..." />
             <TextInput label="Address" name="address" value={formData.address} handleChange={handleChange} placeholder="1234 Main St, City, Country" />
 
@@ -152,7 +184,7 @@ export default function BasicData({ handleNext, handleBack, cardId ,role}) {
     );
 }
 
-// Reusable Components
+// Reusable Components (keep these the same as before)
 function FileUpload({ label, name, preview, handleFileChange, previewClass }) {
     return (
         <div>
