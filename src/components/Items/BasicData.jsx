@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useCard } from "../../Context/CardContext";
 
+
 export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const [apperror, setError] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const { cardData, setCardData, error, loading } = useCard();
+
 
     const categories = [
         "Restaurants",
@@ -24,15 +26,17 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
         phone: "",
         email: "",
         bio: "",
-        address: "",
+        addressLine: "",
+        city: "",
+        state: "",
+        country: "",
+        pinCode: "",
         category: "",
         logo: null,
         photo: null,
     });
 
     useEffect(() => {
-        console.log(cardData);
-        
         if (cardData) {
             setFormData((prev) => ({
                 ...prev,
@@ -40,7 +44,11 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
                 phone: cardData.phone || "",
                 email: cardData.email || "",
                 bio: cardData.bio || "",
-                address: cardData.address || "",
+                addressLine: cardData.addressLine || "",
+                city: cardData.city || "",
+                state: cardData.state || "",
+                country: cardData.country || "",
+                pinCode: cardData.pinCode || "",
                 category: cardData.category || "",
                 logo: cardData.logo || null,
                 photo: cardData.photo || null,
@@ -77,6 +85,12 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const handleSubmit = async () => {
         setError(null);
         const authToken = Cookies.get("authToken");
+
+        // Validate PIN code
+        if (!/^[1-9][0-9]{5}$/.test(formData.pinCode)) {
+            setError("Please enter a valid 6-digit PIN code (starting with 1-9)");
+            return;
+        }
 
         const data = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
@@ -162,7 +176,26 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
             </div>
 
             <TextArea label="Bio" name="bio" value={formData.bio} handleChange={handleChange} placeholder="Write a short bio..." />
-            <TextInput label="Address" name="address" value={formData.address} handleChange={handleChange} placeholder="1234 Main St, City, Country" />
+            
+            {/* Address Fields */}
+           
+            <TextInput label="Address Line" name="addressLine" value={formData.addressLine} handleChange={handleChange} placeholder="Apartment, studio, or floor" />
+            <div className="grid grid-cols-2 gap-4">
+                <TextInput label="City" name="city" value={formData.city} handleChange={handleChange} placeholder="City" />
+                <TextInput label="State" name="state" value={formData.state} handleChange={handleChange} placeholder="State" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <TextInput label="Country" name="country" value={formData.country} handleChange={handleChange} placeholder="Country" />
+                <TextInput 
+                    label="PIN Code" 
+                    name="pinCode" 
+                    value={formData.pinCode} 
+                    handleChange={handleChange} 
+                    placeholder="6-digit code" 
+                    pattern="[1-9][0-9]{5}"
+                    title="6-digit PIN code starting with 1-9"
+                />
+            </div>
 
             {/* Error */}
             {apperror && <p className="text-red-500 text-sm">{apperror}</p>}
@@ -205,7 +238,7 @@ function FileUpload({ label, name, preview, handleFileChange, previewClass }) {
     );
 }
 
-function TextInput({ label, name, value, handleChange, placeholder }) {
+function TextInput({ label, name, value, handleChange, placeholder, pattern, title }) {
     return (
         <div>
             <label className="block text-sm font-medium text-gray-700">{label}</label>
@@ -216,6 +249,8 @@ function TextInput({ label, name, value, handleChange, placeholder }) {
                 onChange={handleChange}
                 className="mt-1 w-full border px-4 py-2 rounded-md"
                 placeholder={placeholder}
+                pattern={pattern}
+                title={title}
             />
         </div>
     );
