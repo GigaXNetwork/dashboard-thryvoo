@@ -74,6 +74,7 @@ export default function PresetForm({
           ] : []),
           { label: 'Min Purchase', name: 'minPurchase', type: 'number' },
           { label: 'Valid Days', name: 'day', type: 'number' },
+          { label: 'Valid Hours', name: 'hour', type: 'number' },
           { label: 'Usage Limit', name: 'usageLimit', type: 'number' }
         ].map(({ label, name, type }) => (
           <div key={name} className="w-full">

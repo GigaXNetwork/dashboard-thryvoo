@@ -38,6 +38,7 @@ import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
 import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
 import Dashboard from './components/Dashboard/Dashboard';
 import BlogCreateForm from './components/Blog/Blog';
+import BlogListPage from './components/Blog/BlogListPage';
 
 
 // 🔁 Scroll Wrapper
@@ -98,7 +99,7 @@ function App() {
               { index: true, element: <User /> },
               { path: 'card', element: <Card /> },
               { path: 'coupons', element: <AllCoupon role={role} /> },
-              { path: 'blog', element: <BlogCreateForm /> },
+              { path: 'blog', element: <BlogListPage /> },
               { path: 'signup', element: <SignupPage /> },
               {
                 path: 'user/:userId',
