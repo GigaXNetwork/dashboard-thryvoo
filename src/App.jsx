@@ -39,6 +39,9 @@ import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
 import Dashboard from './components/Dashboard/Dashboard';
 import BlogCreateForm from './components/Blog/Blog';
 import BlogListPage from './components/Blog/BlogListPage';
+import Setting from './components/Setting/Setting';
+import MediaRewards from './components/SocialMedia/MediaRewards';
+import SocialMedia from './components/SocialMedia/SocialMedia';
 
 
 // 🔁 Scroll Wrapper
@@ -101,6 +104,7 @@ function App() {
               { path: 'coupons', element: <AllCoupon role={role} /> },
               { path: 'blog', element: <BlogListPage /> },
               { path: 'signup', element: <SignupPage /> },
+              { path: 'setting', element: <Setting /> },
               {
                 path: 'user/:userId',
                 element: <UserData />,
@@ -120,6 +124,8 @@ function App() {
               { path: 'card', element: <GetMyCard role={role} /> },
               { path: 'coupon', element: <Coupon role={role} /> },
               { path: 'presets', element: <SetDiscountPage role={role} /> },
+              { path: 'media/allMedia', element: <MediaRewards /> },
+              { path: 'media/setMedia', element: <SocialMedia /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
             ] : [])

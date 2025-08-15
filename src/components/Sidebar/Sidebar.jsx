@@ -16,6 +16,7 @@ const menuItems = [
   { to: "/", icon: <IoHomeOutline />, label: "Home" },
   { to: "/card", icon: <FaAddressCard />, label: "Card" },
   userData.user.role === "admin" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
+  userData.user.role === "admin" && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
   userData.user.role === "admin" ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
   :
    {
@@ -35,6 +36,15 @@ const menuItems = [
     subItems: [
       { to: "/whatsapp/registration", label: "Registration Info" },
       { to: "/whatsapp/templates", label: "Templates" },
+    ]
+  },
+  userData.user.role === "user"  && {
+    to: "/media",
+    icon: <FaWhatsapp />,
+    label: "Media",
+    subItems: [
+      { to: "/media/setMedia", label: "Set Media" },
+      { to: "/media/allMedia", label: "All Media" },
     ]
   },
   { to: "/reviews", icon: <FaStar />, label: "Reviews" },
