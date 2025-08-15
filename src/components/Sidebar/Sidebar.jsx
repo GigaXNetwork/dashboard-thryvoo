@@ -6,6 +6,7 @@ import { IoHomeOutline } from "react-icons/io5";
 import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
+import { MdOutlinePermMedia } from "react-icons/md";
 
 function Sidebar({ onToggleSidebar }) {
 
@@ -40,7 +41,7 @@ const menuItems = [
   },
   userData.user.role === "user"  && {
     to: "/media",
-    icon: <FaWhatsapp />,
+    icon: <MdOutlinePermMedia />,
     label: "Media",
     subItems: [
       { to: "/media/setMedia", label: "Set Media" },

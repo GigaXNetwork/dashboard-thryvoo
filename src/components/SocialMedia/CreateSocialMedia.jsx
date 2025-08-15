@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
-import { FaPlus, FaTimes, FaSpinner } from 'react-icons/fa';
+import { FaPlus, FaTimes, FaSpinner, FaSave, FaWhatsapp } from 'react-icons/fa';
 import {
     FaFacebook,
     FaInstagram,
@@ -10,8 +10,15 @@ import {
     FaTiktok,
     FaGlobe
 } from 'react-icons/fa';
+import { FaThreads, FaXTwitter } from "react-icons/fa6";
 
-const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
+const CreateSocialMedia = ({
+    onClose,
+    onCreateSuccess,
+    onUpdateSuccess,
+    editingMedia,
+    isEditing
+}) => {
     const [formData, setFormData] = useState({
         mediaType: '',
         link: '',
@@ -20,13 +27,46 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // Initialize form with editing data if in edit mode
+    useEffect(() => {
+        if (isEditing && editingMedia) {
+            setFormData({
+                mediaType: editingMedia.mediaType || '',
+                link: editingMedia.link || '',
+                conditions: editingMedia.conditions && editingMedia.conditions.length > 0
+                    ? [...editingMedia.conditions]
+                    : ['']
+            });
+        } else {
+            // Reset form for create mode
+            setFormData({
+                mediaType: '',
+                link: '',
+                conditions: ['']
+            });
+        }
+    }, [isEditing, editingMedia]);
+
     const mediaTypes = [
         { value: 'facebook', label: 'Facebook', icon: <FaFacebook className="text-blue-600" /> },
         { value: 'instagram', label: 'Instagram', icon: <FaInstagram className="text-pink-600" /> },
-        { value: 'twitter', label: 'Twitter', icon: <FaTwitter className="text-blue-400" /> },
-        { value: 'linkedin', label: 'LinkedIn', icon: <FaLinkedin className="text-blue-700" /> },
+        {
+            value: 'x',
+            label: 'X',
+            icon: <FaXTwitter className="text-black" /> // Using Twitter icon for X
+        },
+        {
+            value: 'threads',
+            label: 'Threads',
+            icon: <FaThreads className="text-black" /> // Using Threads icon
+        },
+        {
+            value: 'whatsapp',
+            label: 'WhatsApp',
+            icon: <FaWhatsapp className="text-green-500" /> // Using WhatsApp icon
+        },
         { value: 'youtube', label: 'YouTube', icon: <FaYoutube className="text-red-600" /> },
-        { value: 'tiktok', label: 'TikTok', icon: <FaTiktok className="text-black" /> },
+        { value: 'linkedin', label: 'LinkedIn', icon: <FaLinkedin className="text-blue-700" /> },
         { value: 'other', label: 'Other', icon: <FaGlobe className="text-gray-600" /> }
     ];
 
@@ -58,7 +98,7 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
         const newConditions = formData.conditions.filter((_, i) => i !== index);
         setFormData(prev => ({
             ...prev,
-            conditions: newConditions
+            conditions: newConditions.length > 0 ? newConditions : ['']
         }));
     };
 
@@ -68,14 +108,11 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
         setError(null);
 
         // Filter out empty conditions
-        const filteredConditions = formData.conditions.filter(condition => condition.trim() !== '');
+        const filteredConditions = formData.conditions
+            .map(condition => condition.trim())
+            .filter(condition => condition !== '');
 
-        if (filteredConditions.length === 0) {
-            setError('Please add at least one condition');
-            setLoading(false);
-            return;
-        }
-
+        // Validation
         if (!formData.mediaType) {
             setError('Please select a social media platform');
             setLoading(false);
@@ -88,10 +125,22 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
             return;
         }
 
+        if (filteredConditions.length === 0) {
+            setError('Please add at least one condition');
+            setLoading(false);
+            return;
+        }
+
         const token = Cookies.get('authToken');
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/social-media`, {
-                method: "POST",
+            const url = isEditing && editingMedia
+                ? `${import.meta.env.VITE_API_URL}/api/social-media/${editingMedia._id}`
+                : `${import.meta.env.VITE_API_URL}/api/social-media`;
+
+            const method = isEditing ? 'PATCH' : 'POST';
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `${token}`,
@@ -106,11 +155,17 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to create social media offer");
+                throw new Error(errorData.message || `Failed to ${isEditing ? 'update' : 'create'} social media offer`);
             }
 
             const data = await response.json();
-            onCreateSuccess(data.data.socialMedia);
+
+            if (isEditing) {
+                onUpdateSuccess(data.data.socialMedia);
+            } else {
+                onCreateSuccess(data.data.socialMedia);
+            }
+
             onClose();
         } catch (error) {
             setError(error.message);
@@ -124,8 +179,14 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">Create Social Media Offer</h2>
-                        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            {isEditing ? 'Edit Social Media Offer' : 'Create Social Media Offer'}
+                        </h2>
+                        <button
+                            onClick={onClose}
+                            className="text-gray-500 hover:text-gray-700"
+                            disabled={loading}
+                        >
                             <FaTimes className="text-xl" />
                         </button>
                     </div>
@@ -150,6 +211,7 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, mediaType: type.value }))}
                                         className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 ${formData.mediaType === type.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                                        disabled={loading}
                                     >
                                         <span className="text-2xl mb-1">{type.icon}</span>
                                         <span className="text-sm">{type.label}</span>
@@ -171,6 +233,7 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
                                 placeholder="https://example.com/your-page"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                 required
+                                disabled={loading}
                             />
                         </div>
 
@@ -187,12 +250,14 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
                                             onChange={(e) => handleConditionChange(index, e.target.value)}
                                             placeholder={`Condition ${index + 1}`}
                                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            disabled={loading}
                                         />
                                         {formData.conditions.length > 1 && (
                                             <button
                                                 type="button"
                                                 onClick={() => removeCondition(index)}
                                                 className="ml-2 p-2 text-red-500 hover:text-red-700"
+                                                disabled={loading}
                                             >
                                                 <FaTimes />
                                             </button>
@@ -203,6 +268,7 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
                                     type="button"
                                     onClick={addCondition}
                                     className="flex items-center text-sm text-blue-600 hover:text-blue-800 mt-2"
+                                    disabled={loading}
                                 >
                                     <FaPlus className="mr-1" /> Add Condition
                                 </button>
@@ -226,10 +292,17 @@ const CreateSocialMedia = ({ onClose, onCreateSuccess }) => {
                                 {loading ? (
                                     <>
                                         <FaSpinner className="animate-spin mr-2" />
-                                        Creating...
+                                        {isEditing ? 'Saving...' : 'Creating...'}
                                     </>
                                 ) : (
-                                    "Create Offer"
+                                    <>
+                                        {isEditing ? (
+                                            <>
+                                                <FaSave className="mr-2" />
+                                                Save Changes
+                                            </>
+                                        ) : 'Create Offer'}
+                                    </>
                                 )}
                             </button>
                         </div>
