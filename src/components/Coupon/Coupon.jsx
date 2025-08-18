@@ -174,7 +174,7 @@ function Coupon() {
         <div className="relative  mx-auto">
           <input
             type="text"
-            placeholder="🔍 Search by code..."
+            placeholder="Search by code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
