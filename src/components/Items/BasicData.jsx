@@ -8,6 +8,8 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const [logoPreview, setLogoPreview] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const { cardData, setCardData, error, loading } = useCard();
+    console.log(cardId);
+    
 
 
     const categories = [

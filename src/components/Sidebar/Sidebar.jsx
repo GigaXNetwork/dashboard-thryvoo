@@ -7,6 +7,7 @@ import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia } from "react-icons/md";
+import { IoIosFlash } from "react-icons/io";
 
 function Sidebar({ onToggleSidebar }) {
 
@@ -30,6 +31,8 @@ const menuItems = [
         ]
         
     },
+  userData.user.role === "user"  && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
+
   userData.user.role === "user"  && {
     to: "/whatsapp",
     icon: <FaWhatsapp />,

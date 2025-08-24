@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaTag, FaEllipsisV, FaEdit, FaTrash } from 'react-icons/fa';
 import MessagePopup from '../Common/MessagePopup';
+import { FaDeleteLeft } from 'react-icons/fa6';
 
 const SocialMediaCard = ({
     media,
@@ -21,7 +22,8 @@ const SocialMediaCard = ({
         toggleMenu(index);
     };
 
-
+    // Check if media has rewards data
+    const hasRewards = media.rewards && Object.keys(media.rewards).length > 0;
 
     return (
         <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 relative">
@@ -57,7 +59,7 @@ const SocialMediaCard = ({
                             onClick={() => onDelete(media)}  // Just call onDelete with the media
                             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
                         >
-                            <FaEdit className="w-4 h-4 mr-3 text-red-500" />
+                            <FaDeleteLeft className="w-4 h-4 mr-3 text-red-500" />
                             Delete
                         </button>
                     </div>
@@ -88,14 +90,40 @@ const SocialMediaCard = ({
                     </div>
                 </div>
 
-                <div className="rounded-lg p-3 mb-4 bg-gradient-to-r from-yellow-100 via-yellow-50 to-yellow-100 border border-yellow-200 shadow-sm">
-                    <h4 className="text-xs font-semibold text-yellow-800 mb-1 flex items-center tracking-wide">
-                        <FaTag className="mr-2 text-yellow-700" /> DISCOUNT OFFER
-                    </h4>
-                    <p className="text-2xl font-bold text-yellow-900 text-center">
-                        100 coins
-                    </p>
-                </div>
+                {/* Reward display section - conditional rendering */}
+                {hasRewards ? (
+                    <div className="rounded-lg p-3 mb-4 bg-gradient-to-r from-yellow-100 via-yellow-50 to-yellow-100 border border-yellow-200 shadow-sm">
+                        <h4 className="text-xs font-semibold text-yellow-800 mb-1 flex items-center tracking-wide">
+                            <FaTag className="mr-2 text-yellow-700" /> DISCOUNT OFFER
+                        </h4>
+                        <div className="space-y-2">
+                            <p className="text-lg font-bold text-yellow-900 text-center">
+                                {media.rewards.discountType === 'percentage' && `${media.rewards.discountAmount}% Off`}
+                                {media.rewards.discountType === 'fixed' && `₹${media.rewards.discountAmount} Off`}
+                                {media.rewards.discountType === 'custom' && media.rewards.discountAmount}
+                            </p>
+                            {media.rewards.minPurchase && (
+                                <p className="text-xs text-yellow-700 text-center">
+                                    On min. purchase of ₹{media.rewards.minPurchase}
+                                </p>
+                            )}
+                            {media.rewards.maxDiscount && (
+                                <p className="text-xs text-yellow-700 text-center">
+                                    Max. discount: ₹{media.rewards.maxDiscount}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="rounded-lg p-3 mb-4 bg-gradient-to-r from-yellow-100 via-yellow-50 to-yellow-100 border border-yellow-200 shadow-sm">
+                        <h4 className="text-xs font-semibold text-yellow-800 mb-1 flex items-center tracking-wide">
+                            <FaTag className="mr-2 text-yellow-700" /> DISCOUNT OFFER
+                        </h4>
+                        <p className="text-2xl font-bold text-yellow-900 text-center">
+                            100 coins
+                        </p>
+                    </div>
+                )}
 
                 {media.conditions && media.conditions.length > 0 && (
                     <div className="mb-5">

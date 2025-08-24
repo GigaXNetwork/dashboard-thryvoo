@@ -38,7 +38,7 @@ const SetDiscountPage = () => {
         type: 'own'
     });
 
-    const tabs = ["Own", "Cross Brand", "Offer"]
+    const tabs = ["Own", "Cross Brand"]
 
     const { userId } = useParams();
     const getUrl = user === 'admin'

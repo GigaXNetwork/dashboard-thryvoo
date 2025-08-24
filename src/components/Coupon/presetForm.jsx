@@ -61,7 +61,6 @@ export default function PresetForm({
           >
             <option value="own">Own</option>
             <option value="cross">Cross Brand</option>
-            <option value="offer">Offer</option>
           </select>
         </div>
 

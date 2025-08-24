@@ -22,10 +22,46 @@ const CreateSocialMedia = ({
     const [formData, setFormData] = useState({
         mediaType: '',
         link: '',
-        conditions: ['']
+        conditions: [''],
+        rewards: '' // Added rewards field
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [couponPresets, setCouponPresets] = useState([]); // State for coupon presets
+    const [loadingPresets, setLoadingPresets] = useState(false); // Loading state for presets
+
+    // Fetch coupon presets on component mount
+    useEffect(() => {
+        const fetchCouponPresets = async () => {
+            setLoadingPresets(true);
+            const token = Cookies.get('authToken');
+
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/coupon/presetsName`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `${token}`,
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch coupon presets');
+                }
+
+                const data = await response.json();
+                setCouponPresets(data.data || []);
+            } catch (error) {
+                console.error('Error fetching coupon presets:', error);
+                setError('Failed to load rewardss');
+            } finally {
+                setLoadingPresets(false);
+            }
+        };
+
+        fetchCouponPresets();
+    }, []);
 
     // Initialize form with editing data if in edit mode
     useEffect(() => {
@@ -35,14 +71,16 @@ const CreateSocialMedia = ({
                 link: editingMedia.link || '',
                 conditions: editingMedia.conditions && editingMedia.conditions.length > 0
                     ? [...editingMedia.conditions]
-                    : ['']
+                    : [''],
+                rewards: editingMedia.rewards || '' // Initialize rewards if editing
             });
         } else {
             // Reset form for create mode
             setFormData({
                 mediaType: '',
                 link: '',
-                conditions: ['']
+                conditions: [''],
+                rewards: '' // Reset rewards field
             });
         }
     }, [isEditing, editingMedia]);
@@ -53,17 +91,17 @@ const CreateSocialMedia = ({
         {
             value: 'x',
             label: 'X',
-            icon: <FaXTwitter className="text-black" /> // Using Twitter icon for X
+            icon: <FaXTwitter className="text-black" />
         },
         {
             value: 'threads',
             label: 'Threads',
-            icon: <FaThreads className="text-black" /> // Using Threads icon
+            icon: <FaThreads className="text-black" />
         },
         {
             value: 'whatsapp',
             label: 'WhatsApp',
-            icon: <FaWhatsapp className="text-green-500" /> // Using WhatsApp icon
+            icon: <FaWhatsapp className="text-green-500" />
         },
         { value: 'youtube', label: 'YouTube', icon: <FaYoutube className="text-red-600" /> },
         { value: 'linkedin', label: 'LinkedIn', icon: <FaLinkedin className="text-blue-700" /> },
@@ -131,6 +169,12 @@ const CreateSocialMedia = ({
             return;
         }
 
+        if (!formData.rewards) {
+            setError('Please select a rewards');
+            setLoading(false);
+            return;
+        }
+
         const token = Cookies.get('authToken');
         try {
             const url = isEditing && editingMedia
@@ -148,7 +192,8 @@ const CreateSocialMedia = ({
                 body: JSON.stringify({
                     mediaType: formData.mediaType,
                     link: formData.link,
-                    conditions: filteredConditions
+                    conditions: filteredConditions,
+                    rewards: formData.rewards // Include rewards in the request
                 }),
                 credentials: 'include'
             });
@@ -237,6 +282,45 @@ const CreateSocialMedia = ({
                             />
                         </div>
 
+<div className="mb-6">
+    <label htmlFor="rewards" className="block text-sm font-medium text-gray-700 mb-2">
+        Rewards
+    </label>
+    <select
+        id="rewards"
+        name="rewards"
+        value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+        onChange={handleChange}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        required
+        disabled={loading || loadingPresets}
+    >
+        <option value="">Select a reward</option>
+        {/* Show current value first if it exists and isn't in the preset list */}
+        {formData.rewards && !couponPresets.some(preset => 
+            preset._id === (typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards)
+        ) && (
+            <option 
+                key={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards} 
+                value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+            >
+                {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
+            </option>
+        )}
+        {couponPresets.map((preset) => (
+            <option key={preset._id} value={preset._id}>
+                {preset.presetName}
+            </option>
+        ))}
+    </select>
+    {loadingPresets && (
+        <div className="mt-2 flex items-center text-sm text-gray-500">
+            <FaSpinner className="animate-spin mr-2" />
+            Loading rewards...
+        </div>
+    )}
+</div>
+
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Terms & Conditions
@@ -287,7 +371,7 @@ const CreateSocialMedia = ({
                             <button
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center min-w-[100px]"
-                                disabled={loading}
+                                disabled={loading || loadingPresets}
                             >
                                 {loading ? (
                                     <>

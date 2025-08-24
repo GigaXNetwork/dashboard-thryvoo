@@ -42,6 +42,7 @@ import BlogListPage from './components/Blog/BlogListPage';
 import Setting from './components/Setting/Setting';
 import MediaRewards from './components/SocialMedia/MediaRewards';
 import SocialMedia from './components/SocialMedia/SocialMedia';
+import FlashHourOffer from './components/FlashHourOffer/FlashHourOffer';
 
 
 // 🔁 Scroll Wrapper
@@ -124,6 +125,7 @@ function App() {
               { path: 'card', element: <GetMyCard role={role} /> },
               { path: 'coupon', element: <Coupon role={role} /> },
               { path: 'presets', element: <SetDiscountPage role={role} /> },
+              { path: 'flashOffer', element: <FlashHourOffer role={role} /> },
               { path: 'media/allMedia', element: <MediaRewards /> },
               { path: 'media/setMedia', element: <SocialMedia /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
