@@ -11,7 +11,6 @@ function UserCard({name, profile, email, id}) {
         draggable={false}
       />
       <h2 className="text-xl font-semibold mb-1 capitalize">{name}</h2>
-      <p className="text-gray-500 mb-4 max-w-[250px] mx-auto break-words ">{email}</p>
       <Link to={`/user/${id}`}
         type="button"
         className="w-full block py-2 px-4 bg-blue-600 text-white rounded-lg transition-colors duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
