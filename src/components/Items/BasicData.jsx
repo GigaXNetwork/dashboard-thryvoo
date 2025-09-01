@@ -7,21 +7,37 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const [apperror, setError] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [categories, setCategories] = useState([]);
     const { cardData, setCardData, error, loading } = useCard();
     console.log(cardId);
-    
 
 
-    const categories = [
-        "Restaurants",
-        "Retail",
-        "Healthcare",
-        "Real Estate",
-        "Education",
-        "Banking",
-        "E-commerce",
-        "Hotels"
-    ];
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setError(null);
+
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/category`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch categories: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setCategories(data.data.category || []);
+            } catch (err) {
+                setError(err.message);
+                console.error('Error fetching categories:', err);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -158,7 +174,7 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
             <TextInput label="Full Name" name="name" value={formData.name} handleChange={handleChange} placeholder="John Doe" />
             <TextInput label="Phone" name="phone" value={formData.phone} handleChange={handleChange} placeholder="+1 234 567 890" />
             <TextInput label="Email" name="email" value={formData.email} handleChange={handleChange} placeholder="john@example.com" />
-            
+
             {/* Category Dropdown */}
             <div>
                 <label className="block text-sm font-medium text-gray-700">Category</label>
@@ -178,9 +194,9 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
             </div>
 
             <TextArea label="Bio" name="bio" value={formData.bio} handleChange={handleChange} placeholder="Write a short bio..." />
-            
+
             {/* Address Fields */}
-           
+
             <TextInput label="Address Line" name="addressLine" value={formData.addressLine} handleChange={handleChange} placeholder="Apartment, studio, or floor" />
             <div className="grid grid-cols-2 gap-4">
                 <TextInput label="City" name="city" value={formData.city} handleChange={handleChange} placeholder="City" />
@@ -188,12 +204,12 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <TextInput label="Country" name="country" value={formData.country} handleChange={handleChange} placeholder="Country" />
-                <TextInput 
-                    label="PIN Code" 
-                    name="pinCode" 
-                    value={formData.pinCode} 
-                    handleChange={handleChange} 
-                    placeholder="6-digit code" 
+                <TextInput
+                    label="PIN Code"
+                    name="pinCode"
+                    value={formData.pinCode}
+                    handleChange={handleChange}
+                    placeholder="6-digit code"
                     pattern="[1-9][0-9]{5}"
                     title="6-digit PIN code starting with 1-9"
                 />

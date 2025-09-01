@@ -1,6 +1,4 @@
 import { useState } from "react";
-import TopNav from "../Common/TopNav";
-import Theme from "./Theme";
 import { useParams } from "react-router";
 import BasicData from "./BasicData";
 import Social from "./Social";
@@ -9,9 +7,7 @@ import { useCard } from "../../Context/CardContext";
 
 
 function Items({role}) {
-  const { cardData, loading, error } = useCard()
-  console.log("card data", cardData, loading, error);
-
+  const { cardData, loading, error } = useCard();
   const { cardId } = useParams();
 
   const [step, setStep] = useState(1);
