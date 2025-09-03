@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import UserCard from "./UserCard";
 import "./User.css";
 import { Link } from "react-router";
+import axios from "axios";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 function User() {
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
@@ -11,7 +13,7 @@ function User() {
     page: 1,
     limit: 6
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,39 +21,80 @@ function User() {
     password: "",
     confirmpassword: "",
   });
-  const [layout, setLayout] = useState("card"); // "card" or "list"
+  const [layout, setLayout] = useState("card");
+  const [pagination, setPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    hasNextPage: false,
+    hasPreviousPage: false
+  });
 
   const maxVisiblePages = 5;
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Build query parameters from filters
+  const buildQueryParams = useCallback(() => {
+    const params = {
+      page: filters.page,
+      limit: filters.limit,
+    };
 
-  const fetchUsers = async () => {
+    if (filters.search.trim()) params.search = filters.search.trim();
+
+    return params;
+  }, [filters]);
+
+  // Fetch users with query parameters
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const queryParams = buildQueryParams();
+      
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admin/users`,
+        {
+          params: queryParams,
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      const result = await response.json();
-      if (response.ok && result.status === "success") {
+      const result = response.data;
+      if (result.status === "success") {
         setUsers(result.data.users || []);
-      } else {
-        console.error("API error:", result.message);
-        setUsers([]);
-      }
+        
+          setPagination({
+            totalItems: result.data.results || 0,
+            itemsPerPage: result.data.itemsPerPage || filters.limit,
+            currentPage: result.data.currentPage || filters.page,
+            totalPages: result.data.totalPages || 1,
+            hasNextPage: result.data.hasNextPage || false,
+            hasPreviousPage: result.data.hasPreviousPage || false
+          });
+        }
+      
     } catch (err) {
       console.error("Fetch failed:", err);
       setUsers([]);
+      setPagination({
+        totalItems: 0,
+        totalPages: 1,
+        currentPage: 1,
+        hasNextPage: false,
+        hasPreviousPage: false
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [buildQueryParams, filters.limit, filters.page]);
+
+  // Fetch users when filters change with debounce
+  useEffect(() => {
+    const timeout = setTimeout(fetchUsers, 300);
+    return () => clearTimeout(timeout);
+  }, [fetchUsers]);
 
   const handleFilterChange = useCallback((name, value) => {
     setFilters(prev => ({
@@ -65,34 +108,15 @@ function User() {
     handleFilterChange('search', e.target.value);
   }, [handleFilterChange]);
 
-  const filteredUsers = useMemo(() => {
-    if (!filters.search) return users;
-    
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        user.email.toLowerCase().includes(filters.search.toLowerCase())
-    );
-  }, [users, filters.search]);
 
-  const paginatedUsers = useMemo(() => {
-    const startIndex = (filters.page - 1) * filters.limit;
-    return filteredUsers.slice(startIndex, startIndex + filters.limit);
-  }, [filteredUsers, filters.page, filters.limit]);
 
-  const pagination = useMemo(() => {
-    const totalItems = filteredUsers.length;
-    const totalPages = Math.ceil(totalItems / filters.limit) || 1;
-    
-    return {
-      totalItems,
-      itemsPerPage: filters.limit,
-      currentPage: filters.page,
-      totalPages,
-      hasNextPage: filters.page < totalPages,
-      hasPreviousPage: filters.page > 1
-    };
-  }, [filteredUsers, filters.page, filters.limit]);
+  const resetFilters = () => {
+    setFilters({
+      search: '',
+      page: 1,
+      limit: 6
+    });
+  };
 
   const handlePageChange = useCallback((newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -160,23 +184,25 @@ function User() {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admin/users`,
+        {
           name: formData.name,
           email: formData.email,
           password: formData.password,
           confirmpassword: formData.confirmpassword,
-        }),
-      });
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      const result = await response.json();
+      const result = response.data;
 
-      if (response.ok && result.status === "success") {
+      if (result.status === "success") {
         setFormStatus({ type: "success", message: "User created successfully!" });
 
         // Auto-close modal after short delay
@@ -194,7 +220,10 @@ function User() {
       }
     } catch (error) {
       console.error("Create user failed:", error);
-      setFormStatus({ type: "error", message: "An unexpected error occurred." });
+      setFormStatus({ 
+        type: "error", 
+        message: error.response?.data?.message || "An unexpected error occurred." 
+      });
     }
   };
 
@@ -213,6 +242,7 @@ function User() {
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
         
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,6 +259,20 @@ function User() {
           </div>
           
           <div className="flex gap-2">
+            {/* Sort options */}
+            
+            {/* Reset Button */}
+            <button
+              onClick={resetFilters}
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium transition-all duration-150 flex items-center justify-center space-x-1.5"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Reset</span>
+            </button>
+
+            {/* Layout Toggle */}
             <button
               onClick={() => setLayout("card")}
               className={`p-2 rounded-lg border ${layout === "card" ? "bg-blue-100 text-blue-600 border-blue-300" : "bg-white text-gray-600 border-gray-300"}`}
@@ -263,10 +307,10 @@ function User() {
       </div>
 
       {/* User list */}
-      {paginatedUsers.length ? (
+      {users.length ? (
         <>
           <div className={layout === "card" ? "user-grid" : "space-y-4"}>
-            {paginatedUsers.map((user) => (
+            {users.map((user) => (
               layout === "card" ? (
                 <UserCard
                   key={user._id}
@@ -285,6 +329,9 @@ function User() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-800 truncate capitalize">{user.name}</h3>
                     <p className="text-gray-500 text-sm truncate">{user.email}</p>
+                    <p className="text-xs text-gray-400">
+                      Joined: {new Date(user.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                   <Link 
                     to={`/user/${user._id}`}
@@ -308,45 +355,91 @@ function User() {
 
               {/* Pagination controls */}
               <div className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-normal">
-                <button
-                  onClick={() => handlePageChange(filters.page - 1)}
-                  disabled={!pagination.hasPreviousPage}
-                  className="px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50 flex items-center gap-1"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Prev
-                </button>
+                {/* Mobile: Compact navigation */}
+                <div className="sm:hidden flex items-center gap-1">
+                  <button
+                    onClick={() => handlePageChange(filters.page - 1)}
+                    disabled={filters.page === 1}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="Previous Page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
 
-                <div className="flex items-center gap-1 mx-2">
-                  {getPaginationRange.map((page, idx) =>
-                    page === "..." ? (
-                      <span key={idx} className="px-2 py-1">
-                        ...
-                      </span>
-                    ) : (
-                      <button
-                        key={idx}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 rounded-lg ${filters.page === page ? "bg-blue-600 text-white" : "border hover:bg-gray-50"}`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  )}
+                  <div className="px-3 py-1 text-sm font-medium text-gray-700">
+                    {filters.page} / {pagination.totalPages}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(filters.page + 1)}
+                    disabled={!pagination.hasNextPage}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="Next Page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => handlePageChange(filters.page + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className="px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50 flex items-center gap-1"
-                >
-                  Next
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                {/* Desktop: Full navigation */}
+                <div className="hidden sm:flex items-center gap-1">
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={filters.page === 1}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="First Page"
+                  >
+                    <ChevronsLeft className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(filters.page - 1)}
+                    disabled={filters.page === 1}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="Previous Page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {getPaginationRange.map((page, idx) =>
+                      page === '...' ? (
+                        <span key={`ellipsis-${idx}`} className="px-2 py-1 text-gray-500">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`w-10 h-10 flex items-center justify-center rounded-md border text-sm ${page === filters.page
+                              ? 'bg-blue-600 text-white border-blue-600 font-medium'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          aria-current={page === filters.page ? 'page' : undefined}
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(filters.page + 1)}
+                    disabled={!pagination.hasNextPage}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="Next Page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    disabled={filters.page === pagination.totalPages}
+                    className="p-2 rounded-md border bg-white shadow disabled:opacity-30 hover:bg-gray-50 transition-colors"
+                    aria-label="Last Page"
+                  >
+                    <ChevronsRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           )}
