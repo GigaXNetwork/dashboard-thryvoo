@@ -9,50 +9,57 @@ import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
 
+import { FerrisWheel } from "lucide-react";
+
 function Sidebar({ onToggleSidebar }) {
 
-  const {userData} = useUser();
-  
+  const { userData } = useUser();
 
-const menuItems = [
-  { to: "/", icon: <IoHomeOutline />, label: "Home" },
-  { to: "/card", icon: <FaAddressCard />, label: "Card" },
-  userData.user.role === "admin" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
-  userData.user.role === "admin" && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
-  userData.user.role === "admin" ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
-  :
-   {
-      to: "/coupon",
-      icon: <RiCoupon2Fill />,
-      label: "Coupons",
-      subItems: [
+
+  const menuItems = [
+    { to: "/", icon: <IoHomeOutline />, label: "Home" },
+    { to: "/card", icon: <FaAddressCard />, label: "Card" },
+    userData.user.role === "admin" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
+    userData.user.role === "admin" && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
+    userData.user.role === "admin" ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
+      :
+      {
+        to: "/coupon",
+        icon: <RiCoupon2Fill />,
+        label: "Coupons",
+        subItems: [
           { to: "/coupon", label: "All Coupons" },
           { to: "/presets", label: "All Presets" },
         ]
-        
-    },
-  userData.user.role === "user"  && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
 
-  userData.user.role === "user"  && {
-    to: "/whatsapp",
-    icon: <FaWhatsapp />,
-    label: "WhatsApp",
-    subItems: [
-      { to: "/whatsapp/registration", label: "Registration Info" },
-      { to: "/whatsapp/templates", label: "Templates" },
-    ]
-  },
-  userData.user.role === "user"  && {
-    to: "/media",
-    icon: <MdOutlinePermMedia />,
-    label: "Media",
-    subItems: [
-      { to: "/media/setMedia", label: "Set Media" },
-      { to: "/media/allMedia", label: "All Media" },
-    ]
-  },
-  { to: "/reviews", icon: <FaStar />, label: "Reviews" },
-].filter(Boolean); 
+      },
+    userData.user.role === "user" && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
+
+    userData.user.role === "user" && {
+      to: "/whatsapp",
+      icon: <FaWhatsapp />,
+      label: "WhatsApp",
+      subItems: [
+        { to: "/whatsapp/registration", label: "Registration Info" },
+        { to: "/whatsapp/templates", label: "Templates" },
+      ]
+    },
+    userData.user.role === "user" && {
+      to: "/media",
+      icon: <MdOutlinePermMedia />,
+      label: "Media",
+      subItems: [
+        { to: "/media/setMedia", label: "Set Media" },
+        { to: "/media/allMedia", label: "All Media" },
+      ]
+    },
+    userData.user.role === "user" && {
+      to: "/spin",
+      icon: <FerrisWheel />,
+      label: "Spinning"
+    },
+    { to: "/reviews", icon: <FaStar />, label: "Reviews" },
+  ].filter(Boolean);
 
 
   const [openMenu, setOpenMenu] = useState(null);
@@ -81,85 +88,81 @@ const menuItems = [
 
   return (
     <aside className="sticky top-0 w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm"
-           style={{ height: 'calc(100vh - 4rem)' }}> {/* Subtract h-16 (4rem) */}
+      style={{ height: 'calc(100vh - 4rem)' }}> {/* Subtract h-16 (4rem) */}
       <div className="px-6 py-5 border-b border-gray-100">
         <h2 className="text-xl font-semibold text-gray-800">YourLogo</h2>
       </div>
-      
+
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-  <div className="flex flex-col gap-1.5">
-    {menuItems.map((item) => (
-      <div key={item.to} className="flex flex-col group">
-        <NavLink
-          to={item.to}
-          onClick={(e) => handleMenuClick(item, e)}
-          className={({ isActive }) => 
-            `flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out ${
-              isActive 
-                ? "bg-gradient-to-r from-violet-50 to-violet-100 text-violet-700 shadow-sm" 
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <div className="flex items-center gap-3">
-                <span className={`text-lg p-1 rounded-md transition-all ${
-                  isActive 
-                    ? "text-violet-600 bg-violet-100/50" 
-                    : "text-gray-500 group-hover:bg-gray-200/30"
-                }`}>
-                  {item.icon}
-                </span>
-                <span className="relative">
-                  {item.label}
-                  
-                </span>
-              </div>
-
-              {item.subItems && (
-                <FiChevronDown
-                  className={`transform transition-transform duration-200 ${
-                    openMenu === item.to 
-                      ? "rotate-180 text-violet-500" 
-                      : "text-gray-400 group-hover:text-gray-600"
-                  }`}
-                  size={18}
-                />
-              )}
-            </>
-          )}
-        </NavLink>
-
-        {item.subItems && openMenu === item.to && (
-          <div className="ml-10 mt-1 mb-2 flex flex-col gap-1 animate-fadeIn">
-            {item.subItems.map((sub) => (
+        <div className="flex flex-col gap-1.5">
+          {menuItems.map((item) => (
+            <div key={item.to} className="flex flex-col group">
               <NavLink
-                key={sub.to}
-                to={sub.to}
-                onClick={toggleHandler}
+                to={item.to}
+                onClick={(e) => handleMenuClick(item, e)}
                 className={({ isActive }) =>
-                  `text-sm px-3 py-1.5 rounded-lg transition-all duration-150 ${
-                    isActive 
-                      ? "bg-violet-100/80 text-violet-700 font-medium pl-4 border-l-2 border-violet-500" 
-                      : "text-gray-500 hover:bg-gray-100 hover:pl-4 hover:border-l-2 hover:border-gray-300"
+                  `flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out ${isActive
+                    ? "bg-gradient-to-r from-violet-50 to-violet-100 text-violet-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                   }`
                 }
               >
-                {sub.label}
+                {({ isActive }) => (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-lg p-1 rounded-md transition-all ${isActive
+                          ? "text-violet-600 bg-violet-100/50"
+                          : "text-gray-500 group-hover:bg-gray-200/30"
+                        }`}>
+                        {item.icon}
+                      </span>
+                      <span className="relative">
+                        {item.label}
+
+                      </span>
+                    </div>
+
+                    {item.subItems && (
+                      <FiChevronDown
+                        className={`transform transition-transform duration-200 ${openMenu === item.to
+                            ? "rotate-180 text-violet-500"
+                            : "text-gray-400 group-hover:text-gray-600"
+                          }`}
+                        size={18}
+                      />
+                    )}
+                  </>
+                )}
               </NavLink>
-            ))}
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-</nav>
+
+              {item.subItems && openMenu === item.to && (
+                <div className="ml-10 mt-1 mb-2 flex flex-col gap-1 animate-fadeIn">
+                  {item.subItems.map((sub) => (
+                    <NavLink
+                      key={sub.to}
+                      to={sub.to}
+                      onClick={toggleHandler}
+                      className={({ isActive }) =>
+                        `text-sm px-3 py-1.5 rounded-lg transition-all duration-150 ${isActive
+                          ? "bg-violet-100/80 text-violet-700 font-medium pl-4 border-l-2 border-violet-500"
+                          : "text-gray-500 hover:bg-gray-100 hover:pl-4 hover:border-l-2 hover:border-gray-300"
+                        }`
+                      }
+                    >
+                      {sub.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t border-gray-100"> 
-        <button 
-          onClick={handleLogout} 
+      <div className="p-4 border-t border-gray-100">
+        <button
+          onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-md transition-all"
         >
           <svg

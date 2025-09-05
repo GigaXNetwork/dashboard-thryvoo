@@ -43,6 +43,7 @@ import Setting from './components/Setting/Setting';
 import MediaRewards from './components/SocialMedia/MediaRewards';
 import SocialMedia from './components/SocialMedia/SocialMedia';
 import FlashHourOffer from './components/FlashHourOffer/FlashHourOffer';
+import Spinning from './components/Spinning/Spinning';
 
 
 // 🔁 Scroll Wrapper
@@ -127,6 +128,7 @@ function App() {
               { path: 'presets', element: <SetDiscountPage role={role} /> },
               { path: 'flashOffer', element: <FlashHourOffer role={role} /> },
               { path: 'media/allMedia', element: <MediaRewards /> },
+              { path: 'spin', element: <Spinning /> },
               { path: 'media/setMedia', element: <SocialMedia /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
