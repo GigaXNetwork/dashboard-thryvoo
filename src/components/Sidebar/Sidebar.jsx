@@ -8,7 +8,6 @@ import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-
 import { FerrisWheel } from "lucide-react";
 
 function Sidebar({ onToggleSidebar }) {
