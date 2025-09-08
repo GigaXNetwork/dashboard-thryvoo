@@ -68,8 +68,8 @@ export default function BrochuresSec({ cardData, openModal }) {
             className="cursor-pointer border-2 border-dashed border-purple-400 rounded-xl p-4 flex flex-col items-center justify-center hover:bg-purple-50 transition-colors"
             onClick={() => openModal("brochures", "Brochures")}
           >
-            <span className="text-purple-600 text-2xl font-bold">+</span>
-            <span className="text-sm text-purple-600 font-medium">
+            <span className="text-[#2563EB] text-2xl font-bold">+</span>
+            <span className="text-sm text-[#2563EB] font-medium">
               Add Brochure
             </span>
           </div>

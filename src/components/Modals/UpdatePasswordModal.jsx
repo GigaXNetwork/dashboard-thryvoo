@@ -160,7 +160,7 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 text-purple-600 font-medium rounded-lg hover:bg-purple-50 transition"
+              className="px-6 py-2 text-[#2563EB] font-medium rounded-lg hover:bg-purple-50 transition"
               disabled={submitting}
             >
               Cancel

@@ -84,7 +84,7 @@ export default function Social({ handleBack, handleNext, cardId, role }) {
     return (
         <div className="space-y-6 max-w-xl mx-auto p-4">
             <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-                <CiShare1 className="text-purple-600 text-2xl" />
+                <CiShare1 className="text-[#2563EB] text-2xl" />
                 Social Media Links
             </h2>
 

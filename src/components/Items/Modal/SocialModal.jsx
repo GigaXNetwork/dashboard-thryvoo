@@ -40,7 +40,7 @@ useEffect(() => {
     youtube: <FaYoutube className="text-red-600 text-xl w-8 h-8" />,
     twitter: <FaXTwitter className="text-black text-xl w-8 h-8" />,
     linkedin: <FaLinkedin className="text-blue-700 text-xl w-8 h-8" />,
-    website: <FaGlobe className="text-purple-600 text-xl w-8 h-8" />,
+    website: <FaGlobe className="text-[#2563EB] text-xl w-8 h-8" />,
   };
 
   const handleSubmit = async (e) => {
@@ -123,7 +123,7 @@ useEffect(() => {
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-gray-600 hover:text-purple-600 font-medium transition"
+          className="px-4 py-2 text-gray-600 hover:text-[#2563EB] font-medium transition"
         >
           Cancel
         </button>

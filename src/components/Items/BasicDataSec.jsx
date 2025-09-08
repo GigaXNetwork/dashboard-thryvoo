@@ -28,7 +28,7 @@ export default function BasicDataSec({ cardData, openModal }) {
       </div>
       <div className="pl-4">
         <ChevronRight
-          className='w-5 h-5 text-purple-500 transform transition-transform duration-300'
+          className='w-5 h-5 text-[#2563EB] transform transition-transform duration-300'
         />
       </div>
     </div>
@@ -48,7 +48,7 @@ export default function BasicDataSec({ cardData, openModal }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3">
-          <FaUser className="text-purple-500 text-2xl" />
+          <FaUser className="text-[#2563EB] text-2xl" />
           <h2 className="text-lg font-bold text-gray-800">Basic Information</h2>
         </div>
         <ChevronDown

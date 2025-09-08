@@ -94,7 +94,7 @@ export default function AccountSettingsCard({ setIsEmailUpdate, setIsPasswordUpd
           </div>
           <div className="pl-4">
             {!isEmailVerified && (
-              <ChevronRight className="w-5 h-5 text-purple-600" />
+              <ChevronRight className="w-5 h-5 text-[#2563EB]" />
             )}
           </div>
         </div>

@@ -181,7 +181,7 @@ export default function AddressModal({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-purple-600 hover:underline font-medium"
+              className="text-[#2563EB] hover:underline font-medium"
             >
               Cancel
             </button>

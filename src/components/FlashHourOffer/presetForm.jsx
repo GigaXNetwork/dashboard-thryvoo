@@ -225,7 +225,7 @@ export default function OfferForm({
           <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg mr-3">
-                <Tag className="w-5 h-5 text-purple-600" />
+                <Tag className="w-5 h-5 text-[#2563EB]" />
               </div>
               <h2 className="text-xl font-bold text-gray-800">{title}</h2>
             </div>

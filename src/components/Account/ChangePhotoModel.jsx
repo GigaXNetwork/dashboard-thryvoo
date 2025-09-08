@@ -113,7 +113,7 @@ export default function ChangePhotoModal({ onClose }) {
               )}
             </div>
             
-            <label className="cursor-pointer bg-purple-50 text-purple-600 hover:bg-purple-100 px-4 py-2 rounded-lg font-medium transition text-sm">
+            <label className="cursor-pointer bg-purple-50 text-[#2563EB] hover:bg-purple-100 px-4 py-2 rounded-lg font-medium transition text-sm">
               Select Image
               <input
                 type="file"

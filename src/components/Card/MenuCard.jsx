@@ -36,7 +36,7 @@ console.log(logo, img);
       </a>
       <Link
         to={`/card/${id}`}
-        className="flex items-center gap-1.5 text-sm bg-white text-purple-600 font-medium px-3 py-1.5 rounded-md hover:bg-purple-50 transition"
+        className="flex items-center gap-1.5 text-sm bg-white text-[#2563EB] font-medium px-3 py-1.5 rounded-md hover:bg-purple-50 transition"
         onClick={(e) => e.stopPropagation()}
       >
         <Pencil className="w-4 h-4" />

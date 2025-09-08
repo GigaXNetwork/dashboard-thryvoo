@@ -111,7 +111,7 @@ export default function UploadBrochureModal({
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
               onChange={handleFileChange}
-              className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-50 file:text-purple-600 hover:file:bg-purple-100 cursor-pointer"
+              className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-50 file:text-[#2563EB] hover:file:bg-purple-100 cursor-pointer"
             />
             {errorMessage && (
               <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
@@ -146,7 +146,7 @@ export default function UploadBrochureModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-purple-600 font-medium transition"
+              className="px-4 py-2 text-gray-600 hover:text-[#2563EB] font-medium transition"
             >
               Cancel
             </button>

@@ -30,7 +30,7 @@ export default function PersonalInformationCard({
         <div className="bg-white shadow-lg rounded-xl p-6 w-full mb-6">
             {/* Header */}
             <div className="flex items-center gap-3 mb-5">
-                <FaIdCard className="text-purple-600 text-xl" />
+                <FaIdCard className="text-[#2563EB] text-xl" />
                 <h2 className="text-lg font-semibold text-gray-800">Personal Information</h2>
             </div>
 
@@ -53,7 +53,7 @@ export default function PersonalInformationCard({
                             className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-sm hover:bg-gray-50 transition border border-gray-200"
                             title="Edit Photo"
                         >
-                            <Pencil className="w-3.5 h-3.5 text-purple-600" />
+                            <Pencil className="w-3.5 h-3.5 text-[#2563EB]" />
                         </button>
                     </div>
                 </div>

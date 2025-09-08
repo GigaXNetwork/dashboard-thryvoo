@@ -14,7 +14,7 @@ export default function SocialSec({ cardData, openModal }) {
     { field: "youtube", label: "YouTube", value: cardData?.social?.youtube || "--", icon: <FaYoutube className="text-red-600" /> },
     { field: "twitter", label: "X (Twitter)", value: cardData?.social?.twitter || "--", icon: <FaXTwitter className="text-black" /> },
     { field: "linkedin", label: "LinkedIn", value: cardData?.social?.linkedin || "--", icon: <FaLinkedin className="text-blue-700" /> },
-    { field: "website", label: "Website", value: cardData?.social?.website || "--", icon: <FaGlobe className="text-purple-600" /> },
+    { field: "website", label: "Website", value: cardData?.social?.website || "--", icon: <FaGlobe className="text-[#2563EB]" /> },
   ];
 
   const renderRow = (item) => (

@@ -214,7 +214,7 @@ export default function EmailUpdateModal({ onClose }) {
               <button
                 onClick={handleResendOtp}
                 disabled={countdown > 0}
-                className={`text-sm ${countdown > 0 ? 'text-gray-400' : 'text-purple-600 hover:underline'}`}
+                className={`text-sm ${countdown > 0 ? 'text-gray-400' : 'text-[#2563EB] hover:underline'}`}
               >
                 Resend OTP {countdown > 0 && `(${countdown}s)`}
               </button>

@@ -411,7 +411,7 @@ export default function Setting() {
             <div className="flex-1 flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-3 flex-1 basis-[100px]">
                 <div className="p-2 bg-purple-100 rounded-lg">
-                  <FaCoins className="text-purple-600 text-lg" />
+                  <FaCoins className="text-[#2563EB] text-lg" />
                 </div>
                 <span className="text-gray-600 font-medium">
                   Referral Coins
@@ -601,7 +601,7 @@ export default function Setting() {
                 <div className="flex justify-between items-start p-6 border-b border-gray-100">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-lg bg-purple-100">
-                      <FaCoins className="text-purple-600 w-6 h-6" />
+                      <FaCoins className="text-[#2563EB] w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">
