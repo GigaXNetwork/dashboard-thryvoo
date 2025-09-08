@@ -14,7 +14,7 @@ import UpdateSocialModal from "./Modal/SocialModal";
 import UpdateMetaModal from "./Modal/MetaModal";
 import MetaDataSec from "./MetaDataSec";
 import CategorySec from "./CategorySec";
-import UpdateCategoryModal from "./Modal/categoryModal";
+import UpdateCategoryModal from "./Modal/CategoryModal";
 import BrochuresSec from "./BrochuresSec";
 import UploadBrochureModal from "./Modal/UploadBrochureModal";
 
