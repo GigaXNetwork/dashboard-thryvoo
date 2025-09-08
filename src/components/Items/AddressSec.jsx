@@ -27,7 +27,7 @@ export default function AddressSec({ cardData, openModal }) {
         </span>
       </div>
       <div className="pl-4">
-        <ChevronRight className="w-5 h-5 text-purple-500 transform transition-transform duration-300" />
+        <ChevronRight className="w-5 h-5 text-[#2563EB] transform transition-transform duration-300" />
       </div>
     </div>
   );
@@ -46,7 +46,7 @@ export default function AddressSec({ cardData, openModal }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3">
-          <MapPin className="text-purple-500 text-2xl" />
+          <MapPin className="text-[#2563EB] text-2xl" />
           <h2 className="text-lg font-bold text-gray-800">Address Information</h2>
         </div>
         <ChevronDown

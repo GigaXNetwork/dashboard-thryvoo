@@ -393,7 +393,7 @@ export default function Setting() {
       <div className="bg-white shadow-md rounded-lg p-6 w-full my-10 divide-y py-4 divide-gray-200">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">
-          <FaCoins className="text-purple-500 text-xl" />
+          <FaCoins className="text-[#2563EB] text-xl" />
           <h2 className="text-base font-semibold">Admin Settings</h2>
         </div>
 

@@ -74,7 +74,7 @@ const Me = () => {
 
                     <div className="bg-white shadow-md rounded-lg p-6 w-full my-5 divide-y py-4 divide-gray-200">
                         <div className="flex items-center gap-4 mb-4 ">
-                            <VscSymbolKeyword className="text-purple-500 text-xl" />
+                            <VscSymbolKeyword className="text-[#2563EB] text-xl" />
                             <h2 className="text-base font-semibold">Account Control</h2>
                         </div>
                         <div className="divide-y divide-gray-200"></div>

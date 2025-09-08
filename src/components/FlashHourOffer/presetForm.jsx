@@ -243,7 +243,7 @@ export default function OfferForm({
             {/* Discount Type Selector */}
             <div className="space-y-2">
               <label htmlFor="discountType" className="text-sm font-medium text-gray-700 flex items-center">
-                <DollarSign className="w-4 h-4 mr-2 text-purple-500" />
+                <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />
                 Discount Type
               </label>
               <select
@@ -263,7 +263,7 @@ export default function OfferForm({
             {/* Offer Name */}
             <div className="space-y-2">
               <label htmlFor="presetName" className="text-sm font-medium text-gray-700 flex items-center">
-                <Tag className="w-4 h-4 mr-2 text-purple-500" />
+                <Tag className="w-4 h-4 mr-2 text-[#2563EB]" />
                 Offer Name *
               </label>
               <input
@@ -284,12 +284,12 @@ export default function OfferForm({
               <label htmlFor="discountAmount" className="text-sm font-medium text-gray-700 flex items-center">
                 {form.discountType === 'custom' ? (
                   <>
-                    <MinusCircle className="w-4 h-4 mr-2 text-purple-500" />
+                    <MinusCircle className="w-4 h-4 mr-2 text-[#2563EB]" />
                     Custom Offer *
                   </>
                 ) : (
                   <>
-                    <DollarSign className="w-4 h-4 mr-2 text-purple-500" />
+                    <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />
                     {form.discountType === 'percentage' ? 'Discount Percentage *' : 'Discount Amount *'}
                   </>
                 )}
@@ -317,7 +317,7 @@ export default function OfferForm({
             {form.discountType !== 'custom' && (
               <div className="space-y-2">
                 <label htmlFor="maxDiscount" className="text-sm font-medium text-gray-700 flex items-center">
-                  <DollarSign className="w-4 h-4 mr-2 text-purple-500" />
+                  <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />
                   Maximum Discount *
                 </label>
                 <input
@@ -339,7 +339,7 @@ export default function OfferForm({
             {/* Minimum Purchase */}
             <div className="space-y-2">
               <label htmlFor="minPurchase" className="text-sm font-medium text-gray-700 flex items-center">
-                <ShoppingBag className="w-4 h-4 mr-2 text-purple-500" />
+                <ShoppingBag className="w-4 h-4 mr-2 text-[#2563EB]" />
                 Minimum Purchase Amount *
               </label>
               <input
@@ -438,7 +438,7 @@ export default function OfferForm({
             {/* Usage Limit */}
             <div className="space-y-2">
               <label htmlFor="usageLimit" className="text-sm font-medium text-gray-700 flex items-center">
-                <Users className="w-4 h-4 mr-2 text-purple-500" />
+                <Users className="w-4 h-4 mr-2 text-[#2563EB]" />
                 Usage Limit (per customer) *
               </label>
               <input

@@ -23,7 +23,7 @@ export default function BrochuresSec({ cardData, openModal }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3">
-          <FaFilePdf className="text-purple-500 text-2xl" />
+          <FaFilePdf className="text-[#2563EB] text-2xl" />
           <h2 className="text-lg font-bold text-gray-800">Brochures</h2>
         </div>
         <ChevronDown
@@ -48,7 +48,7 @@ export default function BrochuresSec({ cardData, openModal }) {
                 onClick={() => window.open(url, "_blank")}
                 title={url}
               >
-                <FaFilePdf className="text-purple-500 text-3xl mb-2 group-hover:scale-110 transition-transform" />
+                <FaFilePdf className="text-[#2563EB] text-3xl mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-sm text-gray-700 font-medium truncate w-full text-center">
                   Brochure {idx + 1}
                 </span>

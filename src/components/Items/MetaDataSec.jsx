@@ -26,7 +26,7 @@ export default function MetaDataSec({ cardData, openModal }) {
         </span>
       </div>
       <div className="pl-4">
-        <ChevronRight className="w-5 h-5 text-purple-500" />
+        <ChevronRight className="w-5 h-5 text-[#2563EB]" />
       </div>
     </div>
   );
@@ -45,7 +45,7 @@ export default function MetaDataSec({ cardData, openModal }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3">
-          <FaGlobe className="text-purple-500 text-2xl" />
+          <FaGlobe className="text-[#2563EB] text-2xl" />
           <h2 className="text-lg font-bold text-gray-800">Meta Information</h2>
         </div>
         <ChevronDown
