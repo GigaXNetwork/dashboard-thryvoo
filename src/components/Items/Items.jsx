@@ -4,11 +4,48 @@ import BasicData from "./BasicData";
 import Social from "./Social";
 import Meta from "./Meta";
 import { useCard } from "../../Context/CardContext";
+import ProfileBanner from "./Pofilebanner";
+import BasicDataSec from "./BasicDataSec";
+import UpdateFieldModal from "./Modal/BasicModal";
+import AddressSec from "./AddressSec";
+import AddressModal from "./Modal/AddressModal";
+import SocialSec from "./SocialSec";
+import UpdateSocialModal from "./Modal/SocialModal";
+import UpdateMetaModal from "./Modal/MetaModal";
+import MetaDataSec from "./MetaDataSec";
+import CategorySec from "./CategorySec";
+import UpdateCategoryModal from "./Modal/categoryModal";
+import BrochuresSec from "./BrochuresSec";
+import UploadBrochureModal from "./Modal/UploadBrochureModal";
 
 
-function Items({role}) {
-  const { cardData, loading, error } = useCard();
+function Items({ role }) {
+  const { cardData, setCardData, loading, error } = useCard();
   const { cardId } = useParams();
+  // Instead of multiple states → use one
+  const [modalField, setModalField] = useState(null);
+  const [modalSocialField, setModalSocialField] = useState(null);
+  const [addressModal, setAddressModal] = useState(null);
+  const [metaField, setMetaField] = useState(null);
+  const [categoryModal, setCategoryModal] = useState(null);
+  const [brochureModal, setBrochureModal] = useState(false);
+
+  const handleOpenModal = (field, label) => {
+    setModalField({ field, label });
+  };
+  const handleOpenSocialModal = (field, label) => {
+    setModalSocialField({ field, label });
+  };
+  const handleOpenMetaModal = (field, label) => {
+    setMetaField({ field, label });
+  };
+
+  const handleCloseModal = () => {
+    setModalField(null);
+    setModalSocialField(null);
+    setAddressModal(null);
+    setMetaField(null);
+  };
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({}); // ✅ Added formData state
@@ -20,18 +57,105 @@ function Items({role}) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    // ✅ Example submit logic — replace with your own
-    console.log("Form submitted:", formData);
-    // Redirect to dashboard or show confirmation
+  const onSubmit = (updated) => {
+    setCardData((prev) => ({
+      ...prev,
+      ...updated,
+    }));
+  }
+
+  const onSocialSubmit = (updated) => {
+    setCardData((prev) => ({
+      ...prev,
+      social: {
+        ...prev.social,
+        ...updated, // merge updated socials inside
+      },
+    }));
   };
 
+
   return (
-    <div className="mt-10">
+    <div className="relative my-10 max-w-screen-lg mx-auto">
+
+      <ProfileBanner logo={cardData?.logo} photo={cardData?.photo} />
+      <BasicDataSec cardData={cardData} openModal={handleOpenModal} />
+      <CategorySec cardData={cardData} openModal={() => setCategoryModal(true)} />
+      <AddressSec cardData={cardData} openModal={() => setAddressModal(true)} />
+      <SocialSec cardData={cardData} openModal={handleOpenSocialModal} />
+      <MetaDataSec cardData={cardData} openModal={handleOpenMetaModal} />
+      <BrochuresSec cardData={cardData} openModal={() => setBrochureModal(true)} />
 
 
-      <div className="flex flex-wrap gap-4">
-        {/* Left: Step content */}
+      {modalField && (
+        <UpdateFieldModal
+          field={modalField.field}
+          label={modalField.label}
+          cardData={cardData}
+          cardId={cardData?._id}
+          role={role}
+          onClose={handleCloseModal}
+          onSubmit={onSubmit}
+        />
+      )}
+
+      {addressModal && (
+        <AddressModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setAddressModal(false)}
+          onSubmit={onSubmit}
+        />
+      )}
+
+      {modalSocialField && (
+        <UpdateSocialModal
+          field={modalSocialField.field}
+          label={modalSocialField.label}
+          cardData={cardData}
+          cardId={cardData?._id}
+          role={role}
+          onClose={handleCloseModal}
+          onSubmit={onSocialSubmit}
+        />
+      )}
+
+      {metaField && (
+        <UpdateMetaModal
+          field={metaField.field}
+          label={metaField.label}
+          cardData={cardData}
+          cardId={cardData?._id}
+          role={role}
+          onClose={handleCloseModal}
+          onSubmit={onSubmit}
+        />
+      )}
+
+
+      {categoryModal && (
+        <UpdateCategoryModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setCategoryModal(false)}
+          onSubmit={onSubmit}
+        />
+      )}
+
+      {brochureModal && (
+        <UploadBrochureModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setBrochureModal(false)}
+          onSubmit={onSubmit}
+        />
+      )}
+
+      {/* <div className="flex flex-wrap gap-4">
+
         <div className="min-h-screen flex flex-1 basis-auto items-center justify-center bg-gray-50 px-4">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-4">
             <div className="mb-6 text-center">
@@ -90,7 +214,7 @@ function Items({role}) {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
