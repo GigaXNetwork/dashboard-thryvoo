@@ -18,6 +18,8 @@ import UpdateCategoryModal from "./Modal/CategoryModal";
 import UploadBrochureModal from "./Modal/UploadBrochureModal";
 import UploadPhotoModal from "./Modal/PhotoModal";
 import UploadLogoModal from "./Modal/LogoModal";
+import GallerySec from "./GallerySec";
+import UploadGalleryModal from "./Modal/UploadGalleryModal";
 
 function Items({ role }) {
   const { cardData, setCardData } = useCard();
@@ -32,6 +34,7 @@ function Items({ role }) {
   const [brochureModal, setBrochureModal] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   // Handlers
   const handleOpenModal = (field, label) => setModalField({ field, label });
@@ -84,6 +87,7 @@ function Items({ role }) {
       <SocialSec cardData={cardData} openModal={handleOpenSocialModal} />
       <MetaDataSec cardData={cardData} openModal={handleOpenMetaModal} />
       <BrochuresSec cardData={cardData} openModal={() => setBrochureModal(true)} />
+      <GallerySec cardData={cardData} openModal={() => setShowGalleryModal(true)} />
 
       {/* Modals */}
       {modalField && (
@@ -170,8 +174,16 @@ function Items({ role }) {
           onClose={() => setShowPhotoModal(false)}
           onSubmit={onSubmit}
         />
+      )}
 
-
+      {showGalleryModal && (
+        <UploadGalleryModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setShowGalleryModal(false)}
+          onSubmit={onSubmit}
+        />
       )}
     </div>
   );
