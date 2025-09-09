@@ -124,7 +124,7 @@ export default function UpdateCategoryModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-purple-600 font-medium transition rounded-lg"
+            className="px-4 py-2 text-gray-600 hover:text-[#2563EB] font-medium transition rounded-lg"
           >
             Cancel
           </button>

@@ -1,84 +1,83 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import BasicData from "./BasicData";
-import Social from "./Social";
-import Meta from "./Meta";
 import { useCard } from "../../Context/CardContext";
+
 import ProfileBanner from "./Pofilebanner";
 import BasicDataSec from "./BasicDataSec";
-import UpdateFieldModal from "./Modal/BasicModal";
 import AddressSec from "./AddressSec";
-import AddressModal from "./Modal/AddressModal";
 import SocialSec from "./SocialSec";
-import UpdateSocialModal from "./Modal/SocialModal";
-import UpdateMetaModal from "./Modal/MetaModal";
 import MetaDataSec from "./MetaDataSec";
 import CategorySec from "./CategorySec";
-import UpdateCategoryModal from "./Modal/CategoryModal";
 import BrochuresSec from "./BrochuresSec";
-import UploadBrochureModal from "./Modal/UploadBrochureModal";
 
+import UpdateFieldModal from "./Modal/BasicModal";
+import AddressModal from "./Modal/AddressModal";
+import UpdateSocialModal from "./Modal/SocialModal";
+import UpdateMetaModal from "./Modal/MetaModal";
+import UpdateCategoryModal from "./Modal/CategoryModal";
+import UploadBrochureModal from "./Modal/UploadBrochureModal";
+import UploadPhotoModal from "./Modal/PhotoModal";
+import UploadLogoModal from "./Modal/LogoModal";
 
 function Items({ role }) {
-  const { cardData, setCardData, loading, error } = useCard();
+  const { cardData, setCardData } = useCard();
   const { cardId } = useParams();
-  // Instead of multiple states → use one
+
+  // State for modals
   const [modalField, setModalField] = useState(null);
   const [modalSocialField, setModalSocialField] = useState(null);
-  const [addressModal, setAddressModal] = useState(null);
+  const [addressModal, setAddressModal] = useState(false);
   const [metaField, setMetaField] = useState(null);
-  const [categoryModal, setCategoryModal] = useState(null);
+  const [categoryModal, setCategoryModal] = useState(false);
   const [brochureModal, setBrochureModal] = useState(false);
+  const [showLogoModal, setShowLogoModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
-  const handleOpenModal = (field, label) => {
-    setModalField({ field, label });
-  };
-  const handleOpenSocialModal = (field, label) => {
+  // Handlers
+  const handleOpenModal = (field, label) => setModalField({ field, label });
+  const handleOpenSocialModal = (field, label) =>
     setModalSocialField({ field, label });
-  };
-  const handleOpenMetaModal = (field, label) => {
+  const handleOpenMetaModal = (field, label) =>
     setMetaField({ field, label });
-  };
 
   const handleCloseModal = () => {
     setModalField(null);
     setModalSocialField(null);
-    setAddressModal(null);
     setMetaField(null);
   };
 
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({}); // ✅ Added formData state
-
-  const handleNext = () => setStep((prev) => prev + 1);
-  const handleBack = () => setStep((prev) => Math.max(1, prev - 1));
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+  // Submit updates to context
   const onSubmit = (updated) => {
     setCardData((prev) => ({
       ...prev,
       ...updated,
     }));
-  }
+  };
 
   const onSocialSubmit = (updated) => {
     setCardData((prev) => ({
       ...prev,
       social: {
         ...prev.social,
-        ...updated, // merge updated socials inside
+        ...updated,
       },
     }));
   };
 
-
   return (
     <div className="relative my-10 max-w-screen-lg mx-auto">
+      {/* Banner + Logo */}
+      <ProfileBanner
+        logo={cardData?.logo}
+        photo={cardData?.photo}
+        onOpenLogoModal={() => setShowLogoModal(true)}
+        onOpenPhotoModal={() => {
+          console.log("clicked");
+          setShowPhotoModal(true);
+        }}
+      />
 
-      <ProfileBanner logo={cardData?.logo} photo={cardData?.photo} />
+      {/* Sections */}
       <BasicDataSec cardData={cardData} openModal={handleOpenModal} />
       <CategorySec cardData={cardData} openModal={() => setCategoryModal(true)} />
       <AddressSec cardData={cardData} openModal={() => setAddressModal(true)} />
@@ -86,13 +85,13 @@ function Items({ role }) {
       <MetaDataSec cardData={cardData} openModal={handleOpenMetaModal} />
       <BrochuresSec cardData={cardData} openModal={() => setBrochureModal(true)} />
 
-
+      {/* Modals */}
       {modalField && (
         <UpdateFieldModal
           field={modalField.field}
           label={modalField.label}
           cardData={cardData}
-          cardId={cardData?._id}
+          cardId={cardId}
           role={role}
           onClose={handleCloseModal}
           onSubmit={onSubmit}
@@ -114,7 +113,7 @@ function Items({ role }) {
           field={modalSocialField.field}
           label={modalSocialField.label}
           cardData={cardData}
-          cardId={cardData?._id}
+          cardId={cardId}
           role={role}
           onClose={handleCloseModal}
           onSubmit={onSocialSubmit}
@@ -126,13 +125,12 @@ function Items({ role }) {
           field={metaField.field}
           label={metaField.label}
           cardData={cardData}
-          cardId={cardData?._id}
+          cardId={cardId}
           role={role}
           onClose={handleCloseModal}
           onSubmit={onSubmit}
         />
       )}
-
 
       {categoryModal && (
         <UpdateCategoryModal
@@ -154,67 +152,27 @@ function Items({ role }) {
         />
       )}
 
-      {/* <div className="flex flex-wrap gap-4">
+      {showLogoModal && (
+        <UploadLogoModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setShowLogoModal(false)}
+          onSubmit={onSubmit}
+        />
+      )}
 
-        <div className="min-h-screen flex flex-1 basis-auto items-center justify-center bg-gray-50 px-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-4">
-            <div className="mb-6 text-center">
-              <h2 className="text-2xl font-bold">
-                {step === 1 && "Set up your profile"}
-                {step === 2 && "You're all set!"}
-                {step === 3 && "You're all set!"}
-                {step === 4 && "You're all set!"}
-              </h2>
-              <p className="text-sm text-gray-500 mt-2">Step {step} of 4</p>
-            </div>
+      {showPhotoModal && (
+        <UploadPhotoModal
+          cardData={cardData}
+          cardId={cardId}
+          role={role}
+          onClose={() => setShowPhotoModal(false)}
+          onSubmit={onSubmit}
+        />
 
 
-
-            {step === 1 && (
-              <BasicData
-                handleBack={handleBack}
-                handleNext={handleNext}
-                handleChange={handleChange}
-                cardId={cardId}
-                role={role}
-              />
-            )}
-
-            {step === 2 && (
-              <Social
-                handleBack={handleBack}
-                handleNext={handleNext}
-                handleChange={handleChange}
-                cardId={cardId}
-                role={role}
-              />
-            )}
-
-            {step === 3 && (
-              <Meta
-                handleBack={handleBack}
-                handleNext={handleNext}
-                handleChange={handleChange}
-                cardId={cardId}
-                role={role}
-              />
-            )}
-
-            {step === 4 && (
-              <div className="flex flex-col items-center justify-center text-center p-6">
-                <h2 className="text-2xl font-semibold mb-4 text-green-600">🎉 Your card is created successfully!</h2>
-                <p className="mb-6 text-gray-700">You can now view or share your digital card.</p>
-                <a
-                  href={`/card`}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Go to Card
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </div> */}
+      )}
     </div>
   );
 }
