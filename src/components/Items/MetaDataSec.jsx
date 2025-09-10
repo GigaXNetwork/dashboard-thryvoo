@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { FaGlobe } from "react-icons/fa";
+import { FaGlobe, FaMapMarkedAlt, FaVideo, FaKey } from "react-icons/fa";
+import { MdPlace } from "react-icons/md";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 export default function MetaDataSec({ cardData, openModal }) {
@@ -7,26 +8,56 @@ export default function MetaDataSec({ cardData, openModal }) {
   const contentRef = useRef(null);
   const [height, setHeight] = useState(0);
 
-  const gplaceid = cardData?.gplaceid || "--";
-  const keyword = cardData?.keyword || "--";
-  const map = cardData?.map || "--";
-  const videoUrl = cardData?.videoUrl || "--";
+  // Define metadata fields with icons
+  const metaFields = [
+    {
+      field: "gplaceid",
+      label: "Google Place ID",
+      value: cardData?.gplaceid || "--",
+      icon: <MdPlace className="text-red-500" />,
+    },
+    {
+      field: "keyword",
+      label: "Keyword",
+      value: cardData?.keyword || "--",
+      icon: <FaKey className="text-yellow-600" />,
+    },
+    {
+      field: "map",
+      label: "Map",
+      value: cardData?.map || "--",
+      icon: <FaMapMarkedAlt className="text-green-600" />,
+    },
+    {
+      field: "videoUrl",
+      label: "Video URL",
+      value: cardData?.videoUrl || "--",
+      icon: <FaVideo className="text-purple-600" />,
+    },
+  ];
 
-  const renderRow = (label, value, field) => (
+  const renderRow = (item) => (
     <div
-      key={field}
+      key={item.field}
       className="cursor-pointer flex items-center justify-between py-4 border-t hover:bg-purple-50 transition-colors"
-      onClick={() => openModal(field, label)}
-      title={value}
     >
-      <div className="flex-1 flex items-center gap-4 flex-wrap">
-        <span className="text-gray-600 flex-1 basis-[100px]">{label}</span>
-        <span className="text-gray-800 font-medium flex-1 basis-[100px] truncate break-all">
-          {value}
+      <div
+        className="flex items-center gap-3 flex-1 min-w-0"
+        onClick={() => {
+          openModal(item.field, item.label);
+        }}
+      >
+        {item.icon}
+        <span className="text-gray-600 w-32 shrink-0">{item.label}</span>
+        <span className="text-gray-800 font-medium truncate whitespace-nowrap overflow-hidden flex-1">
+          {item.value}
         </span>
       </div>
       <div className="pl-4">
-        <ChevronRight className="w-5 h-5 text-[#2563EB]" />
+        <ChevronRight
+          className="w-5 h-5 text-[#2563EB]"
+          onClick={() => openModal(item.field, item.label)}
+        />
       </div>
     </div>
   );
@@ -61,10 +92,7 @@ export default function MetaDataSec({ cardData, openModal }) {
         className="px-6 overflow-hidden transition-all duration-300"
         style={{ maxHeight: `${height}px` }}
       >
-        {renderRow("Google Place ID", gplaceid, "gplaceid")}
-        {renderRow("Keyword", keyword, "keyword")}
-        {renderRow("Map", map, "map")}
-        {renderRow("Video URL", videoUrl, "videoUrl")}
+        {metaFields.map(renderRow)}
       </div>
     </div>
   );

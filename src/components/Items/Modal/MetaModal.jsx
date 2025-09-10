@@ -1,33 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Cookies from "js-cookie";
 
 export default function UpdateMetaModal({
-  field,   // gplaceid, keyword, map, videoUrl
-  label,   // e.g. "Google Place ID", "Keyword", "Map", "Video URL"
+  field,   // e.g. gplaceid, keyword, map, videoUrl
+  label,   // e.g. "Google Place ID"
   cardData,
   cardId,
   role,
   onClose,
   onSubmit,
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(cardData?.[field] || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // ✅ preload value
-  useEffect(() => {
-    if (cardData?.[field]) {
-      setValue(cardData[field]);
-    }
-  }, [cardData, field]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const authToken = Cookies.get("authToken");
     setIsSubmitting(true);
     setErrorMessage("");
 
-    let url =
+    const authToken = Cookies.get("authToken");
+    const url =
       role === "admin"
         ? `${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/meta`
         : `${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/meta`;
@@ -43,18 +36,18 @@ export default function UpdateMetaModal({
         body: JSON.stringify({ [field]: value }),
       });
 
+      const result = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData?.message || `Failed to update ${label}`);
+        throw new Error(result?.message || `Failed to update ${label}`);
       }
 
-      const result = await response.json();
-      const updatedValue = result?.data?.[field];
-
-      if (onSubmit) onSubmit({ [field]: updatedValue });
+      if (onSubmit) {
+        onSubmit({ [field]: result?.data?.[field] ?? value });
+      }
       onClose();
     } catch (err) {
-      console.error(`Error updating ${field}:`, err.message);
+      console.error(`Error updating ${field}:`, err);
       setErrorMessage(err.message || "Something went wrong, please try again.");
     } finally {
       setIsSubmitting(false);
@@ -62,8 +55,8 @@ export default function UpdateMetaModal({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-[9999] backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-[fadeIn_0.2s_ease-out,scaleIn_0.2s_ease-out]">
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b pb-3">
           <h2 className="text-lg font-semibold text-gray-800">
@@ -72,6 +65,7 @@ export default function UpdateMetaModal({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            aria-label="Close modal"
           >
             &times;
           </button>
@@ -80,12 +74,15 @@ export default function UpdateMetaModal({
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </label>
             <input
               type="text"
               placeholder={`Enter ${label}`}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               required
             />
             {errorMessage && (
@@ -104,12 +101,10 @@ export default function UpdateMetaModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${
-                isSubmitting
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-purple-700"
-              }`}
               disabled={isSubmitting}
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-[#2563EB] transition ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+              }`}
             >
               {isSubmitting ? "Updating..." : "Save"}
             </button>
