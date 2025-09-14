@@ -6,13 +6,13 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (!selectedFiles.length) return;
 
+    // ✅ Validate all files are images
     const invalidFiles = selectedFiles.filter(
       (file) => !file.type.startsWith("image/")
     );
@@ -24,6 +24,7 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
     setFiles(selectedFiles);
     setErrorMessage("");
 
+    // Generate previews
     const readers = selectedFiles.map(
       (file) =>
         new Promise((resolve) => {
@@ -36,7 +37,7 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
     Promise.all(readers).then((results) => setPreviews(results));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!files.length) {
       setErrorMessage("Please select at least one image.");
@@ -46,55 +47,39 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
     const authToken = Cookies.get("authToken");
     setIsSubmitting(true);
     setErrorMessage("");
-    setProgress(0);
 
     let url =
       role === "admin"
         ? `${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}/gallery`
         : `${import.meta.env.VITE_API_URL}/api/user/card/${cardId}/gallery`;
 
-    const formData = new FormData();
-    files.forEach((file) => formData.append("gallery", file));
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("gallery", file));
 
-    // ✅ Use XMLHttpRequest to track progress
-    const xhr = new XMLHttpRequest();
-    xhr.open("PATCH", url, true);
-    xhr.setRequestHeader("Authorization", authToken);
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: { Authorization: `${authToken}` },
+        credentials: "include",
+        body: formData,
+      });
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        setProgress(percent);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.message || "Failed to upload gallery photos");
       }
-    };
 
-    xhr.onload = () => {
+      const result = await response.json();
+      const uploadedFiles = result?.data?.gallery;
+
+      if (onSubmit) onSubmit(uploadedFiles);
+      onClose();
+    } catch (err) {
+      console.error("Error uploading gallery photos:", err.message);
+      setErrorMessage(err.message || "Something went wrong, please try again.");
+    } finally {
       setIsSubmitting(false);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const result = JSON.parse(xhr.responseText);
-          const uploadedFiles = result?.data?.gallery;
-          if (onSubmit) onSubmit(uploadedFiles);
-          onClose();
-        } catch {
-          setErrorMessage("Upload succeeded but response parsing failed.");
-        }
-      } else {
-        try {
-          const errorData = JSON.parse(xhr.responseText);
-          setErrorMessage(errorData?.message || "Failed to upload gallery photos");
-        } catch {
-          setErrorMessage("Upload failed. Please try again.");
-        }
-      }
-    };
-
-    xhr.onerror = () => {
-      setIsSubmitting(false);
-      setErrorMessage("Network error during upload.");
-    };
-
-    xhr.send(formData);
+    }
   };
 
   return (
@@ -127,16 +112,6 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
               <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
             )}
           </div>
-
-          {/* Progress Bar */}
-          {isSubmitting && (
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-blue-600 h-3 transition-all duration-200"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          )}
 
           {/* Previews */}
           {files.length > 0 && (
@@ -177,14 +152,14 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
               className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
                 isSubmitting
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-blue-700"
               }`}
+              disabled={isSubmitting}
             >
-              {isSubmitting ? `Uploading... ${progress}%` : "Upload"}
+              {isSubmitting ? "Uploading..." : "Upload"}
             </button>
           </div>
         </form>

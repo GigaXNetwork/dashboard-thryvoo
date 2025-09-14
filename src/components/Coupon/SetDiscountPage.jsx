@@ -19,8 +19,8 @@ const SetDiscountPage = () => {
     const [activeTab, setActiveTab] = useState("Own");
 
     const menuRefs = useRef([]);
-      const { userData } = useUser();
-      const user = userData.user.role;
+    const { userData } = useUser();
+    const user = userData.user.role;
 
 
     const toggleMenu = (i) => {
@@ -94,28 +94,30 @@ const SetDiscountPage = () => {
 
 
     // handle submit 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
 
-    const {
-        discountType, presetName, discountAmount,
-        maxDiscount, minPurchase, day, usageLimit, type
-    } = form;
+        const {
+            discountType, presetName, discountAmount,
+            maxDiscount, minPurchase, day, usageLimit, type, conditions, link, startAt,
+            expireAt
+        } = form;
 
-    try {
-        const method = isEditing ? 'PATCH' : 'POST';
-        let url;
+        try {
+            const method = isEditing ? 'PATCH' : 'POST';
+            let url;
 
-        if (isEditing) {
-            url = user === 'admin'
-                ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${editingPresetId}`
-                : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${editingPresetId}`;
-        } else {
-            url = setUrl;
-        }
-        console.log({discountType,
+            if (isEditing) {
+                url = user === 'admin'
+                    ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${editingPresetId}`
+                    : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${editingPresetId}`;
+            } else {
+                url = setUrl;
+            }
+            console.log({
+                discountType,
                 presetName,
                 discountAmount,
                 maxDiscount: parseFloat(maxDiscount),
@@ -125,41 +127,45 @@ const handleSubmit = async (e) => {
                 type
             });
 
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-                discountType,
-                presetName,
-                discountAmount,
-                maxDiscount: parseFloat(maxDiscount),
-                minPurchase: parseFloat(minPurchase),
-                day: parseInt(day),
-                usageLimit: parseInt(usageLimit),
-                type
-            })
-        });
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    discountType,
+                    presetName,
+                    discountAmount,
+                    maxDiscount: parseFloat(maxDiscount),
+                    minPurchase: parseFloat(minPurchase),
+                    day: parseInt(day),
+                    usageLimit: parseInt(usageLimit),
+                    type,
+                    conditions,
+                    link,
+                    startAt,
+                    expireAt
+                })
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (res.ok) {
-            setMessage(isEditing ? '✅ Preset updated!' : '✅ Coupon set successfully!');
-            resetForm();
-            fetchPresets();
-            setShowForm(false);
-            setIsEditing(false);
-            setEditingPresetId(null);
-        } else {
-            setMessage(data.message || '❌ Failed to save preset.');
+            if (res.ok) {
+                setMessage(isEditing ? '✅ Preset updated!' : '✅ Coupon set successfully!');
+                resetForm();
+                fetchPresets();
+                setShowForm(false);
+                setIsEditing(false);
+                setEditingPresetId(null);
+            } else {
+                setMessage(data.message || '❌ Failed to save preset.');
+            }
+        } catch (err) {
+            console.error(err);
+            setMessage('❌ Error saving preset.');
+        } finally {
+            setLoading(false);
         }
-    } catch (err) {
-        console.error(err);
-        setMessage('❌ Error saving preset.');
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
 
 
@@ -225,14 +231,14 @@ const handleSubmit = async (e) => {
                 // Update local state
 
                 setPresets((prevPresets) =>
-                prevPresets.map((p) => ({
-                    ...p,
-                    isActive: p._id === preset._id, // Only one active at a time
-                }))
-            );
+                    prevPresets.map((p) => ({
+                        ...p,
+                        isActive: p._id === preset._id, // Only one active at a time
+                    }))
+                );
 
-            // ✅ Optional: ensure consistency with server
-            fetchPresets();
+                // ✅ Optional: ensure consistency with server
+                fetchPresets();
 
             } else {
                 setMessage(data.message || '❌ Failed to update status.');
@@ -245,25 +251,25 @@ const handleSubmit = async (e) => {
 
     // edit preset
     const handleEditPreset = (preset) => {
-    setForm({
-        discountType: preset.discountType || 'percentage',
-        presetName: preset.presetName || '',
-        discountAmount: preset.discountAmount || '',
-        maxDiscount: preset.maxDiscount || '',
-        minPurchase: preset.minPurchase || '',
-        day: preset.day || '',
-        usageLimit: preset.usageLimit || '',
-        type: preset.type || 'own'
-    });
+        setForm({
+            discountType: preset.discountType || 'percentage',
+            presetName: preset.presetName || '',
+            discountAmount: preset.discountAmount || '',
+            maxDiscount: preset.maxDiscount || '',
+            minPurchase: preset.minPurchase || '',
+            day: preset.day || '',
+            usageLimit: preset.usageLimit || '',
+            type: preset.type || 'own'
+        });
 
-    setIsEditing(true);
-    setEditingPresetId(preset._id);
-    setShowForm(true);
-};
+        setIsEditing(true);
+        setEditingPresetId(preset._id);
+        setShowForm(true);
+    };
 
 
 
-        const filteredPresets = presets.filter(preset => {
+    const filteredPresets = presets.filter(preset => {
         if (activeTab === 'Own') return preset.type === 'own';
         if (activeTab === 'Cross Brand') return preset.type === 'cross';
         if (activeTab === 'Offer') return preset.type === 'offer';

@@ -44,6 +44,8 @@ import MediaRewards from './components/SocialMedia/MediaRewards';
 import SocialMedia from './components/SocialMedia/SocialMedia';
 import FlashHourOffer from './components/FlashHourOffer/FlashHourOffer';
 import Spinning from './components/Spinning/Spinning';
+import PresetCard from './components/Presets/PresetCard';
+import PresetsPage from './components/Presets/Presets';
 
 
 // 🔁 Scroll Wrapper

@@ -1,23 +1,7 @@
 import { X } from 'lucide-react';
 
 const CouponDetails = ({
-  name,
-  number,
-  email,
-  review,
-  rating,
-  code,
-  discountType,
-  discountAmount,
-  maxDiscount,
-  minPurchase,
-  expirationDate,
-  usageLimit,
-  usageCount,
-  status,
-  createdAt,
-  redeemedAt,
-  setShowReviewCard,
+ coupon,setShowReviewCard
 }) => {
   return (
     <div
@@ -42,30 +26,36 @@ const CouponDetails = ({
 
         {/* Scrollable Content */}
         <div className="overflow-y-auto px-6 sm:px-8 py-4 space-y-4 text-sm sm:text-base text-gray-700">
-          <Detail label="Name" value={name} />
-          <Detail label="Number" value={number} />
-          <Detail label="Email" value={email} />
-          <Detail label="Review" value={review} />
-          <Detail label="Rating" value={<span className="text-yellow-500">⭐ {rating}</span>} />
+          <Detail label="Name" value={coupon.account?.name || "N/A"} />
+          <Detail label="Number" value={coupon.account?.phone || "N/A"} />
+          <Detail label="Email" value={coupon.account?.email || "N/A"} />
+          <Detail label="Source" value={coupon.source || "N/A"} />
           <Detail
             label="Code"
             value={
               <span className="font-mono bg-blue-100 text-blue-700 px-3 py-1 rounded-lg tracking-wider">
-                {code}
+                {coupon.code}
               </span>
             }
           />
-          <Detail label="Discount Type" value={discountType} />
-          <Detail label="Discount Amount" value={`💸 ${discountAmount}`} />
-          <Detail label="Max Discount" value={maxDiscount ?? 'N/A'} />
-          <Detail label="Min Purchase" value={minPurchase} />
-          <Detail label="Created At" value={new Date(createdAt).toLocaleDateString()} />
-          <Detail label="Expiration Date" value={new Date(expirationDate).toLocaleDateString()} />
-          <Detail label="Usage Limit" value={usageLimit} />
-          <Detail label="Usage Count" value={usageCount} />
-          <Detail label="Status" value={<StatusPill status={status} />} />
-          {redeemedAt && (
-            <Detail label="Redeemed At" value={new Date(redeemedAt).toLocaleDateString()} />
+          <Detail label="Discount Type" value={coupon.discountType} />
+          <Detail
+            label="Discount Amount"
+            value={coupon.discountType === 'percentage'
+              ? `${coupon.discountAmount}%`
+              : `${coupon.discountAmount}`}
+          />
+          {coupon.maxDiscount && (
+            <Detail label="Max Discount" value={`${coupon.maxDiscount}`} />
+          )}
+          <Detail label="Min Purchase" value={`${coupon.minPurchase}`} />
+          <Detail label="Created At" value={new Date(coupon.createdAt).toLocaleDateString()} />
+          <Detail label="Expiration Date" value={new Date(coupon.expirationDate).toLocaleDateString()} />
+          <Detail label="Usage Limit" value={coupon.usageLimit} />
+          <Detail label="Usage Count" value={coupon.usageCount} />
+          <Detail label="Status" value={<StatusPill status={coupon.status} />} />
+          {coupon.redeemedAt && (
+            <Detail label="Redeemed At" value={new Date(coupon.redeemedAt).toLocaleDateString()} />
           )}
         </div>
 
@@ -84,19 +74,17 @@ const CouponDetails = ({
 };
 
 const Detail = ({ label, value }) => {
-  const displayValue = label === 'Discount Type' || label === "Name"
-    ? value.charAt(0).toUpperCase() + value.slice(1)
+  const displayValue = label === 'Discount Type' || label === "Name" || label === "Source"
+    ? value
     : value;
 
   return (
-    <div className="flex justify-between items-start border-b border-gray-100 pb-2">
-      <span className="font-medium text-gray-600 w-1/2 text-left">{label}:</span>
-      <span className="text-right w-1/2 text-gray-800 break-words">{displayValue}</span>
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-gray-100 pb-3">
+      <span className="font-medium text-gray-600 sm:w-2/5 text-left mb-1 sm:mb-0">{label}:</span>
+      <span className="text-right sm:w-3/5 text-gray-800 break-words">{displayValue}</span>
     </div>
   );
 };
-
-
 
 const StatusPill = ({ status }) => {
   const normalizedStatus = status?.toLowerCase();

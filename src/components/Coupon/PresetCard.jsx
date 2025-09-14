@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { Tag, Gift, Crosshair, Calendar, Clock, CheckCircle } from "lucide-react";
 
 const PresetCard = ({
   preset,
@@ -13,6 +14,55 @@ const PresetCard = ({
   menuRefs,
 }) => {
   const ref = useRef();
+
+  // Get icon based on offer type
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'cross':
+        return <Crosshair className="w-4 h-4 text-blue-500" />;
+      case 'own':
+        return <Gift className="w-4 h-4 text-green-500" />;
+      case 'offer':
+      default:
+        return <Tag className="w-4 h-4 text-purple-500" />;
+    }
+  };
+
+  // Get label based on offer type
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case 'cross':
+        return 'Cross Promotion';
+      case 'own':
+        return 'Own Promotion';
+      case 'offer':
+      default:
+        return 'Special Offer';
+    }
+  };
+
+  // Format date range for display
+  const formatDateRange = (startAt, expireAt) => {
+    if (!startAt || !expireAt) return "No validity period set";
+    
+    const start = new Date(startAt);
+    const end = new Date(expireAt);
+    
+    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleDateString()} ${end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+  };
+
+  // Check if offer is currently active based on validity period
+  const isCurrentlyActive = (preset) => {
+    if (!preset.startAt || !preset.expireAt) return preset.isActive;
+    
+    const now = new Date();
+    const start = new Date(preset.startAt);
+    const end = new Date(preset.expireAt);
+    
+    return preset.isActive && now >= start && now <= end;
+  };
+
+  const currentlyActive = isCurrentlyActive(preset);
 
   return (
     <div
@@ -71,39 +121,117 @@ const PresetCard = ({
 
       {/* Preset Content */}
       <div className="mb-5">
-        <h3 className="text-xl font-bold text-indigo-600 tracking-wide border-b-2 pb-2 border-indigo-200 flex items-center gap-2">
-          <svg className="w-5 h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a1 1 0 00-.894.553L7.382 6H4a1 1 0 000 2h3a1 1 0 00.894-.553L9.618 4H16a1 1 0 100-2h-6z" />
-            <path d="M4 10a1 1 0 011-1h10a1 1 0 011 1v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6z" />
-          </svg>
-          {preset.presetName}
-        </h3>
-      </div>
-
-      <div className="text-sm text-gray-700">
-        {[
-          { label: "Type", value: preset.discountType },
-          { label: "Amount/Offer", value: preset.discountAmount },
-          { label: "Max Discount", value: preset.maxDiscount || "N/A" },
-          { label: "Min Purchase", value: preset.minPurchase || "N/A" },
-          { label: "Valid Days", value: preset.day || "N/A" },
-          { label: "Usage Limit", value: preset.usageLimit || "N/A" },
-          { label: "Created At", value: preset?.createdAt ? new Date(preset.createdAt).toLocaleDateString() : "N/A" },
-        ].map((item, idx) => (
-          <div key={idx} className="flex items-center justify-between py-2 border-b hover:bg-muted transition-colors">
-            <span className="font-medium text-gray-600">{item.label}:</span>
-            <span className="capitalize">{item.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {preset.isActive && (
-        <div className="mt-6 text-right">
-          <span className="inline-block bg-emerald-100 text-emerald-700 text-xs px-3 py-1 rounded-full font-semibold tracking-wide shadow-sm">
-            Active
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xl font-bold text-indigo-600 tracking-wide border-b-2 pb-2 border-indigo-200 flex items-center gap-2">
+            {getTypeIcon(preset.type || 'offer')}
+            {preset.presetName}
+          </h3>
+          <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+            {getTypeLabel(preset.type || 'offer')}
           </span>
         </div>
-      )}
+      </div>
+
+      <div className="text-sm text-gray-700 space-y-2">
+        {/* Discount Information */}
+        <div className="grid grid-cols-2 gap-4 mb-3">
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="font-medium text-blue-700">Discount Type</div>
+            <div className="capitalize text-blue-900">{preset.discountType}</div>
+          </div>
+          <div className="bg-green-50 p-3 rounded-lg">
+            <div className="font-medium text-green-700">
+              {preset.discountType === 'custom' ? 'Custom Offer' : preset.discountType === 'percentage' ? 'Discount %' : 'Discount Amount'}
+            </div>
+            <div className="text-green-900">{preset.discountAmount}</div>
+          </div>
+        </div>
+
+        {/* Additional Details */}
+        {[
+          { label: "Max Discount", value: preset.maxDiscount || "N/A", bg: "bg-purple-50", text: "text-purple-700" },
+          { label: "Min Purchase", value: preset.minPurchase || "N/A", bg: "bg-orange-50", text: "text-orange-700" },
+          { label: "Usage Limit", value: preset.usageLimit || "N/A", bg: "bg-red-50", text: "text-red-700" },
+        ].map((item, idx) => (
+          item.value !== "N/A" && (
+            <div key={idx} className={`flex items-center justify-between p-3 rounded-lg ${item.bg}`}>
+              <span className={`font-medium ${item.text}`}>{item.label}:</span>
+              <span className={item.text.replace('700', '900')}>{item.value}</span>
+            </div>
+          )
+        ))}
+
+        {/* Validity Period */}
+        {preset.startAt && preset.expireAt && (
+          <div className="bg-indigo-50 p-3 rounded-lg">
+            <div className="font-medium text-indigo-700 flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4" />
+              Validity Period
+            </div>
+            <div className="text-indigo-900 text-xs flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {formatDateRange(preset.startAt, preset.expireAt)}
+            </div>
+          </div>
+        )}
+
+        {/* Conditions */}
+        {preset.conditions && preset.conditions.length > 0 && preset.conditions[0] !== "" && (
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <div className="font-medium text-gray-700 mb-1">Conditions</div>
+            <div className="text-gray-900 text-xs space-y-1">
+              {preset.conditions.map((condition, idx) => (
+                <div key={idx} className="flex items-start gap-1">
+                  <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>{condition}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Link */}
+        {preset.link && (
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="font-medium text-blue-700">Offer Link</div>
+            <a 
+              href={preset.link} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-900 text-xs underline truncate block"
+            >
+              {preset.link}
+            </a>
+          </div>
+        )}
+
+        {/* Created At */}
+        <div className="flex items-center justify-between py-2 border-t border-gray-200 mt-2">
+          <span className="font-medium text-gray-600">Created:</span>
+          <span className="text-gray-500 text-xs">
+            {preset?.createdAt ? new Date(preset.createdAt).toLocaleDateString() : "N/A"}
+          </span>
+        </div>
+      </div>
+
+      {/* Status Badges */}
+      <div className="mt-4 flex justify-between items-center">
+        {preset.isActive && (
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm ${
+            currentlyActive 
+              ? "bg-emerald-100 text-emerald-700" 
+              : "bg-gray-100 text-gray-700"
+          }`}>
+            {currentlyActive ? "Currently Active" : "Scheduled"}
+          </span>
+        )}
+        
+        {preset.startAt && preset.expireAt && !currentlyActive && preset.isActive && (
+          <span className="text-xs text-gray-500">
+            {new Date() < new Date(preset.startAt) ? "Starts soon" : "Expired"}
+          </span>
+        )}
+      </div>
     </div>
   );
 };

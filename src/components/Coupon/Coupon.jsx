@@ -19,7 +19,7 @@ function Coupon() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedCoupon, setSelectedCoupon] = useState(null);
-  const [selectedReview, setSelectedReview] = useState({});
+
   const [quickDateFilter, setQuickDateFilter] = useState('');
 
 
@@ -145,7 +145,7 @@ function Coupon() {
   };
 
 
-  const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Review", "Manage"];
+  const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Details", "Manage"];
 
   return (
     <div className="p-2">
@@ -272,7 +272,7 @@ function Coupon() {
                   <tr key={coupon._id} className="border-b hover:bg-gray-50">
                     <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td className="px-6 py-4 font-medium text-gray-900 break-all text-center">{coupon.code}</td>
-                    <td className="px-6 py-4 font-medium capitalize break-all text-center">{coupon.review?.name || "N/A"}</td>
+                    <td className="px-6 py-4 font-medium capitalize break-all text-center">{coupon.account?.name || "N/A"}</td>
                     <td className={`px-6 py-4 font-medium capitalize text-center ${statusColor}`}>{coupon.status}</td>
                     <td className="px-6 py-4 text-center text-gray-700">
                       {coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : ''}
@@ -282,20 +282,14 @@ function Coupon() {
                         className="text-blue-600 hover:underline font-medium"
                         onClick={() => {
                           setShowReviewCard(prev => ({ ...prev, [coupon._id]: true }));
-                          setSelectedReview({
-                            ...coupon.review,
-                            ...coupon,
-                            number: coupon.review?.phone || "N/A",
-                            name: coupon.review?.name || "N/A",
-                            review: coupon.review?.review || "No review available"
-                          });
+                          
                         }}
                       >
                         See Review
                       </button>
                       {showReviewCard[coupon._id] && (
                         <CouponDetails
-                          {...selectedReview}
+                          coupon={coupon}
                           setShowReviewCard={(visible) =>
                             setShowReviewCard(prev => ({ ...prev, [coupon._id]: visible }))}
                         />

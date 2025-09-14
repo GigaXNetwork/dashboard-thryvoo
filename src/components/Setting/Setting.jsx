@@ -3,6 +3,8 @@ import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import SocialMediaRewardsSection from "./SocialMediaRewardSection";
+import ReferralCoinsModal from "./ReferralCoinModal";
+import UpdateFieldModal from "./ReferralCoinModal";
 
 export default function Setting() {
   const [settings, setSettings] = useState(null);
@@ -10,15 +12,21 @@ export default function Setting() {
   const [error, setError] = useState(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [isJoiningModalOpen, setIsJoiningModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCategories, setEditingCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [referralCoin, setReferralCoin] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [modalField, setModalField] = useState(null);
+
+
+  const handleOpenModal = (field, label) => setModalField({ field, label });
 
   // Default settings template
   const [newSettings, setNewSettings] = useState({
     referralCoin: 10,
+    signupCoin: 5,
     socialMediaRewards: {
       facebook: 5,
       twitter: 5,
@@ -160,6 +168,13 @@ export default function Setting() {
       setIsReferralModalOpen(false);
     }
   };
+  // Submit updates to context
+  const onSubmit = (updated) => {
+    setSettings((prev) => ({
+      ...prev,
+      ...updated,
+    }));
+  };
 
   if (loading) return <div className="text-center py-8">Loading settings...</div>;
 
@@ -287,13 +302,13 @@ export default function Setting() {
                         Add
                       </button>
                     </div>
-                    
+
                     {/* Categories Preview */}
                     {newSettings.category.length > 0 && (
                       <div className="mt-2">
                         <div className="flex flex-wrap gap-2">
                           {newSettings.category.map((cat, index) => (
-                            <span 
+                            <span
                               key={index}
                               className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
                             >
@@ -333,11 +348,10 @@ export default function Setting() {
                     type="button"
                     onClick={handleCreateSettings}
                     disabled={isSaving || newSettings.category.length === 0}
-                    className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-                      isSaving || newSettings.category.length === 0
+                    className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${isSaving || newSettings.category.length === 0
                         ? 'bg-indigo-300 cursor-not-allowed'
                         : 'bg-indigo-600 hover:bg-indigo-700'
-                    }`}
+                      }`}
                   >
                     {isSaving ? (
                       <span className="flex items-center justify-center gap-2">
@@ -404,9 +418,10 @@ export default function Setting() {
             key="referral-coins"
             className="cursor-pointer flex items-center justify-between py-4 px-4 hover:bg-gray-50 transition-colors bg-white"
             onClick={(e) => {
-              e.stopPropagation();
-              setIsReferralModalOpen(true);
-            }}
+            
+              handleOpenModal("referralCoin", "Referral Coins");
+            }
+            }
           >
             <div className="flex-1 flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-3 flex-1 basis-[100px]">
@@ -420,6 +435,34 @@ export default function Setting() {
               <div className="flex-1 basis-[100px]">
                 <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
                   {settings?.referralCoin || 0} coins
+                </span>
+              </div>
+            </div>
+            <div className="pl-4 flex gap-2">
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+          </div>
+
+          {/* Joining Coins */}
+          <div
+            key="joining-coins"
+            className="cursor-pointer flex items-center justify-between py-4 px-4 hover:bg-gray-50 transition-colors bg-white"
+            onClick={() => {
+              handleOpenModal("signupCoin", "Joining Coins");
+            }}
+          >
+            <div className="flex-1 flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-3 flex-1 basis-[100px]">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <FaCoins className="text-[#2563EB] text-lg" />
+                </div>
+                <span className="text-gray-600 font-medium">
+                  Joining Coins
+                </span>
+              </div>
+              <div className="flex-1 basis-[100px]">
+                <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                  {settings?.signupCoin || 0} coins
                 </span>
               </div>
             </div>
@@ -594,94 +637,14 @@ export default function Setting() {
           )}
 
           {/* Referral Coin Edit Modal */}
-          {isReferralModalOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm">
-              <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl transition-all">
-                {/* Modal Header */}
-                <div className="flex justify-between items-start p-6 border-b border-gray-100">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-lg bg-purple-100">
-                      <FaCoins className="text-[#2563EB] w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        Update Referral Coins
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">Adjust coin rewards for referrals</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsReferralModalOpen(false)}
-                    className="text-gray-400 hover:text-gray-500 transition-colors p-1 rounded-full hover:bg-gray-100"
-                    disabled={isSaving}
-                    aria-label="Close modal"
-                  >
-                    <FaTimes className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Modal Body */}
-                <div className="p-6 space-y-6">
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Current Reward Value
-                    </label>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-gray-800">
-                        {settings.referralCoin}
-                      </span>
-                      <span className="text-gray-500">coins</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="referralValue" className="block text-sm font-medium text-gray-700">
-                      New Reward Value
-                    </label>
-                    <div className="relative rounded-lg shadow-sm">
-                      <input
-                        type="number"
-                        id="referralValue"
-                        min="0"
-                        value={referralCoin}
-                        onChange={(e) => setReferralCoin(Number(e.target.value))}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                        placeholder="Enter amount"
-                        disabled={isSaving}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal Footer */}
-                <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-gray-100">
-                  <button
-                    type="button"
-                    onClick={() => setIsReferralModalOpen(false)}
-                    disabled={isSaving}
-                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleUpdateReferralCoin}
-                    disabled={isSaving}
-                    className={`px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors ${isSaving
-                      ? 'bg-indigo-400 cursor-not-allowed'
-                      : 'bg-indigo-600 hover:bg-indigo-700 shadow-sm'
-                      }`}
-                  >
-                    {isSaving ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <FaSpinner className="animate-spin" />
-                        Updating...
-                      </span>
-                    ) : 'Save Changes'}
-                  </button>
-                </div>
-              </div>
-            </div>
+          {modalField && (
+            <UpdateFieldModal
+              settings={settings}
+              field={modalField.field}
+              label={modalField.label}
+              onClose={() => setModalField(null)}
+              onSubmit={onSubmit}
+            />
           )}
 
           {/* Created At */}

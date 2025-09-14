@@ -1,4 +1,7 @@
-import { X, Calendar, Clock, Tag, DollarSign, MinusCircle, ShoppingBag, Users, Link as LinkIcon, Plus, Trash2, Crosshair, Gift } from 'lucide-react';
+import { 
+  X, Calendar, Clock, Tag, DollarSign, MinusCircle, ShoppingBag, 
+  Users, Link as LinkIcon, Plus, Trash2, Crosshair, Gift 
+} from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
 export default function OfferForm({
@@ -9,8 +12,7 @@ export default function OfferForm({
   handleSubmit,
   resetForm,
   loading,
-  isEditing,
-  title = isEditing ? "Edit Special Offer" : "Create Special Offer",
+  title = "Create Special Offer",
   onClose
 }) {
   const [errors, setErrors] = useState({});
@@ -37,15 +39,9 @@ export default function OfferForm({
 
   // Initialize form state
   useEffect(() => {
-    if (form.startAt) {
-      setHasValidityPeriod(true);
-    }
-    
-    if (form.day || form.hour) {
-      setHasExpiryDuration(true);
-    }
-    
-    // Ensure conditions is always an array
+    if (form.startAt) setHasValidityPeriod(true);
+    if (form.day || form.hour) setHasExpiryDuration(true);
+
     if (!form.conditions || !Array.isArray(form.conditions)) {
       handleChange({ target: { name: 'conditions', value: [''] } });
     }
@@ -61,7 +57,7 @@ export default function OfferForm({
     } else {
       handleChange({ target: { name: 'startAt', value: null } });
     }
-    
+
     if (hasValidityPeriod && endDateTime.date && endDateTime.time) {
       const expireAt = new Date(`${endDateTime.date}T${endDateTime.time}`);
       if (!isNaN(expireAt)) {
@@ -76,7 +72,6 @@ export default function OfferForm({
   const validateForm = useCallback(() => {
     const newErrors = {};
 
-    // Validate presetName
     if (!form.presetName?.trim()) {
       newErrors.presetName = 'Offer name is required';
     } else if (form.presetName.trim().length < 3) {
@@ -85,55 +80,39 @@ export default function OfferForm({
       newErrors.presetName = 'Offer name must be at most 50 characters';
     }
 
-    // Validate discount fields based on type
     if (form.discountType !== 'custom') {
       if (!form.discountAmount || form.discountAmount <= 0) {
         newErrors.discountAmount = 'Valid discount amount is required';
       }
-      
-      // Max discount is required for percentage and fixed types
       if (!form.maxDiscount || form.maxDiscount <= 0) {
         newErrors.maxDiscount = 'Valid max discount is required';
       }
     } else {
-      // For custom offers, discountAmount is a string description
       if (!form.discountAmount?.trim()) {
         newErrors.discountAmount = 'Custom offer description is required';
       }
     }
 
-    // Min purchase is optional in schema but let's validate if provided
-    if (form.minPurchase !== null && form.minPurchase !== undefined && form.minPurchase < 0) {
+    if (form.minPurchase !== null && form.minPurchase < 0) {
       newErrors.minPurchase = 'Minimum purchase cannot be negative';
     }
 
-    // Validate expiry duration if enabled
     if (hasExpiryDuration) {
-      if (form.day === undefined || form.day === null || form.day < 0) {
-        newErrors.day = 'Day must be a non-negative number';
-      }
-      
-      if (form.hour === undefined || form.hour === null || form.hour < 0) {
-        newErrors.hour = 'Hour must be a non-negative number';
-      }
-      
-      // At least one of day or hour should be provided
+      if (form.day < 0) newErrors.day = 'Day must be a non-negative number';
+      if (form.hour < 0) newErrors.hour = 'Hour must be a non-negative number';
       if ((!form.day || form.day === 0) && (!form.hour || form.hour === 0)) {
-        newErrors.day = 'Please provide either days or hours for expiry';
-        newErrors.hour = 'Please provide either days or hours for expiry';
+        newErrors.day = 'Provide either days or hours';
+        newErrors.hour = 'Provide either days or hours';
       }
     } else {
-      // Clear day and hour if duration is disabled
       handleChange({ target: { name: 'day', value: null } });
       handleChange({ target: { name: 'hour', value: null } });
     }
 
-    // Usage limit is required
     if (!form.usageLimit || form.usageLimit <= 0) {
       newErrors.usageLimit = 'Valid usage limit is required';
     }
 
-    // Validate validity period only if enabled
     if (hasValidityPeriod) {
       if (!startDateTime.date) newErrors.startDate = 'Start date is required';
       if (!endDateTime.date) newErrors.endDate = 'End date is required';
@@ -145,17 +124,8 @@ export default function OfferForm({
         if (start < new Date()) newErrors.startDate = 'Start date cannot be in the past';
       }
     } else {
-      // Clear datetime fields when validity period is disabled
       handleChange({ target: { name: 'startAt', value: null } });
       handleChange({ target: { name: 'expireAt', value: null } });
-    }
-
-    // Validate conditions - now optional
-    const validConditions = form.conditions?.filter(cond => cond?.trim() !== '') || [];
-    for (let i = 0; i < validConditions.length; i++) {
-      if (!validConditions[i]?.trim()) {
-        newErrors[`condition-${i}`] = 'Condition cannot be empty';
-      }
     }
 
     setErrors(newErrors);
@@ -171,24 +141,16 @@ export default function OfferForm({
     }
   }, [updateDateTimeFields, validateForm, handleSubmit]);
 
-  // Condition handlers
+  // Helpers
   const addCondition = () => {
-    const newConditions = [...(form.conditions || []), ''];
-    handleChange({ target: { name: 'conditions', value: newConditions } });
+    handleChange({ target: { name: 'conditions', value: [...(form.conditions || []), ''] } });
   };
 
   const removeCondition = (index) => {
-    if (form.conditions && form.conditions.length > 1) {
+    if (form.conditions?.length > 1) {
       const newConditions = [...form.conditions];
       newConditions.splice(index, 1);
       handleChange({ target: { name: 'conditions', value: newConditions } });
-      
-      // Clear any error for this condition
-      if (errors[`condition-${index}`]) {
-        const newErrors = {...errors};
-        delete newErrors[`condition-${index}`];
-        setErrors(newErrors);
-      }
     }
   };
 
@@ -196,50 +158,15 @@ export default function OfferForm({
     const newConditions = [...(form.conditions || [])];
     newConditions[index] = value;
     handleChange({ target: { name: 'conditions', value: newConditions } });
-    
-    // Clear error for this condition if it exists
-    if (errors[`condition-${index}`]) {
-      const newErrors = {...errors};
-      delete newErrors[`condition-${index}`];
-      setErrors(newErrors);
-    }
   };
 
-  // Change handlers
-  const handleFieldChange = useCallback((e) => {
+  const handleFieldChange = (e) => {
     const { name, value, type } = e.target;
-    
-    // Convert numeric fields to numbers
     let processedValue = value;
-    if (type === 'number' && value !== '') {
-      processedValue = parseFloat(value);
-    }
-    
-    handleChange({
-      target: {
-        name,
-        value: processedValue
-      }
-    });
-    
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  }, [errors, handleChange]);
-
-  const handleDateTimeChange = useCallback((field, value) => {
-    if (field === 'startDate') {
-      handleChange({ target: { name: 'startAt', value: `${value}T${startDateTime.time}` } });
-    } else if (field === 'startTime') {
-      handleChange({ target: { name: 'startAt', value: `${startDateTime.date}T${value}` } });
-    } else if (field === 'endDate') {
-      handleChange({ target: { name: 'expireAt', value: `${value}T${endDateTime.time}` } });
-    } else if (field === 'endTime') {
-      handleChange({ target: { name: 'expireAt', value: `${endDateTime.date}T${value}` } });
-    }
-    
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
-  }, [errors, handleChange, startDateTime, endDateTime]);
-
-  const getTodayDate = () => new Date().toISOString().split('T')[0];
+    if (type === 'number' && value !== '') processedValue = parseFloat(value);
+    handleChange({ target: { name, value: processedValue } });
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+  };
 
   const handleClose = () => {
     setShowForm(false);
@@ -247,14 +174,25 @@ export default function OfferForm({
     onClose?.();
   };
 
-  const handleReset = () => {
-    resetForm();
-    setHasValidityPeriod(false);
-    setHasExpiryDuration(false);
-    setErrors({});
+    const toggleExpiryDuration = () => {
+    const newHasExpiryDuration = !hasExpiryDuration;
+    setHasExpiryDuration(newHasExpiryDuration);
+    
+    if (!newHasExpiryDuration) {
+      // Clear day and hour fields when disabling expiry duration
+      handleChange({ target: { name: 'day', value: null } });
+      handleChange({ target: { name: 'hour', value: null } });
+    }
+    
+    // Clear day/hour errors when toggling
+    if (errors.day || errors.hour) {
+      const newErrors = {...errors};
+      delete newErrors.day;
+      delete newErrors.hour;
+      setErrors(newErrors);
+    }
   };
-
-  const toggleValidityPeriod = () => {
+    const toggleValidityPeriod = () => {
     const newHasValidityPeriod = !hasValidityPeriod;
     setHasValidityPeriod(newHasValidityPeriod);
     
@@ -273,48 +211,28 @@ export default function OfferForm({
     }
   };
 
-  const toggleExpiryDuration = () => {
-    const newHasExpiryDuration = !hasExpiryDuration;
-    setHasExpiryDuration(newHasExpiryDuration);
-    
-    if (!newHasExpiryDuration) {
-      // Clear day and hour fields when disabling expiry duration
-      handleChange({ target: { name: 'day', value: null } });
-      handleChange({ target: { name: 'hour', value: null } });
-    }
-    
-    // Clear day/hour errors when toggling
-    if (errors.day || errors.hour) {
-      const newErrors = {...errors};
-      delete newErrors.day;
-      delete newErrors.hour;
-      setErrors(newErrors);
-    }
+  const handleReset = () => {
+    resetForm();
+    setHasValidityPeriod(false);
+    setHasExpiryDuration(false);
+    setErrors({});
   };
 
-  // Get icon based on offer type
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'cross':
-        return <Crosshair className="w-4 h-4 mr-2 text-[#2563EB]" />;
-      case 'own':
-        return <Gift className="w-4 h-4 mr-2 text-[#2563EB]" />;
-      case 'offer':
-      default:
-        return <Tag className="w-4 h-4 mr-2 text-[#2563EB]" />;
+      case 'cross': return <Crosshair className="w-4 h-4 mr-2 text-[#2563EB]" />;
+      case 'own': return <Gift className="w-4 h-4 mr-2 text-[#2563EB]" />;
+      default: return <Tag className="w-4 h-4 mr-2 text-[#2563EB]" />;
     }
   };
 
-  // Get label based on offer type
   const getTypeLabel = (type) => {
     switch (type) {
-      case 'cross':
-        return 'Cross Promotion';
-      case 'own':
-        return 'Own Promotion';
-      case 'offer':
-      default:
-        return 'Special Offer';
+      case 'cross': return 'Cross Promotion';
+      case 'own': return 'Own Promotion';
+      default: return 'Special Offer';
     }
   };
 
@@ -329,7 +247,7 @@ export default function OfferForm({
 
       <div className={`fixed inset-0 flex items-center justify-center z-[9999] transition ${showForm ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className={`relative w-full max-w-md bg-white rounded-xl shadow-2xl transform transition ${showForm ? 'scale-100' : 'scale-95'}`}>
-          
+
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
             <div className="flex items-center">
@@ -663,7 +581,7 @@ export default function OfferForm({
                 Clear All
               </button>
               <button type="submit" disabled={loading} className="w-1/2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg py-3">
-                {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Offer' : 'Create Offer')}
+                {loading ? 'Creating...' : 'Create Offer'}
               </button>
             </div>
           </form>
