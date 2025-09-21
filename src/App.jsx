@@ -46,6 +46,9 @@ import FlashHourOffer from './components/FlashHourOffer/FlashHourOffer';
 import Spinning from './components/Spinning/Spinning';
 import PresetCard from './components/Presets/PresetCard';
 import PresetsPage from './components/Presets/Presets';
+import CrossBrand from './components/CrossBrand/CrossBrand';
+import RedeemStoreForm from './components/RedeemStore/RedeemStoreForm';
+import RedeemStore from './components/RedeemStore/RedeemStore';
 
 
 // 🔁 Scroll Wrapper
@@ -117,6 +120,7 @@ function App() {
                   { path: 'card', element: <GetMyCard role={role} /> },
                   { path: 'coupon', element: <Coupon role={role} /> },
                   { path: 'presets', element: <SetDiscountPage role={role} /> },
+                  { path: 'redeem-store', element: <RedeemStore /> },
                   { path: 'enquary', element: <Enquary /> },
                 ]
               }
@@ -132,6 +136,7 @@ function App() {
               { path: 'media/allMedia', element: <MediaRewards /> },
               { path: 'spin', element: <Spinning /> },
               { path: 'media/setMedia', element: <SocialMedia /> },
+              { path: 'cross-brand/store', element: <CrossBrand /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
             ] : [])

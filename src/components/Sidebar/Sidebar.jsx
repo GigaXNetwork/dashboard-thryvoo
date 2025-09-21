@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { RiCoupon2Fill } from "react-icons/ri";
-import { FaAddressCard, FaStar, FaWhatsapp } from "react-icons/fa";
+import { FaAddressCard, FaHandshake, FaStar, FaWhatsapp } from "react-icons/fa";
 import { IoHomeOutline } from "react-icons/io5";
 import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
@@ -56,6 +56,15 @@ function Sidebar({ onToggleSidebar }) {
       to: "/spin",
       icon: <FerrisWheel />,
       label: "Spinning"
+    },
+    userData.user.role === "user" && {
+      to: "/cross-brand",
+      icon: <FaHandshake />,
+      label: "Cross Brand",
+      subItems: [
+        { to: "/cross-brand/Presets", label: "presets" },
+        { to: "/cross-brand/Store", label: "store" },
+      ]
     },
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },
   ].filter(Boolean);

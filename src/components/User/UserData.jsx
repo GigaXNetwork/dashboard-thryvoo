@@ -18,6 +18,7 @@ const menuItems = [
   { to: "coupon", icon: <RiCoupon2Fill />, label: "Coupons" },
   { to: "presets", icon: <RiCoupon2Fill />, label: "Presets" },
   { to: "reviews", icon: <FaStar />, label: "Reviews" },
+  { to: "redeem-store", icon: <FaStar />, label: "Redeem Store Item" },
 ];
 
 function UserData() {
