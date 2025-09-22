@@ -62,8 +62,8 @@ function Sidebar({ onToggleSidebar }) {
       icon: <FaHandshake />,
       label: "Cross Brand",
       subItems: [
-        { to: "/cross-brand/Presets", label: "presets" },
-        { to: "/cross-brand/Store", label: "store" },
+        { to: "/cross-brand/presets", label: "Presets" },
+        { to: "/cross-brand/store", label: "Store" },
       ]
     },
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },

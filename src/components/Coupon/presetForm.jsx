@@ -349,7 +349,7 @@ export default function OfferForm({
             {/* Offer Type */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Tag className="w-4 h-4 mr-2 text-[#2563EB]" />
+                
                 Offer Type
               </label>
               <select
@@ -368,7 +368,7 @@ export default function OfferForm({
             {/* Discount Type */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />
+                
                 Discount Type
               </label>
               <select
@@ -387,7 +387,7 @@ export default function OfferForm({
             {/* Offer Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Tag className="w-4 h-4 mr-2 text-[#2563EB]" />
+                
                 {getTypeLabel(form.type || 'own')} Name *
               </label>
               <input
@@ -404,7 +404,7 @@ export default function OfferForm({
             {/* Discount / Custom Offer */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                {form.discountType === 'custom' ? <MinusCircle className="w-4 h-4 mr-2 text-[#2563EB]" /> : <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />}
+                
                 {form.discountType === 'custom' ? 'Custom Offer *' : form.discountType === 'percentage' ? 'Discount Percentage *' : 'Discount Amount *'}
               </label>
               <input
@@ -423,7 +423,7 @@ export default function OfferForm({
             {form.discountType !== 'custom' && (
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <DollarSign className="w-4 h-4 mr-2 text-[#2563EB]" />
+                  
                   Max Discount *
                 </label>
                 <input
@@ -441,7 +441,7 @@ export default function OfferForm({
             {/* Min Purchase (Optional) */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <ShoppingBag className="w-4 h-4 mr-2 text-[#2563EB]" />
+                
                 Min Purchase (Optional)
               </label>
               <input

@@ -92,7 +92,7 @@ function User() {
 
   // Fetch users when filters change with debounce
   useEffect(() => {
-    const timeout = setTimeout(fetchUsers, 300);
+    const timeout = setTimeout(fetchUsers, 2000);
     return () => clearTimeout(timeout);
   }, [fetchUsers]);
 
@@ -106,7 +106,7 @@ function User() {
 
   const handleSearchChange = useCallback((e) => {
     handleFilterChange('search', e.target.value);
-  }, [handleFilterChange]);
+  }, []);
 
 
 

@@ -164,13 +164,13 @@ const PresetCard = ({
               {preset.discountType === 'percentage' 
                 ? `${preset.discountAmount}% OFF` 
                 : preset.discountType === 'fixed' 
-                  ? `$${preset.discountAmount} OFF`
+                  ? `₹${preset.discountAmount} OFF`
                   : preset.discountAmount}
             </span>
           </div>
           {preset.maxDiscount && preset.discountType !== 'custom' && (
             <div className="text-xs text-indigo-600 mt-1">
-              Max discount: ${preset.maxDiscount}
+              Max discount: ₹ {preset.maxDiscount}
             </div>
           )}
         </div>
@@ -179,7 +179,7 @@ const PresetCard = ({
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-gray-50 p-3 rounded-lg">
             <div className="text-xs text-gray-500 font-medium">Min Purchase</div>
-            <div className="font-semibold">${preset.minPurchase || "0"}</div>
+            <div className="font-semibold">₹{preset.minPurchase || "0"}</div>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
             <div className="text-xs text-gray-500 font-medium">Usage Limit</div>

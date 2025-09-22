@@ -49,6 +49,7 @@ import PresetsPage from './components/Presets/Presets';
 import CrossBrand from './components/CrossBrand/CrossBrand';
 import RedeemStoreForm from './components/RedeemStore/RedeemStoreForm';
 import RedeemStore from './components/RedeemStore/RedeemStore';
+import MyPreset from './components/CrossBrand/MyPreset';
 
 
 // 🔁 Scroll Wrapper
@@ -137,6 +138,7 @@ function App() {
               { path: 'spin', element: <Spinning /> },
               { path: 'media/setMedia', element: <SocialMedia /> },
               { path: 'cross-brand/store', element: <CrossBrand /> },
+              { path: 'cross-brand/presets', element: <MyPreset /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
             ] : [])
