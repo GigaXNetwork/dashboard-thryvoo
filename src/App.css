@@ -46,3 +46,7 @@
     scrollbar-width: none;
   }
 }
+
+.ql-container.ql-snow {
+    border: none;
+}

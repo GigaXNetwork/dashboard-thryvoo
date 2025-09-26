@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import BlogCard from './BlogCard';
+import { BlogCard } from './BlogCard';
 import { Search, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

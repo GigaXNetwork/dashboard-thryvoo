@@ -6,6 +6,7 @@ import CustomerTypeChart from "./CustomerTypeChart";
 import VisitsByDay from "./VisitsByDay";
 import VisitsByTime from "./VisitsByTime";
 import CouponChart from "./StatisticsChart";
+import Cookies from "js-cookie";
 
 const DATE_PRESETS = [
   { label: "Today", value: "1day" },
@@ -16,6 +17,17 @@ const DATE_PRESETS = [
   { label: "All time", value: "all" },
 ];
 
+export const getAuthToken = () => {
+  const tokenNames = ['authToken'];
+  for (const name of tokenNames) {
+    const token = Cookies.get(name);
+    if (token) {
+      return token;
+    }
+  }
+  return null;
+};
+
 function Dashboard({ onFilter }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -24,6 +36,12 @@ function Dashboard({ onFilter }) {
   const [insightsData, setInsightsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const authToken = getAuthToken();
+  if (!authToken) {
+    alert('Authentication token not found. Please log in again.');
+    return;
+  }
 
   const calculateDateRange = (preset) => {
     const now = new Date();
@@ -93,9 +111,17 @@ function Dashboard({ onFilter }) {
       const [couponsRes, insightsRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_URL}/api/insights/coupons${couponsQuery}`, {
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `${authToken}`,
+          }
         }),
         fetch(`${import.meta.env.VITE_API_URL}/api/insights/visitorsInsights${visitorsQuery}`, {
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `${authToken}`,
+          }
         }),
       ]);
 

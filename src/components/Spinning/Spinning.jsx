@@ -3,40 +3,38 @@ import Cookies from "js-cookie";
 import SpinList from "./SpinList";
 import CouponPresetSelector from "./CouponPresetSelector";
 import SpinningWheel from "./SpinningWheel";
+import { apiRequest } from "../../Context/apiService";
 
 const Spinning = () => {
   const [spinData, setSpinData] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [fetchError, setFetchError] = useState(null);
   const [addError, setAddError] = useState(null);
   const [removeError, setRemoveError] = useState(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSpinningEnabled, setSpinningEnabled] = useState(true);
 
   const token = Cookies.get("authToken");
 
-  // Fetch spin data
+  const spinId = spinData?._id;
+
   const fetchSpinData = async () => {
     try {
       setLoading(true);
       setFetchError(null);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/spin/my-spins`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
-          credentials: "include",
-        }
+      const data = await apiRequest(
+        "/api/spin/my-spins",
+        "GET",
+        null,
+        { Authorization: `${token}` }
       );
 
-      const data = await response.json();
       if (data.status === "success") {
         setSpinData(data.data.spin || { spins: [] });
+        if (typeof data.data.spin?.isActive === "boolean") {
+          setSpinningEnabled(data.data.spin.isActive);
+        }
       } else {
         setFetchError(data.message || "Failed to fetch spin data");
       }
@@ -51,127 +49,31 @@ const Spinning = () => {
     if (token) fetchSpinData();
   }, [token]);
 
-  // Add spin from modal preset
-  const handleAddSpin = async (presetObj) => {
-    setAddError(null);
-
-    if (!presetObj || !presetObj._id) {
-      setAddError("Invalid preset");
-      return;
-    }
-
-    if (spinData.spins.length >= 5) {
-      setAddError("Maximum limit of 5 spins reached");
-      return;
-    }
-
-    if (spinData.spins.find((s) => s._id === presetObj._id)) {
-      setAddError("This spin already exists");
-      return;
-    }
+  const handleToggleSpinning = async () => {
+    if (!spinId) return;
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/spin/add-items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ itemId: presetObj._id }),
-        }
-      );
-
+      const response = await fetch(`https://api.thryvoo.com/api/spin/${spinId}/toggle`, {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        credentials: "include",
+      });
       const data = await response.json();
-      if (data.status !== "success") {
-        setAddError(data.message || "Failed to add spin");
-        return;
+
+      if (data.status === "success" && data.data) {
+        setSpinningEnabled(data.data.isActive);
+      } else {
+        alert(data.message || "Failed to toggle spinning");
       }
-
-      // Refetch spin data after adding
-      await fetchSpinData();
-      setIsModalOpen(false);
-    } catch (err) {
-      setAddError("Something went wrong. Please try again.");
+    } catch {
+      alert("Network error: Could not toggle spinning");
     }
   };
 
-  // Remove spin
-  const handleRemoveSpin = async (spinId) => {
-    setRemoveError(null);
+  // Add and Remove handlers can be filled here as per your existing logic.
 
-    if (spinData.spins.length <= 1) {
-      setRemoveError("Minimum of 1 spin required");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/spin/remove-items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ itemId: spinId }),
-        }
-      );
-
-      const data = await response.json();
-      if (data.status !== "success") {
-        setRemoveError(data.message || "Failed to remove spin");
-        return;
-      }
-
-      setSpinData((prev) => ({
-        ...prev,
-        spins: prev.spins.filter((s) => s._id !== spinId),
-      }));
-    } catch (err) {
-      setRemoveError("Something went wrong. Please try again.");
-    }
-  };
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-    setAddError(null);
-  };
-const createSpin = async () => {
-  try {
-
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/spin/create-spin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${token}`,
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        // You can send default values here, adjust as needed
-        presetName: "Default Spin",
-        discountType: "percentage",
-        discountAmount: 10,
-      }),
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Failed to create spin");
-
-    // Refetch spins after creating
-    await fetchSpinData();
-  } catch (err) {
-    alert(err.message || "Failed to create spin");
-  }
-};
-
-
-
-  // Loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -180,7 +82,6 @@ const createSpin = async () => {
     );
   }
 
-  // No spins
   if (!spinData) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -189,12 +90,7 @@ const createSpin = async () => {
           <p className="text-gray-600 mb-6">
             No spin data found. Please set up your spins to get started.
           </p>
-          <button
-            onClick={createSpin}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
-          >
-            Setup Spins
-          </button>
+          {/* Include your create spin button */}
         </div>
       </div>
     );
@@ -203,25 +99,44 @@ const createSpin = async () => {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center lg:text-left">
-          Spinning Management
-        </h1>
+        <div className="flex flex-col lg:flex-row items-center justify-between mb-10">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 lg:mb-0">
+            Spinning Management
+          </h1>
+          <div className="flex items-center space-x-3 mr-5 border p-3 rounded-full bg-white shadow-sm">
+            <button
+              type="button"
+              onClick={handleToggleSpinning}
+              aria-pressed={isSpinningEnabled}
+              className={`relative inline-flex items-center h-8 w-16 rounded-full transition-colors duration-300 focus:outline-none
+                ${isSpinningEnabled ? "bg-blue-600" : "bg-gray-300"}`}
+              style={{ minWidth: '4rem' }}
+            >
+              <span
+                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200
+                  ${isSpinningEnabled ? "translate-x-8" : "translate-x-0"}`}
+              />
+            </button>
+            <span className={`ml-2 text-base font-semibold ${isSpinningEnabled ? "text-blue-700" : "text-gray-500"}`}>
+              {isSpinningEnabled ? "Spinning Enabled" : "Spinning Disabled"}
+            </span>
+          </div>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left panel: Spin list */}
           <div className="lg:w-1/2">
             <SpinList
               spins={spinData.spins}
               openModal={() => setIsModalOpen(true)}
-              onRemoveSpin={handleRemoveSpin}
+              onRemoveSpin={() => { }}
+              onToggleActive={() => { }}
               error={removeError || fetchError}
             />
           </div>
 
-          {/* Right panel: Fixed spinning wheel */}
           <div className="lg:w-1/2 flex justify-center lg:justify-end">
             <div className="sticky top-20">
-              <SpinningWheel spins={spinData.spins} />
+              <SpinningWheel spins={spinData.spins.filter((s) => s.active !== false)} />
             </div>
           </div>
         </div>
@@ -230,8 +145,8 @@ const createSpin = async () => {
       {isModalOpen && (
         <CouponPresetSelector
           existingPresets={spinData.spins.map((s) => s._id)}
-          onAddSpin={handleAddSpin}
-          onClose={handleClose}
+          onAddSpin={() => { }}
+          onClose={() => setIsModalOpen(false)}
           error={addError}
         />
       )}

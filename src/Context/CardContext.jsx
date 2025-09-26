@@ -1,8 +1,20 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import Cookies from "js-cookie";
 
 const CardContext = createContext();
 
-export const CardProvider = ({ children, cardId,role }) => {
+export const getAuthToken = () => {
+  const tokenNames = ['authToken'];
+  for (const name of tokenNames) {
+    const token = Cookies.get(name);
+    if (token) {
+      return token;
+    }
+  }
+  return null;
+};
+
+export const CardProvider = ({ children, cardId, role }) => {
   const [cardData, setCardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,21 +22,30 @@ export const CardProvider = ({ children, cardId,role }) => {
   useEffect(() => {
     if (!cardId) return;
     let url;
-    if(role==="admin"){
-      url=`${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}`
+
+    if (role === "admin") {
+      url = `${import.meta.env.VITE_API_URL}/api/admin/card/${cardId}`
     }
-    else{
-      url=`${import.meta.env.VITE_API_URL}/api/user/card/${cardId}`
+    else {
+      url = `${import.meta.env.VITE_API_URL}/api/user/card/${cardId}`
     }
 
     const fetchData = async () => {
       setLoading(true);
+      const authToken = getAuthToken();
+      if (!authToken) {
+        setLoading(false);
+        return;
+      }
       setError(null);
 
       try {
         const response = await fetch(url, {
           method: 'GET',
           credentials: 'include',
+          headers: {
+            'Authorization': `${authToken}`,
+          },
         });
 
         if (!response.ok) {

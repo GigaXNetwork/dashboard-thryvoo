@@ -8,7 +8,7 @@ export default function LoadingAnimation() {
         Loading, please wait...
       </h2>
 
-      <style jsx>{`
+      <style>{`
         .spinner {
           width: 64px;
           height: 64px;

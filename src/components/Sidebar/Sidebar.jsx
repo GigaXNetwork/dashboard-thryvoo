@@ -67,6 +67,7 @@ function Sidebar({ onToggleSidebar }) {
       ]
     },
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },
+    userData.user.role === "user" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
   ].filter(Boolean);
 
 
@@ -95,8 +96,7 @@ function Sidebar({ onToggleSidebar }) {
   };
 
   return (
-    <aside className="sticky top-0 w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm"
-      style={{ height: 'calc(100vh - 4rem)' }}> {/* Subtract h-16 (4rem) */}
+    <aside className="sticky w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm">
       <div className="px-6 py-5 border-b border-gray-100">
         <h2 className="text-xl font-semibold text-gray-800">YourLogo</h2>
       </div>

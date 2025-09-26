@@ -5,11 +5,12 @@ import { Link } from "react-router-dom"; // Ensure you're importing from the cor
 import { useUser } from "../../Context/ContextApt";
 
 function Header({ onToggleSidebar }) {
-  const { 
-          userData,  // User data fetched from API
-          loading,   // Loading state
-          error      // Error state
-        } = useUser();
+  const {
+    userData,  // User data fetched from API
+    loading,   // Loading state
+    error      // Error state
+  } = useUser();
+  
   return (
     <header className="w-full h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-[9999]">
       <div className="flex items-center gap-4">

@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
 import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false); // Optional: for loading state
+  const navigate = useNavigate();
 
-   const [inputValu,setInputValue]= useState({
-        email:"",
-        password:""
-    })
+  const [inputValu, setInputValue] = useState({
+    email: "",
+    password: ""
+  })
 
   const handleGoogleLogin = () => {
     // Replace with actual Google OAuth logic
-    window.open(`${import.meta.env.VITE_API_URL}/auth/google/callback`,"_self")
+    window.open(`${import.meta.env.VITE_API_URL}/auth/google/callback`, "_self")
     console.log("Logging in with Google...");
   };
+
   const handleSubmit=async(e)=>{
     e.preventDefault();
     setLoading(true); // Optional: set loading state
@@ -30,9 +32,9 @@ export default function LoginPage() {
         credentials: "include", // Ensure cookies are sent
         body: JSON.stringify(inputValu),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         console.log("Login successful", data);
         window.open("https://dashboard.thryvoo.com/","_self")
@@ -48,12 +50,35 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Server error:", error);
     }
-    
+
   }
-  const handleInputs=(identifier,values)=>{
-    setInputValue((previousValue)=>({
-        ...previousValue,
-        [identifier]:values,
+
+  // const TEST_USER = {
+  //   email: "test@gmail.com",
+  //   password: "test@123",
+  //   role: "admin",
+  //   name: "John Doe",
+  // };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   if (inputValu.email === TEST_USER.email && inputValu.password === TEST_USER.password) {
+  //     Cookies.set("authToken", "mock-static-token", { expires: 30 });
+  //     localStorage.setItem(
+  //       "authUser",
+  //       JSON.stringify({ user: TEST_USER, isAuthenticated: true })
+  //     );
+  //     navigate("/"); // redirect to protected dashboard
+  //   } else {
+  //     setError("Invalid email or password");
+  //   }
+  // };
+
+  const handleInputs = (identifier, values) => {
+    setInputValue((previousValue) => ({
+      ...previousValue,
+      [identifier]: values,
     }))
   }
 
@@ -69,7 +94,7 @@ export default function LoginPage() {
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
               name="email"
-              onChange={(event)=>handleInputs("email",event.target.value)}
+              onChange={(event) => handleInputs("email", event.target.value)}
               value={inputValu.email}
               required
 
@@ -82,7 +107,7 @@ export default function LoginPage() {
               name="password"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
-              onChange={(event)=>handleInputs("password",event.target.value)}
+              onChange={(event) => handleInputs("password", event.target.value)}
               value={inputValu.password}
             //   required
             />
@@ -103,7 +128,7 @@ export default function LoginPage() {
             className={`w-full flex justify-center items-center bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200 ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700"
               }`}
           >
-          {loading ? (
+            {loading ? (
               <svg
                 className="animate-spin h-5 w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"

@@ -37,8 +37,6 @@ import SetDiscountPage from './components/Coupon/SetDiscountPage';
 import WhatsAppTemplates from './components/WhatsApp/WhatsAppTemplates';
 import RegistrationInfo from './components/WhatsApp/RegistrationInfo';
 import Dashboard from './components/Dashboard/Dashboard';
-import BlogCreateForm from './components/Blog/Blog';
-import BlogListPage from './components/Blog/BlogListPage';
 import Setting from './components/Setting/Setting';
 import MediaRewards from './components/SocialMedia/MediaRewards';
 import SocialMedia from './components/SocialMedia/SocialMedia';
@@ -50,6 +48,7 @@ import CrossBrand from './components/CrossBrand/CrossBrand';
 import RedeemStoreForm from './components/RedeemStore/RedeemStoreForm';
 import RedeemStore from './components/RedeemStore/RedeemStore';
 import MyPreset from './components/CrossBrand/MyPreset';
+import BlogAdmin from './components/Blog/BlogAdmin';
 
 
 // 🔁 Scroll Wrapper
@@ -71,23 +70,42 @@ function App() {
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
-    
+
     if (roles && !roles.includes(role)) {
       return <Navigate to="/" replace />;
     }
-    
+
     return children;
   };
 
+  // const ProtectedRoute = ({ children, roles }) => {
+  //   const { userData, loading } = useUser();
+
+  //   if (loading) return null; // or a spinner
+
+  //   const isAuthenticated = !!userData?.isAuthenticated;
+  //   const role = userData?.user?.role || "user";
+
+  //   if (!isAuthenticated) {
+  //     return <Navigate to="/login" replace />;
+  //   }
+
+  //   if (roles && !roles.includes(role)) {
+  //     return <Navigate to="/" replace />; // unauthorized
+  //   }
+
+  //   return children;
+  // };
+
   const router = createBrowserRouter([
     // Public Routes
-    { 
-      path: '/login', 
+    {
+      path: '/login',
       element: !isAuthenticated ? <Login /> : <Navigate to="/" replace />
     },
     { path: '/forgot', element: <ForgotPasswordPage /> },
     { path: '/resetpassword/:token', element: <ResetPasswordPage /> },
-    
+
     // Protected Routes
     {
       path: '/',
@@ -104,13 +122,13 @@ function App() {
             { path: 'me', element: <Me /> },
             { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
             { path: 'reviews', element: <Reviews role={role} /> },
-            
+
             // Admin-only routes
             ...(role === 'admin' ? [
               { index: true, element: <User /> },
               { path: 'card', element: <Card /> },
               { path: 'coupons', element: <AllCoupon role={role} /> },
-              { path: 'blog', element: <BlogListPage /> },
+              { path: 'blog', element: <BlogAdmin /> },
               { path: 'signup', element: <SignupPage /> },
               { path: 'setting', element: <Setting /> },
               {
@@ -126,7 +144,7 @@ function App() {
                 ]
               }
             ] : []),
-            
+
             // User-only routes
             ...(role !== 'admin' ? [
               { index: true, element: <Dashboard /> },
@@ -146,7 +164,7 @@ function App() {
         }
       ]
     },
-    
+
     // Error Handling
     { path: '*', element: <ErrorHandler /> }
   ]);
