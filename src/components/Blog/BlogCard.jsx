@@ -12,7 +12,7 @@ export const BlogCard = ({ blog, onEdit, onDelete, deleteLoading }) => {
             {blog.b_title}
           </h3>
           <div className="flex-shrink-0">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
               {blog.b_category}
             </span>
           </div>
