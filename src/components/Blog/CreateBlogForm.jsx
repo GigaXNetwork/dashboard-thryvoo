@@ -14,7 +14,6 @@ export const getAuthToken = () => {
 };
 
 export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
-
   const isEditMode = Boolean(blog && blog.id);
 
   const getInitialState = () => ({
@@ -30,24 +29,40 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     meta_title: blog?.meta_title || '',
     meta_description: blog?.meta_description || '',
     meta_photo: blog?.meta_photo || '',
+    author_image: blog?.author_image || '',
     type: 'blog'
   });
 
   const [formData, setFormData] = useState(getInitialState());
   const [tagInput, setTagInput] = useState('');
-  const [galleryInput, setGalleryInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
+  // File states
+  const [authorImageFile, setAuthorImageFile] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [featuredImageFile, setFeaturedImageFile] = useState(null);
+  const [metaPhotoFile, setMetaPhotoFile] = useState(null);
+
+  // Error states
+  const [galleryUploadError, setGalleryUploadError] = useState('');
+  const [authorImageError, setAuthorImageError] = useState('');
+  const [featuredUploadError, setFeaturedUploadError] = useState('');
+  const [metaPhotoError, setMetaPhotoError] = useState('');
+
+  // Refs
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const categoryRef = useRef(null);
   const descriptionRef = useRef(null);
   const contentRef = useRef(null);
   const tagRef = useRef(null);
-  const imageRef = useRef(null);
+  const featuredInputRef = useRef(null);
+  const authorImageInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
+  const metaPhotoInputRef = useRef(null);
   const metaTitleRef = useRef(null);
-  const metaPhotoUrlRef = useRef(null);
   const metaDescriptionRef = useRef(null);
   const metaTagsRef = useRef(null);
 
@@ -56,6 +71,10 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       setFormData(getInitialState());
     }
   }, [blog]);
+
+  // Character limits
+  const DESCRIPTION_MAX_LENGTH = 160;
+  const META_DESCRIPTION_MAX_LENGTH = 160;
 
   const quillModules = {
     toolbar: [
@@ -77,7 +96,6 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     'align', 'blockquote', 'code-block', 'link', 'image', 'video'
   ];
 
-  // Lowercase categories for strict API validation
   const categories = [
     'technology', 'business', 'health', 'entertainment', 'sports', 'science'
   ];
@@ -88,26 +106,37 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     return null;
   }
 
-  const isValidUrl = (string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
         [field]: ''
       }));
     }
+  };
+
+  // Character count validation for descriptions
+  const validateDescription = (field, value, maxLength) => {
+    if (value.length > maxLength) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: `${field === 'b_description' ? 'Description' : 'Meta Description'} cannot exceed ${maxLength} characters`
+      }));
+      return false;
+    }
+    return true;
+  };
+
+  const handleDescriptionChange = (field, value) => {
+    const maxLength = field === 'b_description' ? DESCRIPTION_MAX_LENGTH : META_DESCRIPTION_MAX_LENGTH;
+
+    handleInputChange(field, value);
+    validateDescription(field, value, maxLength);
   };
 
   const addTag = () => {
@@ -120,6 +149,111 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     }
   };
 
+
+  const handleFileUpload = (file, setFileFunction, setErrorFunction, previewField) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorFunction("Please upload a valid image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorFunction("Image must be less than 5MB.");
+      return;
+    }
+
+    setFileFunction(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      handleInputChange(previewField, reader.result);
+      setErrorFunction('');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  
+  const handleFeaturedFileChange = (e) => {
+    const file = e.target.files[0];
+    handleFileUpload(file, setFeaturedImageFile, setFeaturedUploadError, 'b_image');
+  };
+
+  const handleAuthorImageChange = (e) => {
+    const file = e.target.files[0];
+    handleFileUpload(file, setAuthorImageFile, setAuthorImageError, 'author_image');
+  };
+
+  const handleMetaPhotoChange = (e) => {
+    const file = e.target.files[0];
+    handleFileUpload(file, setMetaPhotoFile, setMetaPhotoError, 'meta_photo');
+  };
+
+  const handleGalleryFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+
+    if (galleryFiles.length + files.length > 10) {
+      setGalleryUploadError("Maximum 10 gallery images allowed.");
+      return;
+    }
+
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        setGalleryUploadError("Only image files are allowed in gallery.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setGalleryUploadError("Each gallery image must be ≤ 5MB.");
+        return;
+      }
+    }
+
+    setGalleryFiles(prev => [...prev, ...files].slice(0, 10));
+
+    Promise.all(files.map(file => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    }))).then(base64Images => {
+      setFormData(prev => ({
+        ...prev,
+        b_gallery: [...prev.b_gallery, ...base64Images].slice(0, 10)
+      }));
+      setGalleryUploadError('');
+    });
+  };
+
+  // Remove functions
+  const removeFeaturedImage = () => {
+    handleInputChange('b_image', '');
+    setFeaturedImageFile(null);
+    setFeaturedUploadError('');
+    if (featuredInputRef.current) featuredInputRef.current.value = '';
+  };
+
+  const removeAuthorImage = () => {
+    handleInputChange('author_image', '');
+    setAuthorImageFile(null);
+    setAuthorImageError('');
+    if (authorImageInputRef.current) authorImageInputRef.current.value = '';
+  };
+
+  const removeMetaPhoto = () => {
+    handleInputChange('meta_photo', '');
+    setMetaPhotoFile(null);
+    setMetaPhotoError('');
+    if (metaPhotoInputRef.current) metaPhotoInputRef.current.value = '';
+  };
+
+  const removeGalleryImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      b_gallery: prev.b_gallery.filter((_, i) => i !== index)
+    }));
+    setGalleryFiles(prev => prev.filter((_, i) => i !== index));
+    if (galleryInputRef.current) galleryInputRef.current.value = '';
+  };
+
   const removeTag = (tagToRemove) => {
     setFormData(prev => ({
       ...prev,
@@ -127,71 +261,34 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     }));
   };
 
-  const addGalleryImage = () => {
-    if (galleryInput.trim() && !formData.b_gallery.includes(galleryInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        b_gallery: [...prev.b_gallery, galleryInput.trim()]
-      }));
-      setGalleryInput('');
-    }
-  };
-
-  const removeGalleryImage = (imageToRemove) => {
-    setFormData(prev => ({
-      ...prev,
-      b_gallery: prev.b_gallery.filter(image => image !== imageToRemove)
-    }));
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.b_title.trim()) {
-      newErrors.b_title = 'Title is required';
-    }
-    if (!formData.b_content.trim()) {
-      newErrors.b_content = 'Content is required';
-    } else if (formData.b_content.replace(/<[^>]+>/g, '').length < 5000) {
-      newErrors.b_content = 'Blog content should be at least 5000 characters';
-    }
-    if (!formData.b_author.trim()) {
-      newErrors.b_author = 'Author is required';
-    }
+    if (!formData.b_title.trim()) newErrors.b_title = 'Title is required';
+    if (!formData.b_content.trim()) newErrors.b_content = 'Content is required';
+    if (!formData.b_author.trim()) newErrors.b_author = 'Author is required';
+
     if (!formData.b_description.trim()) {
       newErrors.b_description = 'Description is required';
+    } else if (formData.b_description.length > DESCRIPTION_MAX_LENGTH) {
+      newErrors.b_description = `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`;
     }
+
     if (!formData.b_category.trim() || !categories.includes(formData.b_category)) {
       newErrors.b_category = 'Category is required and must be valid';
     }
-    if (formData.b_gallery.some(img => typeof img !== 'string' || !img.trim())) {
-      newErrors.b_gallery = 'Gallery images must be valid URLs';
-    }
-    if (!formData.meta_title.trim()) {
-      newErrors.meta_title = 'Meta  is required';
-    }
-    if (!formData.meta_photo.trim()) {
-      newErrors.meta_photo = 'Meta Photo URL is required';
-    }
-    else if (!isValidUrl(formData.meta_photo)) {
-      newErrors.meta_photo = 'Meta Photo URL must be a valid URL';
-    }
+    if (!formData.meta_title.trim()) newErrors.meta_title = 'Meta Title is required';
+
     if (!formData.meta_description.trim()) {
       newErrors.meta_description = 'Meta Description is required';
-    }
-    if (!formData.meta_tag.trim()) {
-      newErrors.meta_tag = 'Meta Tags are required';
-    }
-    if (!formData.b_image.trim()) {
-      newErrors.b_image = 'Featured Image URL is required';
-    } else if (!isValidUrl(formData.b_image)) {
-      newErrors.b_image = 'Featured Image URL must be a valid URL';
+    } else if (formData.meta_description.length > META_DESCRIPTION_MAX_LENGTH) {
+      newErrors.meta_description = `Meta Description cannot exceed ${META_DESCRIPTION_MAX_LENGTH} characters`;
     }
 
-    if (formData.b_tags.length === 0) {
-      newErrors.b_tags = 'At least one tag is required';
-    }
-
+    if (!formData.meta_tag.trim()) newErrors.meta_tag = 'Meta Tags are required';
+    if (formData.b_tags.length === 0) newErrors.b_tags = 'At least one tag is required';
+    if (!formData.b_image) newErrors.b_image = 'Featured Image is required';
+    if (!formData.meta_photo) newErrors.meta_photo = 'Meta Photo is required';
 
     setErrors(newErrors);
 
@@ -203,10 +300,8 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
         b_category: categoryRef,
         b_description: descriptionRef,
         b_content: contentRef,
-        b_image: imageRef,
         b_tags: tagRef,
         meta_title: metaTitleRef,
-        meta_photo: metaPhotoUrlRef,
         meta_description: metaDescriptionRef,
         meta_tag: metaTagsRef,
       };
@@ -218,7 +313,6 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
           ref.current.getEditor().focus();
         } else {
           ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-          // ref.current.getEditor().focus();
         }
       }
     }
@@ -231,16 +325,72 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     if (!validateForm()) return;
 
     setLoading(true);
-
     try {
-      const payload = {
-        ...formData,
-        b_category: formData.b_category.toLowerCase(),
-        b_gallery: formData.b_gallery.filter(url => typeof url === 'string' && url.trim()),
+      const formDataToSend = new FormData();
+
+      const textFields = {
+        b_title: 'b_title',
+        b_content: 'b_content',
+        b_author: 'b_author',
+        b_description: 'b_description',
+        b_category: 'b_category',
+        meta_title: 'meta_title',
+        meta_description: 'meta_description',
+        meta_tag: 'meta_tag',
+        type: 'type'
       };
 
+      Object.entries(textFields).forEach(([formField, backendField]) => {
+        formDataToSend.append(backendField, formData[formField]);
+      });
+
+      // Append tags
+      formData.b_tags.forEach(tag => formDataToSend.append('b_tags[]', tag));
+
+      // Append files
+      const fileMappings = [
+        {
+          file: featuredImageFile,
+          backendField: 'b_image',
+          existing: formData.b_image
+        },
+        {
+          file: authorImageFile,
+          backendField: 'author_image',
+          existing: formData.author_image
+        },
+        {
+          file: metaPhotoFile,
+          backendField: 'meta_photo',
+          existing: formData.meta_photo
+        }
+      ];
+
+      fileMappings.forEach(({ file, backendField, existing }) => {
+        if (file instanceof File) {
+          formDataToSend.append(backendField, file);
+        } else if (existing && !existing.startsWith('data:image')) {
+          formDataToSend.append(backendField, existing);
+        }
+      });
+
+      // Handle gallery files
+      if (galleryFiles.length > 0) {
+        galleryFiles.forEach(file => {
+          if (file instanceof File) {
+            formDataToSend.append('b_gallery', file);
+          }
+        });
+      } else if (formData.b_gallery.length > 0) {
+        formData.b_gallery.forEach(url => {
+          if (!url.startsWith('data:image')) {
+            formDataToSend.append('b_gallery[]', url);
+          }
+        });
+      }
+
       const endpoint = isEditMode
-        ? `https://api.thryvoo.com/api/blog/${blog.id}`   // update endpoint
+        ? `https://api.thryvoo.com/api/blog/${blog.id}`
         : 'https://api.thryvoo.com/api/blog/upload';
 
       const method = isEditMode ? 'PATCH' : 'POST';
@@ -248,10 +398,9 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       const response = await fetch(endpoint, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${getAuthToken()}`,
+          'Authorization': getAuthToken()
         },
-        body: JSON.stringify(payload),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
@@ -262,20 +411,12 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       const result = await response.json();
       if (onSuccess) onSuccess(result);
     } catch (err) {
+      console.error('Upload error:', err);
       alert(`Failed to ${isEditMode ? 'update' : 'create'} blog: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (errors.b_gallery) {
-      const timer = setTimeout(() => {
-        setErrors(prev => ({ ...prev, b_gallery: '' }));
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [errors.b_gallery]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -302,7 +443,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="lg:col-span-2">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                 <input
                   ref={titleRef}
@@ -314,6 +455,30 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                 />
                 {errors.b_title && (
                   <p className="mt-1 text-sm text-red-600">{errors.b_title}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                <select
+                  ref={categoryRef}
+                  value={formData.b_category}
+                  onChange={(e) => handleInputChange('b_category', e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_category ? 'border-red-300' : 'border-gray-200'}`}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option
+                      className='text-sm'
+                      key={category}
+                      value={category}
+                    >
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                {errors.b_category && (
+                  <p className="mt-1 text-sm text-red-600">{errors.b_category}</p>
                 )}
               </div>
 
@@ -333,37 +498,60 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                <select
-                  ref={categoryRef}
-                  value={formData.b_category}
-                  onChange={(e) => handleInputChange('b_category', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_category ? 'border-red-300' : 'border-gray-200'}`}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(category => (
-                    <option
-                      className='text-sm'
-                      key={category} value={category}>{category.charAt(0).toUpperCase() + category.slice(1)}</option>
-                  ))}
-                </select>
-                {errors.b_category && (
-                  <p className="mt-1 text-sm text-red-600">{errors.b_category}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Author Image</label>
+                <input
+                  ref={authorImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAuthorImageChange}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all"
+                />
+                {authorImageError && (
+                  <p className="mt-1 text-sm text-red-600">{authorImageError}</p>
+                )}
+                {(formData.author_image && formData.author_image.startsWith('data:image')) && (
+                  <div className="mt-4 relative inline-block">
+                    <img
+                      src={formData.author_image}
+                      alt="author"
+                      className="h-24 w-24 object-cover rounded-lg border border-gray-200 shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeAuthorImage}
+                      className="absolute top-0 right-0 -mr-2 -mt-2 bg-white rounded-full p-1 shadow-md hover:text-red-600 transition-colors"
+                      aria-label="Remove author image"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 )}
               </div>
 
               <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                  <span className="text-gray-500 ml-2">
+                    ({formData.b_description.length}/{DESCRIPTION_MAX_LENGTH} characters)
+                  </span>
+                </label>
                 <textarea
                   ref={descriptionRef}
                   value={formData.b_description}
-                  onChange={(e) => handleInputChange('b_description', e.target.value)}
+                  onChange={(e) => handleDescriptionChange('b_description', e.target.value)}
                   rows={3}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all resize-none ${errors.b_description ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all resize-none ${errors.b_description ? 'border-red-300' : 'border-gray-200'
+                    } ${formData.b_description.length > DESCRIPTION_MAX_LENGTH ? 'border-red-300' : ''
+                    }`}
                   placeholder="Brief description of the blog post"
                 />
                 {errors.b_description && (
                   <p className="mt-1 text-sm text-red-600">{errors.b_description}</p>
+                )}
+                {formData.b_description.length > DESCRIPTION_MAX_LENGTH && !errors.b_description && (
+                  <p className="mt-1 text-sm text-red-600">
+                    Description cannot exceed {DESCRIPTION_MAX_LENGTH} characters
+                  </p>
                 )}
               </div>
 
@@ -404,42 +592,63 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Media</h2>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Featured Image *
+                </label>
                 <input
-                  type="url"
-                  value={formData.b_image}
-                  onChange={(e) => handleInputChange('b_image', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_image ? 'border-red-300' : 'border-gray-200'}`}
-                  placeholder="https://example.com/image.jpg"
+                  ref={featuredInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFeaturedFileChange}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all"
                 />
-                {errors.b_image && (
-                  <p className="mt-1 text-sm text-red-600">{errors.b_image}</p>
+                {featuredUploadError && (
+                  <p className="mt-1 text-sm text-red-600">{featuredUploadError}</p>
+                )}
+                {(formData.b_image && formData.b_image.startsWith('data:image')) && (
+                  <div className="mt-4 relative inline-block">
+                    <img
+                      src={formData.b_image}
+                      alt="featured"
+                      className="h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeFeaturedImage}
+                      className="absolute top-0 right-0 -mr-2 -mt-2 bg-white rounded-full p-1 shadow-md hover:text-red-600 transition-colors"
+                      aria-label="Remove featured image"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 )}
               </div>
 
-              {/* Gallery Images as URLs ONLY */}
-              <div className="mb-6">
+              <div className="lg:col-span-2">
                 <label className="block text-sm font-semibold text-gray-800 mb-3">
-                  Gallery Images <span className="text-gray-500 font-normal">(Max 5 URLs)</span>
+                  Gallery Images <span className="text-gray-500 font-normal">(Max 10 images, each ≤ 5MB)</span>
                 </label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="url"
-                    value={galleryInput}
-                    onChange={(e) => setGalleryInput(e.target.value)}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none"
-                    placeholder="Paste image URL"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addGalleryImage())}
-                  />
-
-                  <button
-                    type="button"
-                    onClick={addGalleryImage}
-                    className="px-4 py-3 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept=".png,.jpg,.jpeg"
+                  multiple
+                  onChange={handleGalleryFileChange}
+                  disabled={uploadingGallery || galleryFiles.length >= 10}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 transition-all outline-none"
+                />
+                {galleryUploadError && (
+                  <p className="mt-2 text-sm text-red-600">{galleryUploadError}</p>
+                )}
+                {uploadingGallery && (
+                  <p className="mt-2 text-sm text-blue-600">Uploading...</p>
+                )}
+                <div className="my-2">
+                  {galleryFiles.length > 0 && (
+                    <span>{galleryFiles.length} image{galleryFiles.length > 1 ? 's' : ''} selected</span>
+                  )}
                 </div>
+
                 {formData.b_gallery.length > 0 && (
                   <div className="flex flex-wrap gap-4 mt-4">
                     {formData.b_gallery.map((url, index) => (
@@ -451,9 +660,9 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                         />
                         <button
                           type="button"
-                          onClick={() => removeGalleryImage(url)}
+                          onClick={() => removeGalleryImage(index)}
                           className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                          aria-label="Remove image"
+                          aria-label="Remove gallery image"
                         >
                           <X className="h-5 w-5" />
                         </button>
@@ -527,34 +736,65 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   <p className="mt-1 text-sm text-red-600">{errors.meta_title}</p>
                 )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Meta Photo URL *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Meta Photo *
+                </label>
                 <input
-                  ref={metaPhotoUrlRef}
-                  type="url"
-                  value={formData.meta_photo}
-                  onChange={(e) => handleInputChange('meta_photo', e.target.value)}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_photo ? 'border-red-300' : 'border-gray-200'}`}
-                  placeholder="https://example.com/meta-image.jpg"
+                  type="file"
+                  accept="image/*"
+                  ref={metaPhotoInputRef}
+                  onChange={handleMetaPhotoChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none"
                 />
-                {errors.meta_photo && (
-                  <p className="mt-1 text-sm text-red-600">{errors.meta_photo}</p>
+                {metaPhotoError && <p className="mt-1 text-sm text-red-600">{metaPhotoError}</p>}
+                {formData.meta_photo && formData.meta_photo.startsWith('data:image') && (
+                  <div className="mt-4 relative inline-block">
+                    <img
+                      src={formData.meta_photo}
+                      alt="meta_photo"
+                      className="h-16 object-cover rounded-lg border border-gray-200 shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeMetaPhoto}
+                      className="absolute top-0 right-0 -mr-2 -mt-2 bg-white rounded-full p-1 shadow-md hover:text-red-600 transition-colors"
+                      aria-label="Remove meta photo"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 )}
               </div>
+
               <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Meta Description *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Meta Description *
+                  <span className="text-gray-500 ml-2">
+                    ({formData.meta_description.length}/{META_DESCRIPTION_MAX_LENGTH} characters)
+                  </span>
+                </label>
                 <textarea
                   ref={metaDescriptionRef}
                   value={formData.meta_description}
-                  onChange={(e) => handleInputChange('meta_description', e.target.value)}
+                  onChange={(e) => handleDescriptionChange('meta_description', e.target.value)}
                   rows={3}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_description ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_description ? 'border-red-300' : 'border-gray-200'
+                    } ${formData.meta_description.length > META_DESCRIPTION_MAX_LENGTH ? 'border-red-300' : ''
+                    }`}
                   placeholder="SEO description for search engines (150-160 characters recommended)"
                 />
                 {errors.meta_description && (
                   <p className="mt-1 text-sm text-red-600">{errors.meta_description}</p>
                 )}
+                {formData.meta_description.length > META_DESCRIPTION_MAX_LENGTH && !errors.meta_description && (
+                  <p className="mt-1 text-sm text-red-600">
+                    Meta Description cannot exceed {META_DESCRIPTION_MAX_LENGTH} characters
+                  </p>
+                )}
               </div>
+
               <div className="lg:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Meta Tags *</label>
                 <input

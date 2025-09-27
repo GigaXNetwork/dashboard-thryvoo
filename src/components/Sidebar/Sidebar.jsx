@@ -67,7 +67,6 @@ function Sidebar({ onToggleSidebar }) {
       ]
     },
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },
-    userData.user.role === "user" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
   ].filter(Boolean);
 
 
