@@ -21,8 +21,8 @@ function Header({ onToggleSidebar }) {
         >
           <CiMenuBurger />
         </button>
-        <h1 className="text-xl font-semibold tracking-wide hidden sm:block">
-          Dashboard
+        <h1 className="text-xl font-semibold  tracking-wide hidden sm:block">
+          Thryvoo
         </h1>
       </div>
 

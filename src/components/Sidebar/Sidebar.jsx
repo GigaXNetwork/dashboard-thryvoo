@@ -14,7 +14,6 @@ function Sidebar({ onToggleSidebar }) {
 
   const { userData } = useUser();
 
-
   const menuItems = [
     { to: "/", icon: <IoHomeOutline />, label: "Home" },
     { to: "/card", icon: <FaAddressCard />, label: "Card" },
@@ -69,7 +68,6 @@ function Sidebar({ onToggleSidebar }) {
     { to: "/reviews", icon: <FaStar />, label: "Reviews" },
   ].filter(Boolean);
 
-
   const [openMenu, setOpenMenu] = useState(null);
 
   const toggleHandler = () => {
@@ -82,10 +80,8 @@ function Sidebar({ onToggleSidebar }) {
     if (item.subItems) {
       e.preventDefault();
       setOpenMenu(openMenu === item.to ? null : item.to);
-      // Don't close sidebar immediately for parent items on mobile
       return;
     }
-    // Close sidebar for regular links and when clicking child items
     toggleHandler();
   };
 
@@ -95,12 +91,9 @@ function Sidebar({ onToggleSidebar }) {
   };
 
   return (
-    <aside className="sticky w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm">
-      <div className="px-6 py-5 border-b border-gray-100">
-        <h2 className="text-xl font-semibold text-gray-800">YourLogo</h2>
-      </div>
-
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+    <aside className="w-64 bg-white border-r border-gray-100 flex flex-col shadow-sm h-full">
+      {/* Scrollable Navigation */}
+      <nav className="flex-1 px-3 py-4 overflow-y-auto overflow-x-hidden">
         <div className="flex flex-col gap-1.5">
           {menuItems.map((item) => (
             <div key={item.to} className="flex flex-col group">
@@ -125,7 +118,6 @@ function Sidebar({ onToggleSidebar }) {
                       </span>
                       <span className="relative">
                         {item.label}
-
                       </span>
                     </div>
 
@@ -166,11 +158,11 @@ function Sidebar({ onToggleSidebar }) {
         </div>
       </nav>
 
-      {/* Logout Button */}
-      <div className="p-4 border-t border-gray-100">
+      {/* Fixed Logout Button at Bottom */}
+      <div className="flex-shrink-0 p-4 border-t border-gray-100 bg-white">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-md transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg transition-all duration-200 font-medium"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

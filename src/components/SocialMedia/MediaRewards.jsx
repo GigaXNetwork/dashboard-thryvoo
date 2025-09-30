@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import MessagePopup from '../Common/MessagePopup';
 import MediaDetails from './MediaDetails';
+import Cookies from "js-cookie"
 
 function MediaRewards() {
   const [filters, setFilters] = useState({
@@ -22,6 +23,7 @@ function MediaRewards() {
   const [selectedMedia, setSelectedMedia] = useState(null);
 
   const itemsPerPage = 10;
+  const token = Cookies.get('authToken');
   const apiUrl = `${import.meta.env.VITE_API_URL}/api/social-media/media/allMedia`;
 
   // Memoized fetch function with debounce
@@ -38,8 +40,11 @@ function MediaRewards() {
 
       const response = await axios.get(apiUrl, {
         params,
-        withCredentials: true,
-        headers: { 'Content-Type': 'application/json' }
+        // withCredentials: true,
+        headers: { 
+          'Content-Type': 'application/json',
+          "Authorization": `${token}`
+        }
       });
 
       setMediaRewards(response.data.data.mediaRewards || []);

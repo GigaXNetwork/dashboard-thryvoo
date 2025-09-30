@@ -5,6 +5,7 @@ import { NavLink, useParams } from 'react-router';
 import CouponDetails from './CouponDetails';
 import MessagePopup from '../Common/MessagePopup';
 import { useUser } from '../../Context/ContextApt';
+import Cookies from "js-cookie"
 
 function Coupon() {
   const [search, setSearch] = useState('');
@@ -28,6 +29,7 @@ function Coupon() {
 
   const { userData } = useUser();
   const user = userData.user.role;
+  const token = Cookies.get("authToken")
 
   const apiUrl = user === "admin"
     ? `${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
@@ -45,7 +47,14 @@ function Coupon() {
           ...(endDate && { 'createdAt[lt]': endDate }), // Less than filter
         };
 
-        const res = await axios.get(apiUrl, { params, withCredentials: true, headers: { 'Content-Type': 'application/json'} });
+        const res = await axios.get(apiUrl, {
+          params,
+          withCredentials: true,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
+          }
+        });
 
         setCoupons(res.data.data.coupons || []);
         setTotalPages(Math.ceil(res.data.results / itemsPerPage));
@@ -148,7 +157,7 @@ function Coupon() {
   const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Details", "Manage"];
 
   return (
-    <div className="p-2">
+    <div className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         {/* Title */}
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -282,7 +291,7 @@ function Coupon() {
                         className="text-blue-600 hover:underline font-medium"
                         onClick={() => {
                           setShowReviewCard(prev => ({ ...prev, [coupon._id]: true }));
-                          
+
                         }}
                       >
                         See Review
