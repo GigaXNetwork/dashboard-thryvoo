@@ -4,6 +4,7 @@ import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
 import { Badge, CheckCircle, ExternalLink, Eye, Pencil, Plus } from "lucide-react";
 import Active from "./Active";
+import Cookies from "js-cookie"
 
 function GetMyCard({ role }) {
   const { userId } = useParams();
@@ -21,6 +22,8 @@ function GetMyCard({ role }) {
     url = `${import.meta.env.VITE_API_URL}/api/user/card`;
   }
 
+  const token = Cookies.get('authToken');
+
   useEffect(() => {
     const fetchCard = async () => {
       try {
@@ -29,6 +32,7 @@ function GetMyCard({ role }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `${token}`
           },
           credentials: "include",
         });

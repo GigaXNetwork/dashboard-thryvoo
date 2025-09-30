@@ -19,7 +19,7 @@ function Main({ user }) {
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* Header */}
       <Header onToggleSidebar={toggleSidebar} />
 
@@ -28,13 +28,15 @@ function Main({ user }) {
         {/* Sidebar */}
         <aside
           className={`
-          fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 overflow-y-auto
-          transform transition-transform duration-300
-          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-          md:relative md:translate-x-0 md:flex-shrink-0 md:overflow-visible
+            fixed top-0 left-0 z-30 w-64 bg-white border-r border-gray-200
+            transform transition-transform duration-300
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+            md:relative md:translate-x-0 md:flex-shrink-0
+            h-screen md:h-full
+            overflow-y-auto overflow-x-hidden 
         `}
+          style={{ paddingTop: isSidebarOpen && window.innerWidth < 768 ? '64px' : '0' }}
         >
-
           <Sidebar
             isSidebarOpen={isSidebarOpen}
             onToggleSidebar={toggleSidebar}
@@ -51,7 +53,7 @@ function Main({ user }) {
         )}
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto pt-4 px-4 md:px-6 transition-all duration-300 max-h-screen">
+        <main className="flex-1 overflow-y-auto bg-gray-50">
           <Outlet />
         </main>
       </div>

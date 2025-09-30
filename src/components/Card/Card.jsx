@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import MenuCard from "./MenuCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Cookies from "js-cookie"
 
 function Card() {
   const [search, setSearch] = useState("");
@@ -11,6 +12,9 @@ function Card() {
   const [totalPages, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
+
+  const token = Cookies.get('authToken');
+  console.log("card---", token)
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -25,9 +29,16 @@ function Card() {
           params.name = search.trim();
         }
 
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
-          params,
-          withCredentials: true,
+        // const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
+        //   params,
+        //   withCredentials: true,
+        // });
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
+          headers: {
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json'
+          }
         });
 
         const data = response.data;
@@ -174,11 +185,10 @@ function Card() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-md border text-sm shadow ${
-                  page === currentPage
-                    ? "bg-blue-600 text-white cursor-default"
-                    : "bg-white hover:bg-blue-50 text-gray-700"
-                }`}
+                className={`px-3 py-1 rounded-md border text-sm shadow ${page === currentPage
+                  ? "bg-blue-600 text-white cursor-default"
+                  : "bg-white hover:bg-blue-50 text-gray-700"
+                  }`}
                 disabled={page === currentPage}
                 aria-current={page === currentPage ? "page" : undefined}
               >

@@ -12,7 +12,7 @@ const CouponPresetSelector = ({
   const [selectedPreset, setSelectedPreset] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [enabled, setEnabled] = useState(true); // toggle state
+  const [enabled, setEnabled] = useState(true);
 
   // Load presets
   const fetchPresets = async () => {
@@ -83,22 +83,9 @@ const CouponPresetSelector = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="relative w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
-
-        {/* Header with toggle */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Select Coupon Preset</h2>
-
-          {/* Toggle switch */}
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-700 font-medium text-sm">{enabled ? 'Enabled' : 'Disabled'}</span>
-            <input
-              type="checkbox"
-              checked={enabled}
-              onChange={handleToggle}
-              className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
+          <h2 className="text-xl font-bold text-gray-800">Select Coupon Preset</h2>
+          <button onClick={onClose} className="top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
 
