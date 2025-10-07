@@ -443,8 +443,8 @@ function Reviews({ role }) {
                           key={page}
                           onClick={() => handlePageChange(page)}
                           className={`w-10 h-10 flex items-center justify-center rounded-md border text-sm ${page === filters.page
-                              ? 'bg-blue-600 text-white border-blue-600 font-medium'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white border-blue-600 font-medium'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                             }`}
                           aria-current={page === filters.page ? 'page' : undefined}
                         >
