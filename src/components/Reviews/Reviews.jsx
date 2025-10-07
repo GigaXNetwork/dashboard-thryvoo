@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useParams } from 'react-router';
+import { getAuthToken } from '../../Context/apiService';
 
 function Reviews({ role }) {
   const { userId } = useParams();
@@ -54,6 +55,10 @@ function Reviews({ role }) {
       const res = await axios.get(apiUrl, {
         params,
         withCredentials: true,
+        headers: {
+          'Authorization': `${getAuthToken()}`,
+          'Content-Type': 'application/json',
+        }
       });
 
       setReviews(res.data.data.reviews || []);
