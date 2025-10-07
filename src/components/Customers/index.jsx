@@ -11,7 +11,7 @@ import {
   Search
 } from 'lucide-react';
 import LeadFormModal from './LeadFormModal';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
+import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
 import Pagination from '../Common/Pagination';
 
 const Customers = () => {
@@ -35,6 +35,7 @@ const Customers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [debounceTimer, setDebounceTimer] = useState(null);
+  const [tableRefreshLoading, setTableRefreshLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -166,17 +167,26 @@ const Customers = () => {
     try {
       setDeleteLoading(true);
       await Api.deleteLead(deletingLead._id);
+
+      // Close modal
       setShowDeleteModal(false);
       setDeletingLead(null);
-
-      fetchLeads();
-    } catch (err) {
-      setError(err.message || 'Failed to delete lead. Please try again.');
-      console.error('Error deleting lead:', err);
-    } finally {
       setDeleteLoading(false);
+
+      // Trigger table refresh loader
+      setTableRefreshLoading(true);
+
+      // Refetch leads to get updated data
+      await fetchLeads();
+
+    } catch (error) {
+      setError(error.message || 'Failed to delete lead. Please try again.');
+      console.error('Error deleting lead:', error);
+    } finally {
+      setTableRefreshLoading(false);
     }
   };
+
 
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
@@ -299,115 +309,128 @@ const Customers = () => {
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
-        show={showDeleteModal}
-        onClose={handleDeleteCancel}
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingLead(null);
+        }}
         onConfirm={handleDeleteConfirm}
-        leadName={deletingLead?.name || ''}
-        loading={deleteLoading}
+        description={
+          <p>
+            Are you sure you want to delete the lead <strong>"{deletingLead?.name}"</strong>?
+            This action cannot be undone.
+          </p>
+        }
+        isLoading={deleteLoading}
       />
 
       {/* Leads Table */}
       <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-        {leads.length === 0 ? (
-          <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">
-              {searchTerm ? 'No leads found matching your search' : 'No leads found'}
-            </p>
-            {searchTerm ? (
-              <button
-                onClick={clearSearch}
-                className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Clear search
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowForm(true)}
-                className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Create your first lead
-              </button>
-            )}
+        {tableRefreshLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader className="w-8 h-8 animate-spin text-blue-600" />
+            <p className="ml-3 text-gray-600">Refreshing data...</p>
           </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Phone
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {leads.map((lead) => (
-                    <tr key={lead._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {lead.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{lead.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{lead.phone}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">
-                          {formatDate(lead.createdAt)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => handleEdit(lead)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
-                            title="Edit lead"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(lead)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
-                            title="Delete lead"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        ) : leads.length === 0 ? (
+            <div className="text-center py-12">
+              <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">
+                {searchTerm ? 'No leads found matching your search' : 'No leads found'}
+              </p>
+              {searchTerm ? (
+                <button
+                  onClick={clearSearch}
+                  className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Clear search
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Create your first lead
+                </button>
+              )}
             </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="border-t border-gray-200 px-6 py-4">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Phone
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Created Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {leads.map((lead) => (
+                      <tr key={lead._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {lead.name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">{lead.email}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">{lead.phone}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">
+                            {formatDate(lead.createdAt)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleEdit(lead)}
+                              className="text-blue-600 hover:text-blue-900 transition-colors"
+                              title="Edit lead"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(lead)}
+                              className="text-red-600 hover:text-red-900 transition-colors"
+                              title="Delete lead"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </>
-        )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="border-t border-gray-200 px-6 py-4">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
+          )}
       </div>
     </div>
   );
