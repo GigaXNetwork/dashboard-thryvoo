@@ -37,7 +37,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         console.log("Login successful", data);
-        window.open("https://dashboard.thryvoo.com/","_self")
+        window.open(`${import.meta.env.VITE_API_URL}`,"_self")
         Cookies.set('authToken', data.token, { expires: 30 });
         setError(null); // Clear any previous error messages
         setLoading(false); // Reset loading state
