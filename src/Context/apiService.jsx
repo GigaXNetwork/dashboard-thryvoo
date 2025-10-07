@@ -1,7 +1,7 @@
 import Cookies from "js-cookie"
 const BASE_URL = import.meta.env.VITE_API_URL
 
-function getAuthToken() {
+export function getAuthToken() {
   const token = localStorage.getItem("authToken");
   return token || Cookies.get("authToken") || null
 }
