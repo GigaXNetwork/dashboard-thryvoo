@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false); // Optional: for loading state
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const [inputValu, setInputValue] = useState({
@@ -20,7 +21,7 @@ export default function LoginPage() {
     console.log("Logging in with Google...");
   };
 
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Optional: set loading state
     try {
@@ -37,7 +38,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         console.log("Login successful", data);
-        window.open(`${import.meta.env.VITE_API_URL}`,"_self")
+        window.open(`${import.meta.env.VITE_FRONTEND_URL}`, "_self")
         Cookies.set('authToken', data.token, { expires: 30 });
         setError(null); // Clear any previous error messages
         setLoading(false); // Reset loading state
@@ -101,16 +102,26 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="password">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-              onChange={(event) => handleInputs("password", event.target.value)}
-              value={inputValu.password}
-            //   required
-            />
+            <label className="block text-sm font-medium text-gray-700" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="mt-1 w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="••••••••"
+                onChange={(event) => handleInputs("password", event.target.value)}
+                value={inputValu.password}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <label className="flex items-center">
@@ -169,7 +180,7 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           <span className="text-sm text-gray-600">Don't have an account? </span>
           <Link to="/signup" className="text-sm text-blue-600 hover:underline">
-            Create one
+            Sign Up
           </Link>
         </div>
       </div>
