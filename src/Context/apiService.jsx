@@ -1,11 +1,9 @@
+import Cookies from "js-cookie"
 const BASE_URL = import.meta.env.VITE_API_URL
 
 function getAuthToken() {
-  // If stored in localStorage
-  return localStorage.getItem("authToken");
-
-  // If using cookies instead, use a cookie parser like js-cookie:
-  // return Cookies.get("authToken");
+  const token = localStorage.getItem("authToken");
+  return token || Cookies.get("authToken") || null
 }
 
 /**
@@ -22,12 +20,12 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
 
     const options = {
       method,
-      headers: {    
+      headers: {
         "Content-Type": "application/json",
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(token ? { 'Authorization': `${token}` } : {}),
         ...headers,
       },
-      credentials: "include", // include cookies if backend uses them
+      credentials: "include",
     };
 
     if (data) {
@@ -55,4 +53,19 @@ export const Api = {
   getBlogs: () => apiRequest("/blog", "GET"),
   uploadBlog: (blogData) => apiRequest("/blog/upload", "POST", blogData),
   getUser: () => apiRequest("/user", "GET"),
+
+  getLeads: (page = 1, limit = 10, search = '') => {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+
+    if (search && search.trim()) {
+      queryParams.append('search', search.trim());
+    }
+    return apiRequest(`/api/lead/my-leads?${queryParams.toString()}`, "GET");
+  },
+  createLead: (leadData) => apiRequest("/api/lead", "POST", leadData),
+  updateLead: (id, leadData) => apiRequest(`/api/lead/${id}`, "PATCH", leadData),
+  deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
 };

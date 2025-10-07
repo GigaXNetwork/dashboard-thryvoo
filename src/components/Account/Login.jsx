@@ -29,7 +29,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Ensure cookies are sent
+        // Ensure cookies are sent
         body: JSON.stringify(inputValu),
       });
 

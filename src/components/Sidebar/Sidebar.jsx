@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-import { FerrisWheel } from "lucide-react";
+import { FerrisWheel, Handshake, Star, Users } from "lucide-react";
 
 function Sidebar({ onToggleSidebar }) {
 
@@ -53,19 +53,20 @@ function Sidebar({ onToggleSidebar }) {
     },
     userData.user.role === "user" && {
       to: "/spin",
-      icon: <FerrisWheel />,
+      icon: <FerrisWheel size={18}/>,
       label: "Spinning"
     },
     userData.user.role === "user" && {
       to: "/cross-brand",
-      icon: <FaHandshake />,
+      icon: <Handshake size={18}/>,
       label: "Cross Brand",
       subItems: [
         { to: "/cross-brand/presets", label: "Presets" },
         { to: "/cross-brand/store", label: "Store" },
       ]
     },
-    { to: "/reviews", icon: <FaStar />, label: "Reviews" },
+    { to: "/reviews", icon: <Star size={18} />, label: "Reviews" },
+    { to: "/customers", icon: <Users size={18} />, label: "Customers" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);
