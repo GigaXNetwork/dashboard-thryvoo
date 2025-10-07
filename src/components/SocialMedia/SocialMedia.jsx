@@ -13,7 +13,7 @@ import {
 import { FaThreads, FaXTwitter } from "react-icons/fa6";
 import CreateSocialMedia from "./CreateSocialMedia";
 import SocialMediaCard from "./SocialMediaCard";
-import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
 
 const SocialMedia = () => {
     // State management
@@ -257,13 +257,19 @@ const SocialMedia = () => {
 
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
-                <DeleteConfirmationModal
-                    mediaToDelete={mediaToDelete}
+                < DeleteConfirmationModal
+                    isOpen={showDeleteModal}
                     onClose={() => {
                         setShowDeleteModal(false);
                         setMediaToDelete(null);
                     }}
                     onConfirm={handleConfirmDelete}
+                    description={
+                        <p>
+                            Are you sure you want to delete the <strong>{mediaToDelete?.mediaType}</strong> account?
+                            This action cannot be undone.
+                        </p>
+                    }
                 />
             )}
         </div>

@@ -39,6 +39,11 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
       throw new Error(errorData.message || `HTTP Error ${response.status}`);
     }
 
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0' || response.status === 204) {
+      return { status: 'success' }; // Return a success object for empty responses
+    }
+
     return await response.json();
   } catch (error) {
     console.error("API Request Failed:", error);

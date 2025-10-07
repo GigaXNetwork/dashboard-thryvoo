@@ -219,6 +219,12 @@ const CreateSocialMedia = ({
         }
     };
 
+    useEffect(() => {
+        console.log('couponPresets:', couponPresets);
+        console.log('Type of couponPresets:', typeof couponPresets);
+        console.log('Is array?', Array.isArray(couponPresets));
+    }, [couponPresets]);
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -282,44 +288,44 @@ const CreateSocialMedia = ({
                             />
                         </div>
 
-<div className="mb-6">
-    <label htmlFor="rewards" className="block text-sm font-medium text-gray-700 mb-2">
-        Rewards
-    </label>
-    <select
-        id="rewards"
-        name="rewards"
-        value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
-        onChange={handleChange}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-        required
-        disabled={loading || loadingPresets}
-    >
-        <option value="">Select a reward</option>
-        {/* Show current value first if it exists and isn't in the preset list */}
-        {formData.rewards && !couponPresets.some(preset => 
-            preset._id === (typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards)
-        ) && (
-            <option 
-                key={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards} 
-                value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
-            >
-                {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
-            </option>
-        )}
-        {couponPresets.map((preset) => (
-            <option key={preset._id} value={preset._id}>
-                {preset.presetName}
-            </option>
-        ))}
-    </select>
-    {loadingPresets && (
-        <div className="mt-2 flex items-center text-sm text-gray-500">
-            <FaSpinner className="animate-spin mr-2" />
-            Loading rewards...
-        </div>
-    )}
-</div>
+                        <div className="mb-6">
+                            <label htmlFor="rewards" className="block text-sm font-medium text-gray-700 mb-2">
+                                Rewards
+                            </label>
+                            <select
+                                id="rewards"
+                                name="rewards"
+                                value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                required
+                                disabled={loading || loadingPresets}
+                            >
+                                <option value="">Select a reward</option>
+                                {/* Show current value first if it exists and isn't in the preset list */}
+                                {formData.rewards && !couponPresets.presetsName.some(preset =>
+                                    preset._id === (typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards)
+                                ) && (
+                                        <option
+                                            key={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+                                            value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+                                        >
+                                            {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
+                                        </option>
+                                    )}
+                                {couponPresets && couponPresets.presetsName && couponPresets.presetsName.length > 0 && couponPresets.presetsName.map((preset) => (
+                                    <option key={preset._id} value={preset._id}>
+                                        {preset.presetName}
+                                    </option>
+                                ))}
+                            </select>
+                            {loadingPresets && (
+                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                    <FaSpinner className="animate-spin mr-2" />
+                                    Loading rewards...
+                                </div>
+                            )}
+                        </div>
 
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
