@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Calendar, ExternalLink } from "lucide-react";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -8,19 +8,70 @@ const CrossBrand = () => {
   const [filteredPromotions, setFilteredPromotions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [loadingSet, setLoadingSet] = useState(null); // track which card is setting
+  const [loadingSet, setLoadingSet] = useState(null);
+
+  // Filter states
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [quickDateFilter, setQuickDateFilter] = useState('');
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const token = Cookies.get("authToken");
   const API_URL = import.meta.env.VITE_API_URL;
 
+  // Simple buildQuery function - send dates as YYYY-MM-DD
+  const buildQuery = (params) => {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== '' && value !== undefined && value !== null) {
+        queryParams.append(key, value);
+      }
+    });
+
+    return queryParams.toString();
+  };
+
+  // Fetch cross brand data with filters
   useEffect(() => {
     const fetchCrossBrandData = async () => {
-      setIsLoading(true);
+      setFetchLoading(true);
       setError(null);
 
       try {
-        const response = await axios.get(`${API_URL}/api/cross-brand/store`, {
-          headers: { Authorization: `${token}` },
+        // Build query params object
+        const queryParams = {};
+        
+        // Add search filter
+        if (search) {
+          queryParams.presetName = search.trim();
+        }
+        
+        if (statusFilter !== '') {
+          queryParams.isActive = statusFilter === 'true';
+        }
+        
+        if (typeFilter) {
+          queryParams.type = typeFilter;
+        }
+        
+        if (startDate) {
+          queryParams['createdAt[gt]'] = startDate;
+        }
+        
+        if (endDate) {
+          queryParams['createdAt[lt]'] = endDate;
+        }
+
+        const queryString = buildQuery(queryParams);
+        const url = `${API_URL}/api/cross-brand/store${queryString ? `?${queryString}` : ''}`;
+        
+        const response = await axios.get(url, {
+          headers: { 'Authorization': `${token}` },
           withCredentials: true,
         });
 
@@ -38,11 +89,71 @@ const CrossBrand = () => {
         setError("Failed to load promotions. Please try again later.");
       } finally {
         setIsLoading(false);
+        setFetchLoading(false);
+        setSearchLoading(false);
       }
     };
 
-    fetchCrossBrandData();
-  }, [API_URL, token]);
+    const timeout = setTimeout(() => {
+      fetchCrossBrandData();
+    }, 300);
+    
+    return () => clearTimeout(timeout);
+  }, [API_URL, token, search, statusFilter, typeFilter, startDate, endDate]);
+
+  // Handle search with separate loading state
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    if (e.target.value.trim()) {
+      setSearchLoading(true);
+    }
+  };
+
+  // Handle quick date filter changes - send simple date strings
+  const handleQuickDateFilterChange = (value) => {
+    setQuickDateFilter(value);
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    switch (value) {
+      case 'today':
+        setStartDate(todayStr);
+        setEndDate(todayStr);
+        break;
+      case '7days':
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        setStartDate(sevenDaysAgo.toISOString().split('T')[0]);
+        setEndDate(todayStr);
+        break;
+      case '15days':
+        const fifteenDaysAgo = new Date(today);
+        fifteenDaysAgo.setDate(today.getDate() - 15);
+        setStartDate(fifteenDaysAgo.toISOString().split('T')[0]);
+        setEndDate(todayStr);
+        break;
+      case '1month':
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+        setStartDate(oneMonthAgo.toISOString().split('T')[0]);
+        setEndDate(todayStr);
+        break;
+      default:
+        setStartDate('');
+        setEndDate('');
+        break;
+    }
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearch('');
+    setStatusFilter('');
+    setTypeFilter('');
+    setStartDate('');
+    setEndDate('');
+    setQuickDateFilter('');
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "No expiration";
@@ -75,21 +186,27 @@ const CrossBrand = () => {
     return { text: "Active", color: "bg-green-100 text-green-700" };
   };
 
-  // 🔑 Handle setting a coupon
+  // Handle setting a coupon
   const handleSetCoupon = async (presetId) => {
     setLoadingSet(presetId);
     try {
-      const res = await fetch(`${API_URL}/api/cross-brand/${presetId}/set`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${token}`,
-      },
-      credentials: "include",
-    });
+      const response = await fetch(`${API_URL}/api/cross-brand/${presetId}/set`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        credentials: "include",
+      });
 
-      console.log(res.data);
+      const result = await response.json();
+      console.log(result);
       
+      if (response.ok) {
+        alert("Coupon set successfully!");
+      } else {
+        alert("Failed to set coupon. Please try again.");
+      }
     } catch (err) {
       console.error("Failed to set coupon:", err);
       alert("Failed to set coupon. Please try again.");
@@ -98,15 +215,158 @@ const CrossBrand = () => {
     }
   };
 
+  // Refresh function
+  const handleRefresh = () => {
+    setSearch(prev => prev + ' ');
+    setTimeout(() => setSearch(prev => prev.trim()), 100);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
-          Cross Brand Promotions
-        </h1>
+        <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
+          <h1 className="text-3xl font-semibold text-gray-900">
+            Cross Brand Promotions
+          </h1>
+          <button
+            onClick={handleRefresh}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
+          >
+            🔄 Refresh
+          </button>
+        </div>
+
+        {/* 🔍 Filter Section */}
+        <div className="bg-white rounded-2xl p-6 shadow-md space-y-6 mb-8">
+          {/* 🔍 Search Bar */}
+          <div className="relative mx-auto">
+            <input
+              type="text"
+              placeholder="Search by promotion name..."
+              value={search}
+              onChange={handleSearchChange}
+              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+            />
+            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+            {/* Search loading indicator - only shows during search */}
+            {searchLoading && (
+              <div className="absolute right-4 top-3.5">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              </div>
+            )}
+          </div>
+
+          {/* 🔧 Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Status Filter */}
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              >
+                <option value="">All Statuses</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            {/* Type Filter */}
+            <div className="relative">
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              >
+                <option value="">All Types</option>
+                <option value="cross">Cross Brand</option>
+                <option value="own">Own Brand</option>
+                <option value="offer">Offer</option>
+              </select>
+              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            {/* Start Date */}
+            <div className="relative">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setQuickDateFilter('');
+                  setStartDate(e.target.value);
+                }}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="relative">
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setQuickDateFilter('');
+                  setEndDate(e.target.value);
+                }}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+              />
+            </div>
+
+            {/* Quick Filter Dropdown */}
+            <div className="relative">
+              <select
+                value={quickDateFilter}
+                onChange={(e) => handleQuickDateFilterChange(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              >
+                <option value="">Custom / All Time</option>
+                <option value="today">Today</option>
+                <option value="7days">Last 7 Days</option>
+                <option value="15days">Last 15 Days</option>
+                <option value="1month">Last 1 Month</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          {(search || statusFilter || typeFilter || startDate || endDate) && (
+            <div className="flex justify-end">
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-gray-600 hover:text-gray-800 underline transition duration-200"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Global loading indicator */}
+        {fetchLoading && (
+          <div className="flex justify-center items-center py-4 mb-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading promotions...</span>
+          </div>
+        )}
+
+        {/* Results count */}
+        {!isLoading && !fetchLoading && (
+          <div className="mb-4 text-sm text-gray-600">
+            Showing {filteredPromotions.length} promotions
+            {(search || statusFilter || typeFilter || startDate || endDate) && " (filtered)"}
+            {search && (
+              <span className="ml-1">for "{search}"</span>
+            )}
+          </div>
+        )}
 
         {error && (
-          <div className="text-center text-red-600 bg-red-50 p-4 rounded-lg">
+          <div className="text-center text-red-600 bg-red-50 p-4 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -208,7 +468,9 @@ const CrossBrand = () => {
           </div>
         ) : (
           <div className="text-center text-gray-500 py-12">
-            No promotions found.
+            {data?.data?.crossBrand?.length === 0 
+              ? "No promotions found." 
+              : "No promotions match your current filters."}
           </div>
         )}
       </div>

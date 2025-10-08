@@ -12,9 +12,7 @@ function Card() {
   const [totalPages, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
-
   const token = Cookies.get('authToken');
-  console.log("card---", token)
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -29,18 +27,14 @@ function Card() {
           params.name = search.trim();
         }
 
-        // const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
-        //   params,
-        //   withCredentials: true,
-        // });
-
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/cards`, {
+          params,
+          withCredentials: true,
           headers: {
             'Authorization': `${token}`,
             'Content-Type': 'application/json'
           }
         });
-
         const data = response.data;
 
         if (data.status === "success") {
@@ -113,7 +107,7 @@ function Card() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Card Gallery</h1>
 
       <div className="bg-gray-50 rounded-xl p-4 shadow-md flex flex-wrap gap-4 items-center justify-between mb-6">

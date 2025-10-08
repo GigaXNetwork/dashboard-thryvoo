@@ -1,14 +1,14 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { RiCoupon2Fill } from "react-icons/ri";
+import { RiCoupon2Fill, RiCoupon2Line } from "react-icons/ri";
 import { FaAddressCard, FaHandshake, FaStar, FaWhatsapp } from "react-icons/fa";
 import { IoHomeOutline } from "react-icons/io5";
 import { FiChevronDown } from "react-icons/fi";
 import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
-import { MdOutlinePermMedia } from "react-icons/md";
+import { MdOutlinePermMedia, MdOutlineReviews } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-import { FerrisWheel, Handshake, Star, Users } from "lucide-react";
+import { FerrisWheel, FileBox, Handshake, IdCard, Settings, Star, Users } from "lucide-react";
 
 function Sidebar({ onToggleSidebar }) {
 
@@ -20,10 +20,10 @@ function Sidebar({ onToggleSidebar }) {
 
   const menuItems = [
     { to: "/", icon: <IoHomeOutline />, label: "Home" },
-    { to: "/card", icon: <FaAddressCard />, label: "Card" },
-    isAdmin && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
-    isAdmin && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
-    isAdmin ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
+    { to: "/card", icon: <IdCard size={18} />, label: "Card" },
+    isAdmin && { to: "/blog", icon: <FileBox size={18} />, label: "Blog" },
+    isAdmin && { to: "/setting", icon: <Settings size={18} />, label: "Setting" },
+    isAdmin ? { to: "/coupons", icon: <RiCoupon2Line />, label: "Coupons" }
       :
       {
         to: "/coupon",
@@ -69,7 +69,7 @@ function Sidebar({ onToggleSidebar }) {
         { to: "/cross-brand/store", label: "Store" },
       ]
     },
-    { to: "/reviews", icon: <Star size={18} />, label: "Reviews" },
+    { to: "/reviews", icon: <MdOutlineReviews size={18} />, label: "Reviews" },
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
   ].filter(Boolean);
 

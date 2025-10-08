@@ -50,6 +50,7 @@ import RedeemStore from './components/RedeemStore/RedeemStore';
 import MyPreset from './components/CrossBrand/MyPreset';
 import BlogAdmin from './components/Blog/BlogAdmin';
 import Customers from './components/Customers';
+import Categories from './components/User/Categories/Categories';
 
 
 // 🔁 Scroll Wrapper
@@ -142,6 +143,8 @@ function App() {
                   { path: 'presets', element: <SetDiscountPage role={role} /> },
                   { path: 'redeem-store', element: <RedeemStore /> },
                   { path: 'enquary', element: <Enquary /> },
+                  { path: 'reviews', element: <Reviews role={role} /> },
+                  { path: 'categories', element: <Categories /> },
                 ]
               }
             ] : []),

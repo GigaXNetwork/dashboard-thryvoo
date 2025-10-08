@@ -59,6 +59,7 @@ export const Api = {
   uploadBlog: (blogData) => apiRequest("/blog/upload", "POST", blogData),
   getUser: () => apiRequest("/user", "GET"),
 
+  //leads
   getLeads: (page = 1, limit = 10, search = '') => {
     const queryParams = new URLSearchParams({
       page: page.toString(),
@@ -73,4 +74,20 @@ export const Api = {
   createLead: (leadData) => apiRequest("/api/lead", "POST", leadData),
   updateLead: (id, leadData) => apiRequest(`/api/lead/${id}`, "PATCH", leadData),
   deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
+
+  //categories
+  getCategories: (page = 1, limit = 10, search = '') => {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+
+    if (search && search.trim()) {
+      queryParams.append('search', search.trim());
+    }
+
+    return apiRequest(`/api/admin/banner/684974a1beaa604fff1c34bd/categories?${queryParams.toString()}`, "GET");
+  },
+  createCategory: (categoryData) => apiRequest("/api/admin/banner/684974a1beaa604fff1c34bd/create-category", "POST", categoryData),
+  updateCategory: (id, categoryData) => apiRequest(`/api/admin/banner/category/${id}/editname`, "PATCH", categoryData),
 };

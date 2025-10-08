@@ -23,7 +23,7 @@ const Me = () => {
     const [isVerificationOtp, setIsVerificationOtp] = useState(false);
     return (
 
-        <div className="relative mt-10">
+        <div className="relative">
             {isModalOpen && (
                 <UpdateNameModal
                     onClose={() => setIsModalOpen(false)}
@@ -52,7 +52,7 @@ const Me = () => {
                 />
             )}
 
-            <div className="user-content min-h-28 max-w-screen-lg mx-auto">
+            <div className="max-w-7xl mx-auto p-6">
 
                 {/* account information */}
                 <PersonalInformationCard
