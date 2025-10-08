@@ -10,6 +10,7 @@ import { BiSolidFoodMenu } from "react-icons/bi";
 
 // Components
 import "./User.css";
+import { getAuthToken } from "../../Context/apiService";
 
 
 const menuItems = [
@@ -36,6 +37,7 @@ function UserData() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `${getAuthToken()}`,
           },
           credentials: "include",
         });
