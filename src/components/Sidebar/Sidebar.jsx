@@ -13,13 +13,17 @@ import { FerrisWheel, Handshake, Star, Users } from "lucide-react";
 function Sidebar({ onToggleSidebar }) {
 
   const { userData } = useUser();
+  const role = userData.user.role;
+
+  const isAdmin = role == "admin"
+  const isUser = role == "user"
 
   const menuItems = [
     { to: "/", icon: <IoHomeOutline />, label: "Home" },
     { to: "/card", icon: <FaAddressCard />, label: "Card" },
-    userData.user.role === "admin" && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
-    userData.user.role === "admin" && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
-    userData.user.role === "admin" ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
+    isAdmin && { to: "/blog", icon: <FaAddressCard />, label: "Blog" },
+    isAdmin && { to: "/setting", icon: <FaAddressCard />, label: "Setting" },
+    isAdmin ? { to: "/coupons", icon: <RiCoupon2Fill />, label: "Coupons" }
       :
       {
         to: "/coupon",
@@ -31,8 +35,8 @@ function Sidebar({ onToggleSidebar }) {
         ]
 
       },
-    userData.user.role === "user" && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
 
+    userData.user.role === "user" && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
     userData.user.role === "user" && {
       to: "/whatsapp",
       icon: <FaWhatsapp />,
@@ -66,7 +70,7 @@ function Sidebar({ onToggleSidebar }) {
       ]
     },
     { to: "/reviews", icon: <Star size={18} />, label: "Reviews" },
-    { to: "/customers", icon: <Users size={18} />, label: "Customers" },
+    userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);

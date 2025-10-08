@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { getAuthToken } from '../../Context/apiService';
 
 const MyProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,10 @@ const MyProfile = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `${getAuthToken()}`,
+           },
           credentials: 'include',
         });
 
@@ -85,6 +89,7 @@ const MyProfile = () => {
           method: 'PATCH',
           credentials: 'include',
           body: formData,
+          'Authorization': `${getAuthToken()}`,
         }
       );
 

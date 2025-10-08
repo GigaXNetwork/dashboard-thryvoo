@@ -4,6 +4,7 @@ import "./User.css";
 import { Link } from "react-router";
 import axios from "axios";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { getAuthToken } from "../../Context/apiService";
 
 function User() {
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
@@ -57,6 +58,7 @@ function User() {
           withCredentials: true,
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `${getAuthToken()}`
           },
         }
       );
@@ -196,6 +198,7 @@ function User() {
           withCredentials: true,
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `${getAuthToken()}`
           },
         }
       );
