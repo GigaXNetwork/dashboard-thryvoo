@@ -3,7 +3,7 @@ import UserCard from "./UserCard";
 import "./User.css";
 import { Link } from "react-router";
 import axios from "axios";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Grid, LayoutGrid, List, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { getAuthToken } from "../../Context/apiService";
 
 function User() {
@@ -50,7 +50,7 @@ function User() {
     setLoading(true);
     try {
       const queryParams = buildQueryParams();
-      
+
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/admin/users`,
         {
@@ -66,17 +66,17 @@ function User() {
       const result = response.data;
       if (result.status === "success") {
         setUsers(result.data.users || []);
-        
-          setPagination({
-            totalItems: result.data.results || 0,
-            itemsPerPage: result.data.itemsPerPage || filters.limit,
-            currentPage: result.data.currentPage || filters.page,
-            totalPages: result.data.totalPages || 1,
-            hasNextPage: result.data.hasNextPage || false,
-            hasPreviousPage: result.data.hasPreviousPage || false
-          });
-        }
-      
+
+        setPagination({
+          totalItems: result.data.results || 0,
+          itemsPerPage: result.data.itemsPerPage || filters.limit,
+          currentPage: result.data.currentPage || filters.page,
+          totalPages: result.data.totalPages || 1,
+          hasNextPage: result.data.hasNextPage || false,
+          hasPreviousPage: result.data.hasPreviousPage || false
+        });
+      }
+
     } catch (err) {
       console.error("Fetch failed:", err);
       setUsers([]);
@@ -92,11 +92,10 @@ function User() {
     }
   }, [buildQueryParams, filters.limit, filters.page]);
 
-  // Fetch users when filters change with debounce
   useEffect(() => {
-    const timeout = setTimeout(fetchUsers, 2000);
+    const timeout = setTimeout(fetchUsers, filters.search ? 500 : 0); // debounce search typing only
     return () => clearTimeout(timeout);
-  }, [fetchUsers]);
+  }, [filters.search, filters.page, filters.limit, fetchUsers]);
 
   const handleFilterChange = useCallback((name, value) => {
     setFilters(prev => ({
@@ -109,8 +108,6 @@ function User() {
   const handleSearchChange = useCallback((e) => {
     handleFilterChange('search', e.target.value);
   }, []);
-
-
 
   const resetFilters = () => {
     setFilters({
@@ -223,9 +220,9 @@ function User() {
       }
     } catch (error) {
       console.error("Create user failed:", error);
-      setFormStatus({ 
-        type: "error", 
-        message: error.response?.data?.message || "An unexpected error occurred." 
+      setFormStatus({
+        type: "error",
+        message: error.response?.data?.message || "An unexpected error occurred."
       });
     }
   };
@@ -239,73 +236,64 @@ function User() {
   }
 
   return (
-    <div className="py-10 px-4 relative max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8">
       {/* Header with search + button */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-        
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
           {/* Search Input */}
           <div className="relative w-full sm:w-64">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
             <input
               type="text"
               placeholder="Search by name or email"
               value={filters.search}
               onChange={handleSearchChange}
-              className="p-2 pl-10 border rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full h-11 pl-10 pr-4 border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base outline-none"
             />
           </div>
-          
-          <div className="flex gap-2">
-            {/* Sort options */}
-            
-            {/* Reset Button */}
-            <button
-              onClick={resetFilters}
-              className="px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium transition-all duration-150 flex items-center justify-center space-x-1.5"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Reset</span>
-            </button>
 
-            {/* Layout Toggle */}
+          {/* Layout Toggle */}
+          <div className="flex items-center bg-gray-100 rounded-lg py-1 px-1 min-h-[44px]">
             <button
               onClick={() => setLayout("card")}
-              className={`p-2 rounded-lg border ${layout === "card" ? "bg-blue-100 text-blue-600 border-blue-300" : "bg-white text-gray-600 border-gray-300"}`}
-              aria-label="Card view"
+              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "card" ? "bg-white text-blue-600 shadow" : "text-gray-600 hover:text-gray-800"
+                }`}
+              title="Card View"
+              style={{ minWidth: "2.5rem" }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
+              <LayoutGrid className="w-5 h-5" />
             </button>
-            
             <button
               onClick={() => setLayout("list")}
-              className={`p-2 rounded-lg border ${layout === "list" ? "bg-blue-100 text-blue-600 border-blue-300" : "bg-white text-gray-600 border-gray-300"}`}
-              aria-label="List view"
+              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "list" ? "bg-white text-blue-600 shadow" : "text-gray-600 hover:text-gray-800"
+                }`}
+              title="List View"
+              style={{ minWidth: "2.5rem" }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Create User
+              <List className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Reset Button */}
+          <button
+            onClick={resetFilters}
+            className="flex items-center gap-2 px-4 h-11 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 transition-colors"
+            title="Reset Filters"
+          >
+            <RotateCcw className="h-5 w-5" />
+            <span className="hidden sm:inline">Reset</span>
+          </button>
+
+          {/* Create User Button */}
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 h-11 rounded-lg transition-colors font-medium"
+            style={{ minWidth: "142px" }}
+          >
+            <Plus className="h-5 w-5" />
+            <span>Create User</span>
+          </button>
         </div>
       </div>
 
@@ -336,7 +324,7 @@ function User() {
                       Joined: {new Date(user.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <Link 
+                  <Link
                     to={`/user/${user._id}`}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
                   >
@@ -414,8 +402,8 @@ function User() {
                           key={page}
                           onClick={() => handlePageChange(page)}
                           className={`w-10 h-10 flex items-center justify-center rounded-md border text-sm ${page === filters.page
-                              ? 'bg-blue-600 text-white border-blue-600 font-medium'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white border-blue-600 font-medium'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                             }`}
                           aria-current={page === filters.page ? 'page' : undefined}
                         >
@@ -482,7 +470,7 @@ function User() {
                 </svg>
               </button>
             </div>
-            
+
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -496,7 +484,7 @@ function User() {
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
@@ -509,7 +497,7 @@ function User() {
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input
@@ -522,7 +510,7 @@ function User() {
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <input

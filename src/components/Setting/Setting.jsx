@@ -403,7 +403,7 @@ export default function Setting() {
   }
 
   return (
-    <div className="user-content min-h-28 max-w-screen-lg mx-auto">
+    <div className="max-w-7xl mx-auto p-4 sm:px-6 lg:px-12">
       <div className="bg-white shadow-md rounded-lg p-6 w-full my-10 divide-y py-4 divide-gray-200">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">
