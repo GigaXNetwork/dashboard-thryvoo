@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAuthToken } from '../../Context/apiService';
+import { User } from 'lucide-react';
 
 const MyProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -89,7 +90,9 @@ const MyProfile = () => {
           method: 'PATCH',
           credentials: 'include',
           body: formData,
-          'Authorization': `${getAuthToken()}`,
+          headers: {
+            'Authorization': `${getAuthToken()}`
+           },
         }
       );
 
@@ -124,7 +127,10 @@ const MyProfile = () => {
         `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/changepassword`,
         {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `${getAuthToken()}`
+           },
           credentials: 'include',
           body: JSON.stringify({ password: passwords.password }),
         }
@@ -161,7 +167,7 @@ const MyProfile = () => {
         <form onSubmit={handleProfileSubmit} className="space-y-6">
           <div className="flex items-center gap-4">
             <img
-              src={previewImage || (profile.photo || '/default-avatar.png')}
+              src={previewImage || (profile.photo || <User className="w-12 h-12 text-gray-400" />)}
               alt="Profile"
               className="w-20 h-20 rounded-full object-cover"
             />

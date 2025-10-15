@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 export const getAuthToken = () => {
   const tokenNames = ['authToken', 'token', 'jwt', 'access_token'];
@@ -173,7 +174,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     reader.readAsDataURL(file);
   };
 
-  
+
   const handleFeaturedFileChange = (e) => {
     const file = e.target.files[0];
     handleFileUpload(file, setFeaturedImageFile, setFeaturedUploadError, 'b_image');
@@ -390,8 +391,8 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       }
 
       const endpoint = isEditMode
-        ? `https://api.thryvoo.com/api/blog/${blog.id}`
-        : 'https://api.thryvoo.com/api/blog/upload';
+        ? `${import.meta.env.VITE_API_URL}/api/blog/${blog.id}`
+        : `${import.meta.env.VITE_API_URL}/api/blog/upload`;
 
       const method = isEditMode ? 'PATCH' : 'POST';
 
@@ -412,7 +413,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       if (onSuccess) onSuccess(result);
     } catch (err) {
       console.error('Upload error:', err);
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} blog: ${err.message}`);
+      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} blog`);
     } finally {
       setLoading(false);
     }
@@ -450,7 +451,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="text"
                   value={formData.b_title}
                   onChange={(e) => handleInputChange('b_title', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_title ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.b_title ? 'border-red-300' : 'border-gray-200'}`}
                   placeholder="Enter blog title"
                 />
                 {errors.b_title && (
@@ -464,7 +465,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   ref={categoryRef}
                   value={formData.b_category}
                   onChange={(e) => handleInputChange('b_category', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_category ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.b_category ? 'border-red-300' : 'border-gray-200'}`}
                 >
                   <option value="">Select a category</option>
                   {categories.map(category => (
@@ -489,7 +490,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="text"
                   value={formData.b_author}
                   onChange={(e) => handleInputChange('b_author', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_author ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.b_author ? 'border-red-300' : 'border-gray-200'}`}
                   placeholder="Author name"
                 />
                 {errors.b_author && (
@@ -504,7 +505,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleAuthorImageChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all"
                 />
                 {authorImageError && (
                   <p className="mt-1 text-sm text-red-600">{authorImageError}</p>
@@ -540,7 +541,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   value={formData.b_description}
                   onChange={(e) => handleDescriptionChange('b_description', e.target.value)}
                   rows={3}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all resize-none ${errors.b_description ? 'border-red-300' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all resize-none ${errors.b_description ? 'border-red-300' : 'border-gray-200'
                     } ${formData.b_description.length > DESCRIPTION_MAX_LENGTH ? 'border-red-300' : ''
                     }`}
                   placeholder="Brief description of the blog post"
@@ -600,7 +601,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleFeaturedFileChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all"
                 />
                 {featuredUploadError && (
                   <p className="mt-1 text-sm text-red-600">{featuredUploadError}</p>
@@ -635,7 +636,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   multiple
                   onChange={handleGalleryFileChange}
                   disabled={uploadingGallery || galleryFiles.length >= 10}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                 />
                 {galleryUploadError && (
                   <p className="mt-2 text-sm text-red-600">{galleryUploadError}</p>
@@ -685,13 +686,13 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 outline-none focus:border-transparent transition-all ${errors.b_tags ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.b_tags ? 'border-red-300' : 'border-gray-200'}`}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 />
                 <button
                   type="button"
                   onClick={addTag}
-                  className="px-4 py-3 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors"
+                  className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -729,7 +730,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="text"
                   value={formData.meta_title}
                   onChange={(e) => handleInputChange('meta_title', e.target.value)}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_title ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none ${errors.meta_title ? 'border-red-300' : 'border-gray-200'}`}
                   placeholder="SEO title for search engines"
                 />
                 {errors.meta_title && (
@@ -746,7 +747,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   accept="image/*"
                   ref={metaPhotoInputRef}
                   onChange={handleMetaPhotoChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 />
                 {metaPhotoError && <p className="mt-1 text-sm text-red-600">{metaPhotoError}</p>}
                 {formData.meta_photo && formData.meta_photo.startsWith('data:image') && (
@@ -780,7 +781,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   value={formData.meta_description}
                   onChange={(e) => handleDescriptionChange('meta_description', e.target.value)}
                   rows={3}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_description ? 'border-red-300' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none ${errors.meta_description ? 'border-red-300' : 'border-gray-200'
                     } ${formData.meta_description.length > META_DESCRIPTION_MAX_LENGTH ? 'border-red-300' : ''
                     }`}
                   placeholder="SEO description for search engines (150-160 characters recommended)"
@@ -802,7 +803,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="text"
                   value={formData.meta_tag}
                   onChange={(e) => handleInputChange('meta_tag', e.target.value)}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none ${errors.meta_tag ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none ${errors.meta_tag ? 'border-red-300' : 'border-gray-200'}`}
                   placeholder="Comma-separated meta tags"
                 />
                 {errors.meta_tag && (

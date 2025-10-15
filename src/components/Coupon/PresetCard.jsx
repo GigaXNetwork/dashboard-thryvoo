@@ -44,21 +44,21 @@ const PresetCard = ({
   // Format date range for display
   const formatDateRange = (startAt, expireAt) => {
     if (!startAt || !expireAt) return "No validity period set";
-    
+
     const start = new Date(startAt);
     const end = new Date(expireAt);
-    
-    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleDateString()} ${end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+
+    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleDateString()} ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   };
 
   // Check if offer is currently active based on validity period
   const isCurrentlyActive = (preset) => {
     if (!preset.startAt || !preset.expireAt) return preset.isActive;
-    
+
     const now = new Date();
     const start = new Date(preset.startAt);
     const end = new Date(preset.expireAt);
-    
+
     return preset.isActive && now >= start && now <= end;
   };
 
@@ -70,54 +70,7 @@ const PresetCard = ({
       className="relative bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-6 transform hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
     >
       {/* 3-dots menu */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={() => toggleMenu(index)}
-          className="text-gray-500 hover:text-gray-700"
-          aria-label="Options"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
-          </svg>
-        </button>
 
-        {openMenuIndex === index && (
-          <div
-            ref={(el) => (menuRefs.current[index] = el)}
-            className="absolute right-0 mt-2 w-48 bg-white z-10 bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-4 transition-all duration-300"
-          >
-            <button
-              onClick={() => handleEditPreset(preset)}
-              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-            >
-              ✏️ Edit
-            </button>
-            <button
-              onClick={() => {
-                setPresetToDelete(preset);
-                setShowDeleteModal(true);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-            >
-              🗑️ Delete
-            </button>
-            <button
-              onClick={() => handleToggleActive(preset)}
-              disabled={preset.isActive}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                preset.isActive ? "text-gray-400 cursor-not-allowed" : ""
-              }`}
-            >
-              ✅ Activate
-            </button>
-          </div>
-        )}
-      </div>
 
       {/* Preset Content */}
       <div className="mb-5">
@@ -129,6 +82,53 @@ const PresetCard = ({
           <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
             {getTypeLabel(preset.type || 'offer')}
           </span>
+          <div className="absolute top-4 right-4">
+            <button
+              onClick={() => toggleMenu(index)}
+              className="text-gray-500 hover:text-gray-700"
+              aria-label="Options"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
+              </svg>
+            </button>
+
+            {openMenuIndex === index && (
+              <div
+                ref={(el) => (menuRefs.current[index] = el)}
+                className="absolute right-0 mt-2 w-48 bg-white z-10 bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-4 transition-all duration-300"
+              >
+                <button
+                  onClick={() => handleEditPreset(preset)}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  onClick={() => {
+                    setPresetToDelete(preset);
+                    setShowDeleteModal(true);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                >
+                  🗑️ Delete
+                </button>
+                <button
+                  onClick={() => handleToggleActive(preset)}
+                  disabled={preset.isActive}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${preset.isActive ? "text-gray-400 cursor-not-allowed" : ""
+                    }`}
+                >
+                  ✅ Activate
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -194,9 +194,9 @@ const PresetCard = ({
         {preset.link && (
           <div className="bg-blue-50 p-3 rounded-lg">
             <div className="font-medium text-blue-700">Offer Link</div>
-            <a 
-              href={preset.link} 
-              target="_blank" 
+            <a
+              href={preset.link}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-blue-900 text-xs underline truncate block"
             >
@@ -217,15 +217,14 @@ const PresetCard = ({
       {/* Status Badges */}
       <div className="mt-4 flex justify-between items-center">
         {preset.isActive && (
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm ${
-            currentlyActive 
-              ? "bg-emerald-100 text-emerald-700" 
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm ${currentlyActive
+              ? "bg-emerald-100 text-emerald-700"
               : "bg-gray-100 text-gray-700"
-          }`}>
+            }`}>
             {currentlyActive ? "Currently Active" : "Scheduled"}
           </span>
         )}
-        
+
         {preset.startAt && preset.expireAt && !currentlyActive && preset.isActive && (
           <span className="text-xs text-gray-500">
             {new Date() < new Date(preset.startAt) ? "Starts soon" : "Expired"}

@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import axios from "axios";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Grid, LayoutGrid, List, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { getAuthToken } from "../../Context/apiService";
+import UserListCard from "./UserListCard";
 
 function User() {
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
@@ -306,31 +307,18 @@ function User() {
                 <UserCard
                   key={user._id}
                   name={user.name}
-                  profile={user.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"}
+                  profile={user?.photo}
                   email={user.email}
                   id={user._id}
                 />
               ) : (
-                <div key={user._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex items-center gap-4">
-                  <img
-                    src={user.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"}
-                    alt={user.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-800 truncate capitalize">{user.name}</h3>
-                    <p className="text-gray-500 text-sm truncate">{user.email}</p>
-                    <p className="text-xs text-gray-400">
-                      Joined: {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Link
-                    to={`/user/${user._id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    Manage
-                  </Link>
-                </div>
+                <UserListCard
+                  key={user._id}
+                  name={user.name}
+                  profile={user?.photo}
+                  email={user.email}
+                  id={user._id}
+                />
               )
             ))}
           </div>

@@ -382,7 +382,7 @@ function MediaRewards() {
                         </button>
                         {showDetailsCard[reward._id] && (
                           <MediaDetails
-                            conditions={reward.social.conditions}
+                            conditions={reward.social?.conditions}
                             onClose={() => setShowDetailsCard(prev => ({ ...prev, [reward._id]: false }))}
                           />
                         )}

@@ -4,6 +4,7 @@ import MessagePopup from '../Common/MessagePopup';
 import { useUser } from '../../Context/ContextApt';
 import PresetCard from './PresetCard'; // assuming you’ll reuse this
 import OfferForm from './PresetsForm';
+import { getAuthToken } from '../../Context/apiService';
 
 const PresetsPage = () => {
   const [offers, setOffers] = useState([]);
@@ -91,7 +92,10 @@ const PresetsPage = () => {
     try {
       const res = await fetch(setUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `${getAuthToken()}`
+         },
         credentials: 'include',
         body: JSON.stringify(form),
       });

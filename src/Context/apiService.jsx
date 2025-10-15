@@ -1,3 +1,103 @@
+// import Cookies from "js-cookie"
+// const BASE_URL = import.meta.env.VITE_API_URL
+
+// export function getAuthToken() {
+//   const token = localStorage.getItem("authToken");
+//   return token || Cookies.get("authToken") || null
+// }
+
+// /**
+//  * Generic API request function
+//  * @param {string} endpoint - API endpoint (e.g. "/blog/upload")
+//  * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
+//  * @param {object} [data] - Request body (for POST/PUT)
+//  * @param {object} [headers] - Additional headers
+//  * @returns {Promise<any>} - Parsed JSON response
+//  */
+// export async function apiRequest(endpoint, method = "GET", data = null, headers = {}) {
+//   try {
+//     const token = getAuthToken();
+
+//     const options = {
+//       method,
+//       headers: {
+//         "Content-Type": "application/json",
+//         ...(token ? { 'Authorization': `${token}` } : {}),
+//         ...headers,
+//       },
+//       credentials: "include",
+//     };
+
+//     if (data) {
+//       options.body = JSON.stringify(data);
+//     }
+
+//     const response = await fetch(`${BASE_URL}${endpoint}`, options);
+
+//     if (!response.ok) {
+//       const errorData = await response.json().catch(() => ({}));
+//       throw new Error(errorData.message || `HTTP Error ${response.status}`);
+//     }
+
+//     const contentLength = response.headers.get('content-length');
+//     if (contentLength === '0' || response.status === 204) {
+//       return { status: 'success' }; // Return a success object for empty responses
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error("API Request Failed:", error);
+//     throw error;
+//   }
+// }
+
+
+// export const Api = {
+//   getBlogs: () => apiRequest("/blog", "GET"),
+//   uploadBlog: (blogData) => apiRequest("/blog/upload", "POST", blogData),
+//   getUser: () => apiRequest("/user", "GET"),
+
+//   //leads
+//   getLeads: (page = 1, limit = 10, search = '') => {
+//     const queryParams = new URLSearchParams({
+//       page: page.toString(),
+//       limit: limit.toString()
+//     });
+
+//     if (search && search.trim()) {
+//       queryParams.append('search', search.trim());
+//     }
+//     return apiRequest(`/api/lead/my-leads?${queryParams.toString()}`, "GET");
+//   },
+//   createLead: (leadData) => apiRequest("/api/lead", "POST", leadData),
+//   updateLead: (id, leadData) => apiRequest(`/api/lead/${id}`, "PATCH", leadData),
+//   deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
+
+//   //categories
+//   getCategories: (userId, page = 1, limit = 10, search = '') => {
+//     const queryParams = new URLSearchParams({
+//       page: page.toString(),
+//       limit: limit.toString()
+//     });
+
+//     if (search && search.trim()) {
+//       queryParams.append('search', search.trim());
+//     }
+
+//     return apiRequest(`/api/admin/banner/${userId}/categories?${queryParams.toString()}`, "GET");
+//   },
+//   createCategory: (userId, categoryData) => apiRequest(`/api/admin/banner/${userId}/create-category`, "POST", categoryData),
+//   updateCategory: (id, categoryData) => apiRequest(`/api/admin/banner/category/${id}/editname`, "PATCH", categoryData),
+
+//   addItemToCategory: (userId, categoryId, itemData) => 
+//     apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload`, "POST", itemData),
+  
+//   deleteItemFromCategory: (userId, categoryId, itemId) => 
+//     apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload/${itemId}`, "DELETE"),
+// };
+
+
+
 import Cookies from "js-cookie"
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -10,7 +110,7 @@ export function getAuthToken() {
  * Generic API request function
  * @param {string} endpoint - API endpoint (e.g. "/blog/upload")
  * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
- * @param {object} [data] - Request body (for POST/PUT)
+ * @param {object|FormData} [data] - Request body (for POST/PUT)
  * @param {object} [headers] - Additional headers
  * @returns {Promise<any>} - Parsed JSON response
  */
@@ -18,10 +118,14 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
   try {
     const token = getAuthToken();
 
+    // Check if data is FormData (for file uploads)
+    const isFormData = data instanceof FormData;
+
     const options = {
       method,
       headers: {
-        "Content-Type": "application/json",
+        // Don't set Content-Type for FormData - let the browser set it with boundary
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(token ? { 'Authorization': `${token}` } : {}),
         ...headers,
       },
@@ -29,7 +133,9 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
     };
 
     if (data) {
-      options.body = JSON.stringify(data);
+      // For FormData, use the data directly
+      // For JSON, stringify it
+      options.body = isFormData ? data : JSON.stringify(data);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
@@ -51,9 +157,6 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
   }
 }
 
-/**
- * Example helper functions
- */
 export const Api = {
   getBlogs: () => apiRequest("/blog", "GET"),
   uploadBlog: (blogData) => apiRequest("/blog/upload", "POST", blogData),
@@ -76,7 +179,7 @@ export const Api = {
   deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
 
   //categories
-  getCategories: (page = 1, limit = 10, search = '') => {
+  getCategories: (userId, page = 1, limit = 10, search = '') => {
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString()
@@ -86,8 +189,18 @@ export const Api = {
       queryParams.append('search', search.trim());
     }
 
-    return apiRequest(`/api/admin/banner/684974a1beaa604fff1c34bd/categories?${queryParams.toString()}`, "GET");
+    return apiRequest(`/api/admin/banner/${userId}/categories?${queryParams.toString()}`, "GET");
   },
-  createCategory: (categoryData) => apiRequest("/api/admin/banner/684974a1beaa604fff1c34bd/create-category", "POST", categoryData),
+  createCategory: (userId, categoryData) => apiRequest(`/api/admin/banner/${userId}/create-category`, "POST", categoryData),
   updateCategory: (id, categoryData) => apiRequest(`/api/admin/banner/category/${id}/editname`, "PATCH", categoryData),
+  
+  // category-items
+  getCategoryItems: (userId, categoryId) => 
+    apiRequest(`/api/user/banner/${userId}/category/${categoryId}`, "GET"),
+
+  addItemToCategory: (userId, categoryId, itemData) => 
+    apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload`, "POST", itemData),
+  
+  deleteItemFromCategory: (userId, categoryId, itemId) => 
+    apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload/${itemId}`, "DELETE"),
 };

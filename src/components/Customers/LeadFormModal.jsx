@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Loader, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 const LeadFormModal = ({
   show,
@@ -58,7 +58,7 @@ const LeadFormModal = ({
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            {editingLead ? 'Edit Lead' : 'Add New Lead'}
+            {editingLead ? 'Edit Customer' : 'Add New Customer'}
           </h2>
           <button
             onClick={onClose}
@@ -143,7 +143,7 @@ const LeadFormModal = ({
             )}
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
@@ -158,11 +158,15 @@ const LeadFormModal = ({
               className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
-                <Loader className="w-4 h-4 animate-spin" />
+                <>
+                  <Loader className="w-4 h-4 animate-spin mr-2" />
+                  {editingLead ? "Updating..." : "Creating..."}
+                </>
               ) : (
-                <CheckCircle className="w-4 h-4" />
+                <>
+                  {editingLead ? "Update" : "Create"}
+                </>
               )}
-              {editingLead ? 'Update Lead' : 'Create Lead'}
             </button>
           </div>
         </form>
