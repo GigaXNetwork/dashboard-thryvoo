@@ -84,24 +84,23 @@ export default function UserData() {
     fetchUser();
   }, [userId]);
 
-  if (!user)
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center bg-white rounded-2xl shadow-lg p-8 max-w-md mx-4">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <RiUser3Line className="w-8 h-8 text-red-500" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">User Not Found</h3>
-          <p className="text-gray-600">The requested user profile could not be loaded.</p>
-        </div>
-      </div>
-    );
+  console.log(`${import.meta.env.VITE_API_URL}/${user?.photo}`)
 
   return (
     <>
       {loading ? (
         <div className="flex items-center justify-center min-h-64">
           <Loader className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      ) : !user ? (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+          <div className="text-center bg-white rounded-2xl shadow-lg p-8 max-w-md mx-4">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <RiUser3Line className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">User Not Found</h3>
+            <p className="text-gray-600">The requested user profile could not be loaded.</p>
+          </div>
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -117,7 +116,7 @@ export default function UserData() {
                     <div className="relative inline-block">
                       <img
                         src={
-                          user.photo ||
+                          `${import.meta.env.VITE_API_URL}/Image/company/logo/${user.photo}` ||
                           "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80"
                         }
                         alt="Profile"

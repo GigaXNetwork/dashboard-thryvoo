@@ -187,7 +187,6 @@ const Customers = () => {
     }
   };
 
-
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
     setDeletingLead(null);
@@ -195,11 +194,6 @@ const Customers = () => {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-  };
-
-  const handleRefresh = () => {
-    setSearchTerm('');
-    setCurrentPage(1);
   };
 
   const formatDate = (dateString) => {
@@ -227,7 +221,7 @@ const Customers = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
           <p className="text-gray-600 mt-1">
-            Showing {leads.length} of {totalResults} lead{totalResults !== 1 ? 's' : ''}
+            Showing {leads.length} of {totalResults} customer{totalResults !== 1 ? 's' : ''}
             {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
             {searchTerm && ` • Searching for "${searchTerm}"`}
           </p>

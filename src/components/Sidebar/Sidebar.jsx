@@ -8,7 +8,8 @@ import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia, MdOutlineReviews } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-import { FerrisWheel, FileBox, Handshake, IdCard, Settings, Star, Users } from "lucide-react";
+import { CreditCard, FerrisWheel, FileBox, Handshake, IdCard, Settings, Star, Users } from "lucide-react";
+import MyCategories from "../MyCategories/MyCategories";
 
 function Sidebar({ onToggleSidebar }) {
 
@@ -36,7 +37,15 @@ function Sidebar({ onToggleSidebar }) {
 
       },
 
-    userData.user.role === "user" && { to: "/flashOffer", icon: <IoIosFlash />, label: "Flash Hour Offer" },
+    userData.user.role === "user" && {
+      to: "/offer",
+      icon: <IoIosFlash />,
+      label: "Offer",
+      subItems: [
+        { to: "/offer/flashOffer", label: "Flash Offer" },
+        { to: "/offer/specialOffer", label: "Special Offer" },
+      ]
+    },
     userData.user.role === "user" && {
       to: "/whatsapp",
       icon: <FaWhatsapp />,
@@ -57,12 +66,12 @@ function Sidebar({ onToggleSidebar }) {
     },
     userData.user.role === "user" && {
       to: "/spin",
-      icon: <FerrisWheel size={18}/>,
+      icon: <FerrisWheel size={18} />,
       label: "Spinning"
     },
     userData.user.role === "user" && {
       to: "/cross-brand",
-      icon: <Handshake size={18}/>,
+      icon: <Handshake size={18} />,
       label: "Cross Brand",
       subItems: [
         { to: "/cross-brand/presets", label: "Presets" },
@@ -71,6 +80,7 @@ function Sidebar({ onToggleSidebar }) {
     },
     { to: "/reviews", icon: <MdOutlineReviews size={18} />, label: "Reviews" },
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
+    userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Categories" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);
@@ -107,7 +117,7 @@ function Sidebar({ onToggleSidebar }) {
                 onClick={(e) => handleMenuClick(item, e)}
                 className={({ isActive }) =>
                   `flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-out ${isActive
-                    ? "bg-gradient-to-r from-violet-50 to-violet-100 text-violet-700 shadow-sm"
+                    ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                   }`
                 }
@@ -116,8 +126,8 @@ function Sidebar({ onToggleSidebar }) {
                   <>
                     <div className="flex items-center gap-3">
                       <span className={`text-lg p-1 rounded-md transition-all ${isActive
-                          ? "text-violet-600 bg-violet-100/50"
-                          : "text-gray-500 group-hover:bg-gray-200/30"
+                        ? "text-blue-600 bg-blue-100/50"
+                        : "text-gray-500 group-hover:bg-gray-200/30"
                         }`}>
                         {item.icon}
                       </span>
@@ -129,8 +139,8 @@ function Sidebar({ onToggleSidebar }) {
                     {item.subItems && (
                       <FiChevronDown
                         className={`transform transition-transform duration-200 ${openMenu === item.to
-                            ? "rotate-180 text-violet-500"
-                            : "text-gray-400 group-hover:text-gray-600"
+                          ? "rotate-180 text-blue-500"
+                          : "text-gray-400 group-hover:text-gray-600"
                           }`}
                         size={18}
                       />
@@ -148,7 +158,7 @@ function Sidebar({ onToggleSidebar }) {
                       onClick={toggleHandler}
                       className={({ isActive }) =>
                         `text-sm px-3 py-1.5 rounded-lg transition-all duration-150 ${isActive
-                          ? "bg-violet-100/80 text-violet-700 font-medium pl-4 border-l-2 border-violet-500"
+                          ? "bg-blue-100/80 text-blue-700 font-medium pl-4 border-l-2 border-blue-500"
                           : "text-gray-500 hover:bg-gray-100 hover:pl-4 hover:border-l-2 hover:border-gray-300"
                         }`
                       }

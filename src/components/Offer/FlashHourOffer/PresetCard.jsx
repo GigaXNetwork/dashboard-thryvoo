@@ -80,10 +80,10 @@ const PresetCard = ({
     <div
       className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-200/60 shadow-lg rounded-2xl p-6 transform hover:scale-[1.02] hover:shadow-xl transition-all duration-300 group overflow-hidden"
     >
-    <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-400 to-purple-500">{preset.status}</div>
+    <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-400 to-blue-500">{preset.status}</div>
 
       {/* Decorative gradient accent */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-500"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-blue-500"></div>
       
       {/* 3-dots menu */}
       <div className="absolute top-4 right-4 z-10">
@@ -220,7 +220,7 @@ const PresetCard = ({
       </div>
 
       {/* Hover effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
     </div>
   );
 };

@@ -222,9 +222,9 @@ export default function OfferForm({
         <div className={`relative w-full max-w-md bg-white rounded-xl shadow-2xl transform transition-transform duration-300 ${showForm ? 'scale-100' : 'scale-95'}`}>
           
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
+          <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg mr-3">
+              <div className="p-2 bg-blue-100 rounded-lg mr-3">
                 <Tag className="w-5 h-5 text-[#2563EB]" />
               </div>
               <h2 className="text-xl font-bold text-gray-800">{title}</h2>
@@ -252,7 +252,7 @@ export default function OfferForm({
                 value={form.discountType}
                 onChange={handleFieldChange}
                 disabled={loading}
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors shadow-sm"
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm"
               >
                 <option value="percentage">Percentage Off</option>
                 <option value="fixed">Fixed Amount Off</option>
@@ -274,7 +274,7 @@ export default function OfferForm({
                 onChange={handleFieldChange}
                 placeholder="Enter offer name"
                 disabled={loading}
-                className={`w-full rounded-lg border ${errors.presetName ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 transition-colors shadow-sm`}
+                className={`w-full rounded-lg border ${errors.presetName ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors shadow-sm`}
               />
               {errors.presetName && <p className="text-red-500 text-xs mt-1">{errors.presetName}</p>}
             </div>
@@ -305,7 +305,7 @@ export default function OfferForm({
                 min={form.discountType === 'percentage' ? 0 : undefined}
                 max={form.discountType === 'percentage' ? 100 : undefined}
                 step={form.discountType === 'percentage' ? 0.01 : 1}
-                className={`w-full rounded-lg border ${errors.discountAmount ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 transition-colors shadow-sm`}
+                className={`w-full rounded-lg border ${errors.discountAmount ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors shadow-sm`}
               />
               {errors.discountAmount && <p className="text-red-500 text-xs mt-1">{errors.discountAmount}</p>}
               {form.discountType === 'percentage' && form.discountAmount > 0 && (
@@ -330,7 +330,7 @@ export default function OfferForm({
                   disabled={loading}
                   min="0"
                   step="0.01"
-                  className={`w-full rounded-lg border ${errors.maxDiscount ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 transition-colors shadow-sm`}
+                  className={`w-full rounded-lg border ${errors.maxDiscount ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors shadow-sm`}
                 />
                 {errors.maxDiscount && <p className="text-red-500 text-xs mt-1">{errors.maxDiscount}</p>}
               </div>
@@ -352,14 +352,14 @@ export default function OfferForm({
                 disabled={loading}
                 min="0"
                 step="0.01"
-                className={`w-full rounded-lg border ${errors.minPurchase ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 transition-colors shadow-sm`}
+                className={`w-full rounded-lg border ${errors.minPurchase ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors shadow-sm`}
               />
               {errors.minPurchase && <p className="text-red-500 text-xs mt-1">{errors.minPurchase}</p>}
             </div>
 
             {/* Date and Time Range */}
-            <div className="space-y-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
-              <h3 className="text-sm font-medium text-purple-800 flex items-center">
+            <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+              <h3 className="text-sm font-medium text-blue-800 flex items-center">
                 
                 Validity Period *
               </h3>
@@ -377,7 +377,7 @@ export default function OfferForm({
                       value={startDate}
                       onChange={(e) => handleDateTimeChange('startDate', e.target.value)}
                       min={getTodayDate()}
-                      className={`w-full rounded-lg border ${errors.startDate ? 'border-red-500' : 'border-gray-200'} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors`}
+                      className={`w-full rounded-lg border ${errors.startDate ? 'border-red-500' : 'border-gray-200'} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                     />
                   </div>
                   {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
@@ -393,7 +393,7 @@ export default function OfferForm({
                       type="time"
                       value={startTime}
                       onChange={(e) => handleDateTimeChange('startTime', e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -412,7 +412,7 @@ export default function OfferForm({
                       value={endDate}
                       onChange={(e) => handleDateTimeChange('endDate', e.target.value)}
                       min={startDate || getTodayDate()}
-                      className={`w-full rounded-lg border ${errors.endDate ? 'border-red-500' : 'border-gray-200'} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors`}
+                      className={`w-full rounded-lg border ${errors.endDate ? 'border-red-500' : 'border-gray-200'} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                     />
                   </div>
                   {errors.endDate && <p className="text-red-500 text-xs mt-1">{errors.endDate}</p>}
@@ -428,7 +428,7 @@ export default function OfferForm({
                       type="time"
                       value={endTime}
                       onChange={(e) => handleDateTimeChange('endTime', e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -450,7 +450,7 @@ export default function OfferForm({
                 placeholder="Enter usage limit"
                 disabled={loading}
                 min="1"
-                className={`w-full rounded-lg border ${errors.usageLimit ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 transition-colors shadow-sm`}
+                className={`w-full rounded-lg border ${errors.usageLimit ? 'border-red-500' : 'border-gray-200'} px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors shadow-sm`}
               />
               {errors.usageLimit && <p className="text-red-500 text-xs mt-1">{errors.usageLimit}</p>}
             </div>
@@ -469,7 +469,7 @@ export default function OfferForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-1/2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg py-3 transition-all flex items-center justify-center shadow-md disabled:opacity-50"
+                className="w-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg py-3 transition-all flex items-center justify-center shadow-md disabled:opacity-50"
               >
                 {loading ? (
                   <>

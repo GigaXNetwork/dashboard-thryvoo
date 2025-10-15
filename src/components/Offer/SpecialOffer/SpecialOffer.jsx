@@ -1,13 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import MessagePopup from '../Common/MessagePopup';
-import PresetForm from './presetForm';
-import PresetToggle from './PresetToggle';
-import PresetCard from './PresetCard';
-import { useUser } from '../../Context/ContextApt';
+import { useUser } from '../../../Context/ContextApt';
 import Cookies from "js-cookie"
+import PresetCard from '../FlashHourOffer/PresetCard';
 
-const FlashHourOffer = () => {
+const SpecialOffer = () => {
     const [presets, setPresets] = useState([]);
     const [filteredPresets, setFilteredPresets] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -26,6 +23,8 @@ const FlashHourOffer = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [quickDateFilter, setQuickDateFilter] = useState('');
+    const [isSpinningEnabled, setSpinningEnabled] = useState(true);
+    const [isToggling, setIsToggling] = useState(false);
 
     const token = Cookies.get("authToken")
     const menuRefs = useRef([]);
@@ -184,7 +183,10 @@ const FlashHourOffer = () => {
 
             const res = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `${token}`,
+                },
                 credentials: 'include',
                 body: JSON.stringify({
                     discountType,
@@ -325,6 +327,27 @@ const FlashHourOffer = () => {
         setQuickDateFilter('');
     }, []);
 
+    const handleToggleSpinning = async () => {
+        // if (!spinData?._id) return;
+
+        setIsToggling(true);
+        setSpinningEnabled((prev) => !prev);
+
+        try {
+            // const data = await apiRequest(`/api/spin/${spinData._id}/toggle`, "POST");
+
+            // if (data.status !== "success") {
+            //     setSpinningEnabled((prev) => !prev);
+            // }
+
+        } catch {
+            setSpinningEnabled((prev) => !prev);
+            alert("Network error: Could not toggle spinning");
+        } finally {
+            setIsToggling(false);
+        }
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md min-h-screen">
             {message && (
@@ -337,12 +360,34 @@ const FlashHourOffer = () => {
 
             <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
                 <h1 className="text-3xl font-bold text-gray-900">Special Offers</h1>
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
-                >
-                    + Create Offer
-                </button>
+                <div className='flex justify-end gap-3'>
+                    <div className="flex items-center gap-4 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 shadow-sm">
+                        <button
+                            type="button"
+                            onClick={handleToggleSpinning}
+                            aria-pressed={isSpinningEnabled}
+                            className={`relative inline-flex items-center h-6 w-14 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50
+                            ${isSpinningEnabled ? "bg-gradient-to-r from-blue-500 to-blue-600 focus:ring-blue-300" : "bg-gray-300 focus:ring-gray-200"}`}
+                        >
+                            <span
+                                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ease-in-out
+                                ${isSpinningEnabled ? "translate-x-9" : "translate-x-1"}`}
+                            />
+                        </button>
+                        <div className="flex flex-col">
+                            <span className={`text-sm font- leading-tight ${isSpinningEnabled ? "text-blue-700" : "text-gray-700"}`}>
+                                {isSpinningEnabled ? "Enabled" : "Disabled"}
+                            </span>
+                            <span className="text-xs text-gray-500">Special Offers</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
+                    >
+                        + Create Offer
+                    </button>
+                </div>
             </div>
 
             {/* 🔍 Filter Section */}
@@ -497,33 +542,8 @@ const FlashHourOffer = () => {
                     onClick={closeForm}
                 />
             )}
-
-            {/* Slide-In Form Drawer */}
-            <PresetForm
-                showForm={showForm}
-                setShowForm={setShowForm}
-                form={form}
-                handleChange={handleChange}
-                handleSubmit={handleSubmit}
-                resetForm={resetForm}
-                loading={loading}
-                isEditing={isEditing}
-                title={isEditing ? "Edit Offer" : "Create New Offer"}
-                onClose={closeForm}
-            />
-
-            {showDeleteModal && (
-                <PresetToggle
-                    presetToDelete={presetToDelete}
-                    setShowDeleteModal={setShowDeleteModal}
-                    handleDeletePreset={handleDeletePreset}
-                    setPresetToDelete={setPresetToDelete}
-                    title="Delete Offer"
-                    message="Are you sure you want to delete this offer?"
-                />
-            )}
         </div>
     );
 };
 
-export default React.memo(FlashHourOffer);
+export default React.memo(SpecialOffer);

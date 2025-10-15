@@ -40,7 +40,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Setting from './components/Setting/Setting';
 import MediaRewards from './components/SocialMedia/MediaRewards';
 import SocialMedia from './components/SocialMedia/SocialMedia';
-import FlashHourOffer from './components/FlashHourOffer/FlashHourOffer';
+import FlashHourOffer from './components/Offer/FlashHourOffer/FlashHourOffer';
 import Spinning from './components/Spinning/Spinning';
 import PresetCard from './components/Presets/PresetCard';
 import PresetsPage from './components/Presets/Presets';
@@ -51,6 +51,8 @@ import MyPreset from './components/CrossBrand/MyPreset';
 import BlogAdmin from './components/Blog/BlogAdmin';
 import Customers from './components/Customers';
 import Categories from './components/User/Categories/Categories';
+import SpecialOffer from './components/Offer/SpecialOffer/SpecialOffer';
+import MyCategories from './components/MyCategories/MyCategories';
 
 
 // 🔁 Scroll Wrapper
@@ -62,7 +64,7 @@ function ScrollToTop() {
 function App() {
   const { userData, loading } = useUser();
 
-  if (loading) return <LoadingAnimation />;
+  if (loading) return <LoadingAnimation loading={loading}/>;
 
   const isAuthenticated = !!userData?.user;
   const role = userData?.user?.role || 'user';
@@ -155,7 +157,8 @@ function App() {
               { path: 'card', element: <GetMyCard role={role} /> },
               { path: 'coupon', element: <Coupon role={role} /> },
               { path: 'presets', element: <SetDiscountPage role={role} /> },
-              { path: 'flashOffer', element: <FlashHourOffer role={role} /> },
+              { path: 'offer/flashOffer', element: <FlashHourOffer role={role} /> },
+              { path: 'offer/specialOffer', element: <SpecialOffer role={role} /> },
               { path: 'media/allMedia', element: <MediaRewards /> },
               { path: 'spin', element: <Spinning /> },
               { path: 'media/setMedia', element: <SocialMedia /> },
@@ -164,6 +167,7 @@ function App() {
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
               { path: 'customers', element: <Customers /> },
+              { path: 'myCategories', element: <MyCategories /> },
             ] : [])
           ]
         }

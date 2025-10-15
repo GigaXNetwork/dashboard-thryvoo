@@ -81,7 +81,7 @@ const Me = () => {
                         <p className="text-sm text-gray-500 divide-y py-4 divide-gray-200">
                             The information provided below will reflect on your invoices
                         </p>
-                        <button className="self-start bg-violet-600 text-white font-semibold text-sm px-4 py-2 rounded-md hover:bg-violet-700 transition">
+                        <button className="self-start bg-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-md hover:bg-blue-700 transition">
                             delete account
                         </button>
                     </div>

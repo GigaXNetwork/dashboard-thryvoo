@@ -48,7 +48,7 @@ const TopNav = ({ Maintitle,title, buttonTitle, navLinks }) => {
       {/* Right Side - Button */}
       {typeof buttonTitle === "string" && (
 
-        <button className="flex items-center gap-2 bg-violet-600 text-white font-semibold text-sm px-4 py-2 rounded-md hover:bg-violet-700 transition">
+        <button className="flex items-center gap-2 bg-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-md hover:bg-blue-700 transition">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"

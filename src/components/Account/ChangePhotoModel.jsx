@@ -107,13 +107,13 @@ export default function ChangePhotoModal({ onClose }) {
                   className="w-full h-full object-cover rounded-full border-2 border-gray-200 shadow-sm"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-full border-2 border-dashed border-gray-300 text-sm text-gray-500">
+                <div className="w-full h-full flex items-center justify-center text-center bg-gray-100 rounded-full border-2 border-dashed border-gray-300 text-sm text-gray-500">
                   No image selected
                 </div>
               )}
             </div>
             
-            <label className="cursor-pointer bg-purple-50 text-[#2563EB] hover:bg-purple-100 px-4 py-2 rounded-lg font-medium transition text-sm">
+            <label className="cursor-pointer bg-blue-50 text-[#2563EB] hover:bg-blue-100 px-4 py-2 rounded-lg font-medium transition text-sm">
               Select Image
               <input
                 type="file"
@@ -135,7 +135,7 @@ export default function ChangePhotoModal({ onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm"
+              className="px-4 py-2 text-gray-400 hover:text-gray-800 font-medium text-sm"
               disabled={isSubmitting}
             >
               Cancel
@@ -144,8 +144,8 @@ export default function ChangePhotoModal({ onClose }) {
               type="submit"
               className={`px-4 py-2 rounded-lg font-medium text-sm ${
                 isSubmitting
-                  ? "bg-purple-400 cursor-not-allowed"
-                  : "bg-purple-600 text-white hover:bg-purple-700"
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
               disabled={isSubmitting}
             >

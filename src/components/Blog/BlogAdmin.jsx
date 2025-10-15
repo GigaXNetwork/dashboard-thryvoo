@@ -7,6 +7,7 @@ import { Pagination } from './Pagination';
 import { LoadingGrid } from './LoadingSpinner';
 import { ErrorState } from './ErrorState';
 import { BookOpen, Users, Eye, Plus } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 export const BlogAdmin = () => {
   const { blogs, loading, error, totalPages, currentPage, totalResults, refetch, changePage, deleteBlog } = useBlogs();
@@ -66,11 +67,12 @@ export const BlogAdmin = () => {
   const confirmDelete = async () => {
     if (!selectedBlog) return;
     setDeleteLoading(selectedBlog);
-
+    
     try {
       await deleteBlog(selectedBlog);
-      console.log("Deleted successfully");
+      toast.success("Blog deleted successfully");
     } catch (err) {
+      toast.error("Failed to delete blog");
       console.error("Delete failed:", err.message);
     } finally {
       setDeleteLoading(null);
@@ -116,7 +118,7 @@ export const BlogAdmin = () => {
           <div className="mt-4 sm:mt-0">
             <button
               onClick={handleCreateNew}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
             >
               <Plus className="h-4 w-4" />
               Create New Blog
