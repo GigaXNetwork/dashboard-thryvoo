@@ -275,6 +275,7 @@ import ItemModal from './ItemModal';
 import { Api } from "../../../Context/apiService";
 import Pagination from '../../Common/Pagination';
 import { useUser } from '../../../Context/ContextApt';
+import { useParams } from 'react-router';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -296,8 +297,7 @@ const Categories = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   
-  const { userData } = useUser();
-  const userId = userData?.user?._id;
+  const { userId } = useParams();
 
   // Fetch categories
   const fetchCategories = async () => {

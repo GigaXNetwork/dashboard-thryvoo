@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
 import { useUser } from "../../Context/ContextApt";
+import { Loader2 } from "lucide-react";
 
 export default function UpdatePasswordModal({ onClose, onSubmit }) {
   const { userData, loading, error } = useUser();
@@ -46,10 +47,10 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
           Authorization: `${authToken}`,
         },
         credentials: "include",
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           currentPassword: formData.currentPassword,
           password: formData.newPassword,
-          confirmpassword: formData.confirmPassword
+          confirmPassword: formData.confirmPassword
         }),
       });
 
@@ -60,17 +61,17 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
       }
 
       setMessage({ text: "Password updated successfully!", isError: false });
-      
+
       // Clear form and close modal on success
       setFormData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       });
-      
+
       if (onSubmit) onSubmit();
       if (onClose) onClose();
-      
+
     } catch (err) {
       console.error("Error updating password:", err.message);
       setMessage({ text: err.message, isError: true });
@@ -87,8 +88,8 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 mx-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-800">Update Your Password</h2>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-2xl font-bold transition"
             disabled={submitting}
             aria-label="Close modal"
@@ -96,7 +97,7 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
             &times;
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
@@ -114,7 +115,7 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
               minLength="8"
             />
           </div>
-          
+
           <div>
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
               New Password
@@ -132,7 +133,7 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
               placeholder="At least 8 characters"
             />
           </div>
-          
+
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm New Password
@@ -149,7 +150,7 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
               minLength="8"
             />
           </div>
-          
+
           {message.text && (
             <div className={`p-3 rounded-md ${message.isError ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}>
               {message.text}
@@ -167,15 +168,16 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 text-white font-medium rounded-lg transition ${
-                submitting ? "bg-purple-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
-              }`}
+              className={`px-6 py-2 text-white font-medium rounded-lg transition ${submitting ? "bg-purple-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+                }`}
               disabled={submitting}
             >
               {submitting ? (
                 <>
-                  <span className="inline-block animate-spin mr-2">↻</span>
-                  Updating...
+                  <span className="flex items-center gap-2">
+                    <Loader2 className='animate-spin' size={16} />
+                    Updating...
+                  </span>
                 </>
               ) : "Update Password"}
             </button>

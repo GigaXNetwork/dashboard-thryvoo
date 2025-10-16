@@ -31,9 +31,10 @@ export default function MyCategories() {
   const fetchCategoryItems = async (categoryId) => {
     try {
       setLoading(true);
-      const response = await apiRequest("get", `/api/user/mybanner/${categoryId}`);
+      const response = await apiRequest(`/api/user/mybanner/${categoryId}`);
+      console.log(response.data)
       if (response.status === "success") {
-        setItems(response.data || []); // adjust based on actual API response
+        setItems(response.data.banners || []); // adjust based on actual API response
       } else {
         setError("Failed to fetch category items");
       }
@@ -69,10 +70,9 @@ export default function MyCategories() {
                 setSelectedCategory(null);
                 setItems([]);
               }}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-300 p-2 rounded-full transition"
             >
               <ArrowLeft size={20} />
-              <span>Back</span>
             </button>
           )}
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -116,9 +116,6 @@ export default function MyCategories() {
 
                 {/* Info */}
                 <div className="mt-4 flex flex-col flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {item.name || "Untitled"}
-                  </h2>
                   {item.url && (
                     <a
                       href={item.url}

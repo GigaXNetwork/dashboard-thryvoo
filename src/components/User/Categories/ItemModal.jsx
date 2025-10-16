@@ -136,7 +136,8 @@ const ItemModal = ({
         const formData = new FormData();
         formData.append('image', imageFile);
         formData.append('type', 'image');
-        formData.append('name', category?.name || ''); // Add category name
+        formData.append('name', category?.name || '');
+        formData.append('url', 'url');
         payload = formData;
       } else if (mediaType === 'url') {
         // For video URL - use regular object

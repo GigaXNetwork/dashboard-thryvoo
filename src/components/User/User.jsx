@@ -3,9 +3,10 @@ import UserCard from "./UserCard";
 import "./User.css";
 import { Link } from "react-router";
 import axios from "axios";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Grid, LayoutGrid, List, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Grid, LayoutGrid, List, Loader2, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { getAuthToken } from "../../Context/apiService";
 import UserListCard from "./UserListCard";
+import { toast } from "react-toastify";
 
 function User() {
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
@@ -16,12 +17,13 @@ function User() {
     limit: 6
   });
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmpassword: "",
+    confirmPassword: "",
   });
   const [layout, setLayout] = useState("card");
   const [pagination, setPagination] = useState({
@@ -178,10 +180,11 @@ function User() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmpassword) {
+    if (formData.password !== formData.confirmPassword) {
       setFormStatus({ type: "error", message: "Passwords do not match." });
       return;
     }
+    setCreating(true);
 
     try {
       const response = await axios.post(
@@ -190,7 +193,7 @@ function User() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          confirmpassword: formData.confirmpassword,
+          confirmPassword: formData.confirmPassword,
         },
         {
           withCredentials: true,
@@ -204,27 +207,18 @@ function User() {
       const result = response.data;
 
       if (result.status === "success") {
-        setFormStatus({ type: "success", message: "User created successfully!" });
-
-        // Auto-close modal after short delay
-        setTimeout(() => {
-          setShowModal(false);
-          setFormData({ name: "", email: "", password: "", confirmpassword: "" });
-          setFormStatus({ type: "", message: "" });
-          fetchUsers(); // Refresh user list
-        }, 1500);
+        toast.success("User created successfully!");
+        setShowModal(false);
+        setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+        fetchUsers();
       } else {
-        setFormStatus({
-          type: "error",
-          message: result.message || "Failed to create user.",
-        });
+        toast.error(result.message || "Failed to create user.");
       }
     } catch (error) {
       console.error("Create user failed:", error);
-      setFormStatus({
-        type: "error",
-        message: error.response?.data?.message || "An unexpected error occurred."
-      });
+      toast.error(error.response?.data?.message || "An unexpected error occurred.");
+    } finally {
+      setCreating(false)
     }
   };
 
@@ -239,11 +233,13 @@ function User() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8">
       {/* Header with search + button */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+      {/* Header with search + button */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           {/* Search Input */}
-          <div className="relative w-full sm:w-64">
+          <div className="relative flex-1 min-w-[220px] sm:min-w-[260px] lg:min-w-[280px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
             <input
               type="text"
@@ -258,19 +254,21 @@ function User() {
           <div className="flex items-center bg-gray-100 rounded-lg py-1 px-1 min-h-[44px]">
             <button
               onClick={() => setLayout("card")}
-              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "card" ? "bg-white text-blue-600 shadow" : "text-gray-600 hover:text-gray-800"
+              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "card"
+                  ? "bg-white text-blue-600 shadow"
+                  : "text-gray-600 hover:text-gray-800"
                 }`}
               title="Card View"
-              style={{ minWidth: "2.5rem" }}
             >
               <LayoutGrid className="w-5 h-5" />
             </button>
             <button
               onClick={() => setLayout("list")}
-              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "list" ? "bg-white text-blue-600 shadow" : "text-gray-600 hover:text-gray-800"
+              className={`p-2 rounded-md transition-all flex items-center justify-center w-10 h-9 ${layout === "list"
+                  ? "bg-white text-blue-600 shadow"
+                  : "text-gray-600 hover:text-gray-800"
                 }`}
               title="List View"
-              style={{ minWidth: "2.5rem" }}
             >
               <List className="w-5 h-5" />
             </button>
@@ -290,7 +288,6 @@ function User() {
           <button
             onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 h-11 rounded-lg transition-colors font-medium"
-            style={{ minWidth: "142px" }}
           >
             <Plus className="h-5 w-5" />
             <span>Create User</span>
@@ -449,7 +446,7 @@ function User() {
                 onClick={() => {
                   setShowModal(false);
                   setFormStatus({ type: "", message: "" });
-                  setFormData({ name: "", email: "", password: "", confirmpassword: "" });
+                  setFormData({ name: "", email: "", password: "", confirmPassword: "" });
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -503,9 +500,9 @@ function User() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <input
                   type="password"
-                  name="confirmpassword"
+                  name="confirmPassword"
                   placeholder="Confirm password"
-                  value={formData.confirmpassword}
+                  value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -524,7 +521,7 @@ function User() {
                   onClick={() => {
                     setShowModal(false);
                     setFormStatus({ type: "", message: "" });
-                    setFormData({ name: "", email: "", password: "", confirmpassword: "" });
+                    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                 >
@@ -532,9 +529,19 @@ function User() {
                 </button>
                 <button
                   type="submit"
+                  disabled={creating}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                  Create User
+                  {creating ? (
+                    <>
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="animate-spin" size={16} />
+                        Creating...
+                      </span>
+                    </>
+                  ) : (
+                    "Create User"
+                  )}
                 </button>
               </div>
             </form>

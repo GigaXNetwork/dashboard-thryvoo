@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router";
 export default function ResetPasswordPage() {
   const { token } = useParams(); // Get token from URL
   const [password, setPassword] = useState("");
-  const [confirmpassword, setconfirmpassword] = useState(""); // ✅ fixed name
+  const [confirmPassword, setconfirmpassword] = useState(""); // ✅ fixed name
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -14,7 +14,7 @@ export default function ResetPasswordPage() {
     setError("");
     setMessage("");
 
-    if (password !== confirmpassword) {
+    if (password !== confirmPassword) {
       setError("❌ Passwords do not match.");
       return;
     }
@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ password,confirmpassword }),
+          body: JSON.stringify({ password,confirmPassword }),
         }
       );
 
@@ -80,7 +80,7 @@ export default function ResetPasswordPage() {
             <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
             <input
               type="password"
-              value={confirmpassword}
+              value={confirmPassword}
               onChange={(e) => setconfirmpassword(e.target.value)}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"

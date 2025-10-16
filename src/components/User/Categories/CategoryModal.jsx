@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit } from "lucide-react";
+import { X, Edit, Loader2 } from "lucide-react";
 
 const CategoryModal = ({
   isOpen,
@@ -51,7 +51,7 @@ const CategoryModal = ({
                 onClick={onEdit}
                 className=" text-blue-600 rounded-lg px-4 py-2 hover:bg-gray-200 font-semibold"
               >
-                <Edit size={18}/>
+                <Edit size={18} />
               </button>
               <button
                 onClick={onClose}
@@ -92,7 +92,16 @@ const CategoryModal = ({
                 className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 font-semibold"
                 disabled={loading || !input.trim()}
               >
-                {mode === 'edit' ? 'Save' : 'Create'}
+                {loading ? (
+                  <>
+                    <span className="flex items-center gap-2">
+                      <Loader2 className='animate-spin' size={16} />
+                      {mode === 'edit' ? 'Saving...' : 'Creating...'}
+                    </span>
+                  </>
+                ) : (
+                  mode === 'edit' ? 'Save' : 'Create'
+                )}
               </button>
             </div>
           </form>
