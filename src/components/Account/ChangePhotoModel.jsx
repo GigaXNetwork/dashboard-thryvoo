@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { useUser } from "../../Context/ContextApt";
+import { getAuthToken } from "../../Context/apiService";
 
 export default function ChangePhotoModal({ onClose }) {
   const { setUserData } = useUser();
@@ -41,14 +42,12 @@ export default function ChangePhotoModal({ onClose }) {
     const formData = new FormData();
     formData.append("photo", selectedFile);
 
-    const token = Cookies.get("accountToken");
-
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/updateuser`, {
         method: "PATCH",
         credentials: "include",
         headers: {
-          Authorization: `${token}`,
+          'Authorization': `${getAuthToken()}`,
         },
         body: formData,
       });

@@ -12,13 +12,13 @@ const MyProfile = () => {
     email: '',
     photo: null,
   });
-
-
   const [passwords, setPasswords] = useState({ password: '' });
   const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
   const [profileMessage, setProfileMessage] = useState({ type: '', text: '' });
-
   const [previewImage, setPreviewImage] = useState(null);
+
+  const userPhoto = profile?.photo && profile.photo !== "default-user.png" ? profile.photo : null;
+  const userPhotoURL = userPhoto?.startsWith("http") ? userPhoto : null;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,10 +26,10 @@ const MyProfile = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/user/${userId}`, {
           method: 'GET',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `${getAuthToken()}`,
-           },
+          },
           credentials: 'include',
         });
 
@@ -92,7 +92,7 @@ const MyProfile = () => {
           body: formData,
           headers: {
             'Authorization': `${getAuthToken()}`
-           },
+          },
         }
       );
 
@@ -100,6 +100,13 @@ const MyProfile = () => {
 
       if (response.ok && result.status === 'success') {
         setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
+        if (result.data?.user?.photo) {
+          setProfile(prev => ({
+            ...prev,
+            photo: result.data.user.photo,
+          }));
+          setPreviewImage(null);
+        }
       } else {
         setProfileMessage({ type: 'error', text: result.message || 'Failed to update profile.' });
       }
@@ -127,10 +134,10 @@ const MyProfile = () => {
         `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/changepassword`,
         {
           method: 'PATCH',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `${getAuthToken()}`
-           },
+          },
           credentials: 'include',
           body: JSON.stringify({ password: passwords.password }),
         }
@@ -166,11 +173,23 @@ const MyProfile = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">My Profile</h2>
         <form onSubmit={handleProfileSubmit} className="space-y-6">
           <div className="flex items-center gap-4">
-            <img
-              src={previewImage || (profile.photo || <User className="w-12 h-12 text-gray-400" />)}
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover"
-            />
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+              {previewImage ? (
+                <img
+                  src={previewImage}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : profile.photo && profile.photo !== "default-user.png" ? (
+                <img
+                  src={profile.photo}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-12 h-12 text-gray-400" />
+              )}
+            </div>
 
             <input
               type="file"
@@ -204,8 +223,8 @@ const MyProfile = () => {
           {profileMessage.text && (
             <div
               className={`text-sm px-4 py-2 rounded-md ${profileMessage.type === 'success'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
                 }`}
             >
               {profileMessage.text}
@@ -242,8 +261,8 @@ const MyProfile = () => {
           {passwordMessage.text && (
             <div
               className={`text-sm px-4 py-2 rounded-md ${passwordMessage.type === 'success'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
                 }`}
             >
               {passwordMessage.text}
