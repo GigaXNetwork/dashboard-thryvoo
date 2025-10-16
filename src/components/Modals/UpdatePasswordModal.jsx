@@ -65,24 +65,14 @@ export default function UpdatePasswordModal({ onClose, onSubmit }) {
       setMessage({ text: "Password updated successfully! Logging out...", isError: false });
 
       // Clear form and close modal on success
-      // setFormData({
-      //   currentPassword: "",
-      //   newPassword: "",
-      //   confirmPassword: ""
-      // });
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
 
-      // if (onSubmit) onSubmit();
-      // if (onClose) onClose();
-
-
-      // Remove auth token
-      localStorage.removeItem("authToken");
-      Cookies.remove("authToken");
-
-      // Redirect to login after short delay
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
+      if (onSubmit) onSubmit();
+      if (onClose) onClose();
 
     } catch (err) {
       console.error("Error updating password:", err.message);
