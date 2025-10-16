@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = 'https://api.thryvoo.in/api/blog';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/blog`;
 
 export const useBlogs = () => {
   const [blogs, setBlogs] = useState([]);

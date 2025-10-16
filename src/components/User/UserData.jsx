@@ -17,7 +17,7 @@ import {
   BiCategory
 } from "react-icons/bi";
 import { getAuthToken } from "../../Context/apiService";
-import { Loader } from "lucide-react";
+import { Loader, User } from "lucide-react";
 
 const menuItems = [
   { to: "/", icon: <IoHomeOutline />, label: "Home" },
@@ -39,6 +39,9 @@ export default function UserData() {
 
   // Responsive: Use window.matchMedia for desktop height sync
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  const userPhoto = user?.photo && user.photo !== "default-user.png" ? user.photo : null;
+  const userPhotoURL = userPhoto?.startsWith("http") ? userPhoto : null;
 
   useEffect(() => {
     const updateIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
@@ -84,8 +87,6 @@ export default function UserData() {
     fetchUser();
   }, [userId]);
 
-  console.log(`${import.meta.env.VITE_API_URL}/${user?.photo}`)
-
   return (
     <>
       {loading ? (
@@ -114,16 +115,22 @@ export default function UserData() {
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 flex-1 flex flex-col">
                   <div className="bg-gradient-to-r from-blue-700 to-blue-500 p-6 text-center rounded-lg">
                     <div className="relative inline-block">
-                      <img
-                        src={
-                          `${import.meta.env.VITE_API_URL}/Image/company/logo/${user.photo}` ||
-                          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80"
-                        }
-                        alt="Profile"
-                        className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg mx-auto mb-4"
-                        loading="lazy"
-                        draggable={false}
-                      />
+                      {userPhotoURL ? (
+                        <img
+                          src={
+                            `${user.photo}` ||
+                            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80"
+                          }
+                          alt="Profile"
+                          className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg mx-auto mb-4"
+                          loading="lazy"
+                          draggable={false}
+                        />
+                      ) : (
+                        <div className="relative w-24 h-24 rounded-full mx-auto mb-2 border-4 border-white shadow-md bg-gray-100 flex items-center justify-center">
+                          <User className="w-12 h-12 text-gray-400" />
+                        </div>
+                      )}
                       <div className="absolute bottom-4 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
                     <h2 className="text-xl font-bold text-white mb-1 capitalize">{user.name}</h2>
