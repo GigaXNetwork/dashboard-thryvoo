@@ -168,7 +168,7 @@ export default function UserData() {
               {/* Main Content */}
               <main className="flex-1 flex flex-col min-h-0">
                 <div
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 flex-1 flex flex-col h-full"
+                  className="bg-transparent rounded-2xl shadow-lg border border-gray-100 flex-1 flex flex-col h-full"
                   style={
                     isDesktop && sidebarHeight
                       ? { maxHeight: sidebarHeight, minHeight: sidebarHeight }

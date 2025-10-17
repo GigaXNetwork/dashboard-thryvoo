@@ -167,7 +167,7 @@ const MyProfile = () => {
   if (loading) return <div className="text-center mt-20">Loading user data...</div>;
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-2xl mt-10 space-y-10">
+    <div className="max-w-6xl mx-auto p-6 rounded-2xl mt-10 space-y-10">
       {/* Profile Update */}
       <section>
         <h2 className="text-2xl font-bold mb-6 text-center">My Profile</h2>

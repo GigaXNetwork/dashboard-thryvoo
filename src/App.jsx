@@ -53,6 +53,7 @@ import Customers from './components/Customers';
 import Categories from './components/User/Categories/Categories';
 import SpecialOffer from './components/Offer/SpecialOffer/SpecialOffer';
 import MyCategories from './components/MyCategories/MyCategories';
+import CreateCrossCoupon from './components/CrossBrand/CreateCrossCoupon';
 
 
 // 🔁 Scroll Wrapper
@@ -164,6 +165,7 @@ function App() {
               { path: 'media/setMedia', element: <SocialMedia /> },
               { path: 'cross-brand/store', element: <CrossBrand /> },
               { path: 'cross-brand/presets', element: <MyPreset /> },
+              { path: 'cross-brand/coupon', element: <CreateCrossCoupon /> },
               { path: 'whatsapp/templates', element: <WhatsAppTemplates /> },
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
               { path: 'customers', element: <Customers /> },

@@ -76,6 +76,7 @@ function Sidebar({ onToggleSidebar }) {
       subItems: [
         { to: "/cross-brand/presets", label: "Presets" },
         { to: "/cross-brand/store", label: "Store" },
+        { to: "/cross-brand/coupon", label: "Coupon" },
       ]
     },
     { to: "/reviews", icon: <MdOutlineReviews size={18} />, label: "Reviews" },
