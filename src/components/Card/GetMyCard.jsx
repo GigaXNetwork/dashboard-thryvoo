@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
-import { Badge, CheckCircle, ExternalLink, Eye, Pencil, Plus } from "lucide-react";
+import { Badge, CheckCircle, ExternalLink, Eye, Loader2, Pencil, Plus } from "lucide-react";
 import Active from "./Active";
 import Cookies from "js-cookie"
 
@@ -62,7 +62,7 @@ function GetMyCard({ role }) {
     setIsCreateCardForm(true);
   };
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (loading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
 
   return (

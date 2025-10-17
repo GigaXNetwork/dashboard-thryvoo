@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Tag, Gift, Crosshair, Calendar, Clock, CheckCircle } from "lucide-react";
+import { Tag, Gift, Crosshair, Calendar, Clock, CheckCircle, Trash2, SquarePen } from "lucide-react";
 
 const PresetCard = ({
   preset,
@@ -69,20 +69,22 @@ const PresetCard = ({
       key={index}
       className="relative bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-6 transform hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
     >
-      {/* 3-dots menu */}
-
 
       {/* Preset Content */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xl font-bold text-indigo-600 tracking-wide border-b-2 pb-2 border-indigo-200 flex items-center gap-2">
-            {getTypeIcon(preset.type || 'offer')}
-            {preset.presetName}
+      <div className="relative mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 text-xl font-bold text-indigo-600 tracking-wide border-b-2 pb-2 border-indigo-200 min-w-0">
+            {getTypeIcon(preset.type || "offer")}
+            <span className="truncate">{preset.presetName}</span>
           </h3>
-          <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-            {getTypeLabel(preset.type || 'offer')}
+
+          {/* Type Label */}
+          <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full flex-shrink-0">
+            {getTypeLabel(preset.type || "offer")}
           </span>
-          <div className="absolute top-4 right-4">
+
+          {/* 3-dot menu */}
+          <div className="flex-shrink-0 relative">
             <button
               onClick={() => toggleMenu(index)}
               className="text-gray-500 hover:text-gray-700"
@@ -101,27 +103,32 @@ const PresetCard = ({
             {openMenuIndex === index && (
               <div
                 ref={(el) => (menuRefs.current[index] = el)}
-                className="absolute right-0 mt-2 w-48 bg-white z-10 bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-2xl p-4 transition-all duration-300"
+                className="absolute right-0 mt-2 w-40 bg-white z-10 bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-200 shadow-md rounded-xl px-2 py-2 transition-all duration-300"
               >
                 <button
                   onClick={() => handleEditPreset(preset)}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md"
                 >
-                  ✏️ Edit
+                  <span className="flex items-center gap-2">
+                    <SquarePen className="text-blue-500" size={16}/>
+                    Edit
+                  </span>
                 </button>
                 <button
-                  onClick={() => {
-                    setPresetToDelete(preset);
-                    setShowDeleteModal(true);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  onClick={() => handleDeletePreset(preset)}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm text-red-600 hover:bg-gray-100"
                 >
-                  🗑️ Delete
+                  <span className="flex items-center gap-2">
+                    <Trash2 className="text-red-500" size={16}/>
+                    Delete
+                  </span>
                 </button>
                 <button
                   onClick={() => handleToggleActive(preset)}
                   disabled={preset.isActive}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${preset.isActive ? "text-gray-400 cursor-not-allowed" : ""
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md ${preset.isActive
+                      ? "text-gray-400 cursor-not-allowed"
+                      : ""
                     }`}
                 >
                   ✅ Activate
@@ -218,8 +225,8 @@ const PresetCard = ({
       <div className="mt-4 flex justify-between items-center">
         {preset.isActive && (
           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm ${currentlyActive
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-gray-100 text-gray-700"
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-gray-100 text-gray-700"
             }`}>
             {currentlyActive ? "Currently Active" : "Scheduled"}
           </span>
