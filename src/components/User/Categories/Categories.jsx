@@ -267,7 +267,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Plus, Eye, Search, X, Loader, AlertCircle, FolderOpen, Edit, 
+  Plus, Eye, Search, X, Loader, AlertCircle, FolderOpen, Edit,
   Image as ImageIcon, Link as LinkIcon, Trash2, List, Video
 } from 'lucide-react';
 import CategoryModal from './CategoryModal';
@@ -276,6 +276,8 @@ import { Api } from "../../../Context/apiService";
 import Pagination from '../../Common/Pagination';
 import { useUser } from '../../../Context/ContextApt';
 import { useParams } from 'react-router';
+import { toast } from 'react-toastify';
+import DeleteConfirmationModal from '../../Common/DeleteConfirmationModal';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -290,13 +292,17 @@ const Categories = () => {
   const [submitting, setSubmitting] = useState(false);
   const [viewingItems, setViewingItems] = useState(null);
   const [itemsLoading, setItemsLoading] = useState(false);
-  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  
+
   const { userId } = useParams();
 
   // Fetch categories
@@ -325,12 +331,11 @@ const Categories = () => {
   // Fetch items for a specific category
   const fetchCategoryItems = async (categoryId) => {
     if (!userId || !categoryId) return;
-    
+
     try {
       setItemsLoading(true);
       const response = await Api.getCategoryItems(userId, categoryId);
-      console.log('Category items response:', response);
-      
+
       // Update the viewingItems state with the fetched items
       if (viewingItems && viewingItems._id === categoryId) {
         setViewingItems(prev => ({
@@ -347,7 +352,7 @@ const Categories = () => {
   };
 
   useEffect(() => { fetchCategories(); }, [currentPage, searchTerm]);
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setCurrentPage(1);
@@ -363,11 +368,12 @@ const Categories = () => {
     try {
       setSubmitting(true);
       await Api.createCategory(userId, formData);
-      setMessage('✅ Category created successfully!');
+      toast.success('Category created successfully!');
       setShowCategoryModal(false);
       fetchCategories();
     } catch (err) {
-      setError(err.message || 'Failed to create category');
+      console.log(err)
+      toast.error('Failed to create category');
     } finally {
       setSubmitting(false);
     }
@@ -376,13 +382,14 @@ const Categories = () => {
   const handleEditCategory = async (formData) => {
     try {
       setSubmitting(true);
-      await Api.updateCategory(userId, modalCategory._id, formData);
-      setMessage('✅ Category updated successfully!');
+      await Api.updateCategory(modalCategory._id, formData);
+      toast.success('Category updated successfully!');
       setShowCategoryModal(false);
       setModalCategory(null);
       fetchCategories();
     } catch (err) {
-      setError(err.message || 'Failed to update category');
+      console.log(err)
+      toast.error('Failed to update category');
     } finally {
       setSubmitting(false);
     }
@@ -398,28 +405,36 @@ const Categories = () => {
     try {
       setSubmitting(true);
       await Api.addItemToCategory(userId, category._id, formData);
-      setMessage('✅ Item added successfully!');
+      toast.success('Item added successfully!');
       setShowItemModal(false);
       // Refresh the items for this category
       await fetchCategoryItems(category._id);
     } catch (err) {
       console.error('Error adding item:', err);
-      setError(err.message || 'Failed to add item');
+      toast.error('Failed to add item');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteItem = async (category, itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
+  const handleDeleteItem = (category, itemId) => {
+    setSelectedCategory(category);
+    setSelectedItem(itemId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedCategory?._id || !selectedItem) return;
     
     try {
-      await Api.deleteItemFromCategory(userId, category._id, itemId);
-      setMessage('✅ Item deleted successfully!');
-      // Refresh the items for this category
-      await fetchCategoryItems(category._id);
+      await Api.deleteItemFromCategory(userId, selectedCategory._id, selectedItem);
+      toast.success('Item deleted successfully!');
+      await fetchCategoryItems(selectedCategory._id);
     } catch (err) {
-      setError(err.message || 'Failed to delete item');
+      console.error('Error deleting item:', err);
+      toast.error('Failed to delete item');
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -465,21 +480,21 @@ const Categories = () => {
   // YouTube URL parsing function
   const getYouTubeVideoId = (url) => {
     if (!url) return null;
-    
+
     // Handle various YouTube URL formats
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^#&?]{11})/, // youtu.be/ABC123 or youtube.com/watch?v=ABC123
       /(?:youtube\.com\/embed\/)([^#&?]{11})/, // youtube.com/embed/ABC123
       /(?:youtube\.com\/v\/)([^#&?]{11})/, // youtube.com/v/ABC123
     ];
-    
+
     for (const pattern of patterns) {
       const match = url.match(pattern);
       if (match && match[1]) {
         return match[1];
       }
     }
-    
+
     return null;
   };
 
@@ -505,13 +520,13 @@ const Categories = () => {
                 {viewingItems ? `Items in ${viewingItems.name}` : 'Categories'}
               </h1>
               <p className="text-gray-600 mt-1">
-                {viewingItems 
+                {viewingItems
                   ? `Showing ${viewingItems.items?.length || 0} items`
                   : `Showing ${categories.length} of ${totalResults} categories${totalPages > 1 ? ` • Page ${currentPage} of ${totalPages}` : ''}`
                 }
               </p>
             </div>
-            
+
             {viewingItems ? (
               <div className="flex gap-3">
                 <button
@@ -573,11 +588,10 @@ const Categories = () => {
             </div>
           )}
           {message && (
-            <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${
-              message.includes('✅') 
-                ? 'bg-green-50 text-green-700 border border-green-200' 
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
+            <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${message.includes('✅')
+              ? 'bg-green-50 text-green-700 border border-green-200'
+              : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
               {message}
             </div>
           )}
@@ -668,7 +682,7 @@ const Categories = () => {
                               )}
                             </div>
                           ) : null}
-                          
+
                           {/* URL Display */}
                           {item.url && (
                             <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
@@ -677,7 +691,7 @@ const Categories = () => {
                               </p>
                             </div>
                           )}
-                          
+
                           {/* Created Date */}
                           <div className="mt-2 text-xs text-gray-500">
                             Added: {new Date(item.createdAt).toLocaleDateString()}
@@ -758,7 +772,7 @@ const Categories = () => {
                           </div>
                           {category.items && category.items.length > 0 && (
                             <div className="mt-1 text-xs text-gray-500">
-                              {category.items.filter(item => item.image).length} images, 
+                              {category.items.filter(item => item.image).length} images,
                               {' '}{category.items.filter(item => item.url).length} videos
                             </div>
                           )}
@@ -811,6 +825,16 @@ const Categories = () => {
             loading={submitting}
             category={modalCategory}
             error={error}
+          />
+
+          <DeleteConfirmationModal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={confirmDelete}
+            title="Delete Item"
+            description="Are you sure you want to delete this item from this category? This action cannot be undone."
+            confirmButtonText="Delete"
+            cancelButtonText="Cancel"
           />
         </div>
       )}
