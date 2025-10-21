@@ -123,15 +123,23 @@ export const Api = {
   deleteHelpItem: (id) => apiRequest(`/api/help/${id}`, "DELETE"),
 
   // FAQ APIs (new)
-  addFAQ: (categoryId, faqData) => 
+  addFAQ: (categoryId, faqData) =>
     apiRequest(`/api/help/${categoryId}/faqs`, "POST", faqData),
-  
-  updateFAQ: (categoryId, faqId, faqData) => 
+
+  updateFAQ: (categoryId, faqId, faqData) =>
     apiRequest(`/api/help/${categoryId}/faqs/${faqId}`, "PATCH", faqData),
-  
-  deleteFAQ: (categoryId, faqId) => 
+
+  deleteFAQ: (categoryId, faqId) =>
     apiRequest(`/api/help/${categoryId}/faqs/${faqId}`, "DELETE"),
-  
-  getHelpBySlug: (slug) => 
+
+  getHelpBySlug: (slug) =>
     apiRequest(`/api/help/slug/${slug}`, "GET"),
+
+  // Special Offer
+  getMySpecialOffers: () => apiRequest("/api/special-offer/my-special-offers", "GET"),
+  createSpecialOffer: () => apiRequest("/api/special-offer/create-special-offer", "POST"),
+  addSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/add-items", "POST", { itemId }),
+  removeSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/remove-items", "POST", { itemId }),
+  toggleSpecialOffer: (id) => apiRequest(`/api/special-offer/${id}/toggle`, "POST"),
+  getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
 };
