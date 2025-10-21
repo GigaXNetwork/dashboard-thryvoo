@@ -93,14 +93,45 @@ export const Api = {
   },
   createCategory: (userId, categoryData) => apiRequest(`/api/admin/banner/${userId}/create-category`, "POST", categoryData),
   updateCategory: (id, categoryData) => apiRequest(`/api/admin/banner/category/${id}/editname`, "PATCH", categoryData),
-  
+
   // category-items
-  getCategoryItems: (userId, categoryId) => 
+  getCategoryItems: (userId, categoryId) =>
     apiRequest(`/api/user/banner/${userId}/category/${categoryId}`, "GET"),
 
-  addItemToCategory: (userId, categoryId, itemData) => 
+  addItemToCategory: (userId, categoryId, itemData) =>
     apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload`, "POST", itemData),
-  
-  deleteItemFromCategory: (userId, categoryId, itemId) => 
+
+  deleteItemFromCategory: (userId, categoryId, itemId) =>
     apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload/${itemId}`, "DELETE"),
+
+  // Support/Help
+  createHelpItem: (helpData) => apiRequest("/api/help", "POST", helpData),
+  getHelpItems: (page = 1, limit = 10, search = '') => {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    })
+
+    if (search && search.trim()) {
+      queryParams.append('search', search.trim());
+    }
+
+    return apiRequest(`/api/help?${queryParams.toString()}`, "GET");
+  },
+  getHelpItem: (id) => apiRequest(`/api/help/${id}`, "GET"),
+  updateHelpItem: (id, helpData) => apiRequest(`/api/help/${id}`, "PATCH", helpData),
+  deleteHelpItem: (id) => apiRequest(`/api/help/${id}`, "DELETE"),
+
+  // FAQ APIs (new)
+  addFAQ: (categoryId, faqData) => 
+    apiRequest(`/api/help/${categoryId}/faqs`, "POST", faqData),
+  
+  updateFAQ: (categoryId, faqId, faqData) => 
+    apiRequest(`/api/help/${categoryId}/faqs/${faqId}`, "PATCH", faqData),
+  
+  deleteFAQ: (categoryId, faqId) => 
+    apiRequest(`/api/help/${categoryId}/faqs/${faqId}`, "DELETE"),
+  
+  getHelpBySlug: (slug) => 
+    apiRequest(`/api/help/slug/${slug}`, "GET"),
 };

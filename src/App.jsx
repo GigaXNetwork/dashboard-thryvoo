@@ -54,6 +54,7 @@ import Categories from './components/User/Categories/Categories';
 import SpecialOffer from './components/Offer/SpecialOffer/SpecialOffer';
 import MyCategories from './components/MyCategories/MyCategories';
 import CreateCrossCoupon from './components/CrossBrand/CreateCrossCoupon';
+import Support from './components/Support/Support';
 
 
 // 🔁 Scroll Wrapper
@@ -149,7 +150,8 @@ function App() {
                   { path: 'reviews', element: <Reviews role={role} /> },
                   { path: 'categories', element: <Categories /> },
                 ]
-              }
+              },
+              { path: 'support', element: <Support /> }
             ] : []),
 
             // User-only routes
