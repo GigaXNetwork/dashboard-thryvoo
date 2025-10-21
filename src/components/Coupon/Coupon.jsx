@@ -394,7 +394,7 @@ import { NavLink, useParams } from 'react-router';
 import CouponDetails from './CouponDetails';
 import MessagePopup from '../Common/MessagePopup';
 import { useUser } from '../../Context/ContextApt';
-import Pagination from '../Common/Pagination';
+import Pagination from '../common/Pagination';
 import FilterBar from '../Common/FilterBar';
 import { getAuthToken } from '../../Context/apiService';
 import { toast } from 'react-toastify';
