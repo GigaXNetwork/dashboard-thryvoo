@@ -427,7 +427,7 @@ import { toast } from 'react-toastify';
 import SupportForm from './SupportForm';
 import SupportCard from './SupportCard';
 import FAQForm from './FAQForm';
-import Pagination from '../common/Pagination';
+import Pagination from '../Common/Pagination';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import { MdOutlineSupportAgent } from 'react-icons/md';
 
