@@ -133,10 +133,9 @@ export default function MyCategories() {
                   onClick={() => handleDownload(item.image, item.name)}
                   disabled={!item.image}
                   className={`mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition 
-                    ${
-                      item.image
-                        ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-                        : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    ${item.image
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
                     }`}
                 >
                   <Download size={16} />
@@ -149,40 +148,44 @@ export default function MyCategories() {
       ) : (
         /* CATEGORY VIEW */
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {categories.map((category) => (
-            <div
-              key={category._id}
-              onClick={() => {
-                setSelectedCategory(category);
-                fetchCategoryItems(category._id);
-              }}
-              className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition p-4 flex flex-col justify-between"
-            >
-              <div className="relative w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                {category.image ? (
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-gray-400 flex flex-col items-center">
-                    <ImageIcon size={40} />
-                    <span className="text-sm mt-2">No Image</span>
-                  </div>
-                )}
-              </div>
+          {categories.length === 0 ? (
+            <div className="text-center text-gray-600">No items found in this category.</div>
+          ) : (
+            categories.map((category) => (
+              <div
+                key={category._id}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  fetchCategoryItems(category._id);
+                }}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition p-4 flex flex-col justify-between"
+              >
+                <div className="relative w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-gray-400 flex flex-col items-center">
+                      <ImageIcon size={40} />
+                      <span className="text-sm mt-2">No Image</span>
+                    </div>
+                  )}
+                </div>
 
-              <div className="mt-4">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {category.name}
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  Created: {new Date(category.createdAt).toLocaleString()}
-                </p>
+                <div className="mt-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {category.name}
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Created: {new Date(category.createdAt).toLocaleString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
     </div>
