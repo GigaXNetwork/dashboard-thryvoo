@@ -26,7 +26,7 @@ const menuItems = [
   { to: "presets", icon: <BiSolidFoodMenu />, label: "Presets" },
   { to: "reviews", icon: <FaStar />, label: "Reviews" },
   { to: "redeem-store", icon: <FaGift />, label: "Reward Store" },
-  { to: "categories", icon: <BiCategory />, label: "Categories" },
+  { to: "categories", icon: <BiCategory />, label: "Offer Design" },
 ];
 
 export default function UserData() {

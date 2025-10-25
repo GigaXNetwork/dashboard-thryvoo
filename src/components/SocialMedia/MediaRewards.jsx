@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import MessagePopup from '../Common/MessagePopup';
 import MediaDetails from './MediaDetails';
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
+import FilterBar from '../Common/FilterBar'; // Import the FilterBar
 
 function MediaRewards() {
   const [filters, setFilters] = useState({
@@ -21,26 +22,35 @@ function MediaRewards() {
   const [messageType, setMessageType] = useState('success');
   const [showDetailsCard, setShowDetailsCard] = useState({});
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const itemsPerPage = 10;
   const token = Cookies.get('authToken');
   const apiUrl = `${import.meta.env.VITE_API_URL}/api/social-media/media/allMedia`;
 
-  // Memoized fetch function with debounce
-  // Memoized fetch function with debounce
+  // Custom status options for Media Rewards
+  const mediaStatusOptions = [
+    { value: "", label: "All Statuses" },
+    { value: "Pending", label: "Pending" },
+    { value: "Approved", label: "Approved" },
+    { value: "Rejected", label: "Rejected" }
+  ];
+
+  // Memoized fetch function
   const fetchMediaRewards = useCallback(async () => {
     try {
+      setSearchLoading(true);
       const params = {
         page: filters.page,
         limit: itemsPerPage,
+        ...(filters.search && { search: filters.search }),
         ...(filters.status && { status: filters.status }),
-        ...(filters.startDate && { 'createdAt[gte]': filters.startDate }), // Greater than filter
-        ...(filters.endDate && { 'createdAt[lte]': filters.endDate }), // Less than filter
+        ...(filters.startDate && { 'createdAt[gte]': filters.startDate }),
+        ...(filters.endDate && { 'createdAt[lte]': filters.endDate }),
       };
 
       const response = await axios.get(apiUrl, {
         params,
-        // withCredentials: true,
         headers: { 
           'Content-Type': 'application/json',
           "Authorization": `${token}`
@@ -53,13 +63,10 @@ function MediaRewards() {
       console.error('Error fetching media rewards:', error);
       setMessage('❌ Failed to fetch media rewards');
       setMessageType('error');
+    } finally {
+      setSearchLoading(false);
     }
-  }, [ filters.status, filters.page, filters.startDate, filters.endDate, itemsPerPage, apiUrl]);
-
-  useEffect(() => {
-    const debounceTimer = setTimeout(fetchMediaRewards, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [fetchMediaRewards]);
+  }, [filters, itemsPerPage, apiUrl, token]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(fetchMediaRewards, 300);
@@ -70,16 +77,15 @@ function MediaRewards() {
     setFilters(prev => ({
       ...prev,
       [name]: value,
-      // Reset page to 1 when filters change (except page changes)
       ...(name !== 'page' && { page: 1 })
     }));
   };
 
+  // Handler for FilterBar's quick date filter
   const handleQuickDateFilterChange = (value) => {
-
     const today = new Date();
     let start = '';
-    let end = today.toISOString().split('T')[0]; // format: yyyy-mm-dd
+    let end = today.toISOString().split('T')[0];
 
     switch (value) {
       case 'today':
@@ -106,6 +112,18 @@ function MediaRewards() {
       endDate: end,
       page: 1
     }));
+  };
+
+  // Handler for clearing all filters
+  const handleClearFilters = () => {
+    setFilters({
+      search: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+      quickDateFilter: '',
+      page: 1
+    });
   };
 
   const handleStatusUpdate = async (id, action) => {
@@ -139,7 +157,6 @@ function MediaRewards() {
       console.error(`Error ${action}ing media reward:`, error);
       setMessage(`❌ Failed to ${action} media reward`);
       setMessageType('error');
-      // Re-fetch to revert optimistic update if failed
       fetchMediaRewards();
     }
   };
@@ -172,7 +189,7 @@ function MediaRewards() {
   const tableHeaders = ["Sl. No", "User", "Media Type", "Conditions", "Screenshot", "Status", "Actions"];
 
   return (
-    <div className="p-2">
+    <div className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
           📱 Media Rewards
@@ -189,123 +206,35 @@ function MediaRewards() {
         </NavLink>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-xs mb-6">
-        <div className="space-y-4">
-
-
-          {/* Filters Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-            {/* Status Filter */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </div>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="block w-full pl-8 pr-8 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 text-sm text-gray-700 appearance-none"
-              >
-                <option value="">All Statuses</option>
-                <option value="Pending" className="bg-yellow-50 text-yellow-700">Pending</option>
-                <option value="Approved" className="bg-green-50 text-green-700">Approved</option>
-                <option value="Rejected" className="bg-red-50 text-red-700">Rejected</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Date Range */}
-            <div className="grid grid-cols-2 gap-2 sm:col-span-2">
-              <div className="relative">
-                <label htmlFor="startDate" className="block text-xs font-medium text-gray-500 mb-1">From</label>
-                <div className="relative">
-                  <input
-                    id="startDate"
-                    type="date"
-                    value={filters.startDate}
-                    onChange={(e) => {
-                      handleFilterChange('quickDateFilter', '');
-                      handleFilterChange('startDate', e.target.value);
-                    }}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 text-sm text-gray-700"
-                  />
-                </div>
-              </div>
-              <div className="relative">
-                <label htmlFor="endDate" className="block text-xs font-medium text-gray-500 mb-1">To</label>
-                <div className="relative">
-                  <input
-                    id="endDate"
-                    type="date"
-                    value={filters.endDate}
-                    onChange={(e) => {
-                      handleFilterChange('quickDateFilter', '');
-                      handleFilterChange('endDate', e.target.value);
-                    }}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 text-sm text-gray-700"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Filter Dropdown */}
-            <div className="relative">
-              <label htmlFor="quickFilter" className="block text-xs font-medium text-gray-500 mb-1">Time Range</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <select
-                  id="quickFilter"
-                  value={filters.quickDateFilter}
-                  onChange={(e) => handleQuickDateFilterChange(e.target.value)}
-                  className="block w-full pl-8 pr-8 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 text-sm text-gray-700 appearance-none"
-                >
-                  <option value="">Custom Range</option>
-                  <option value="today">Today</option>
-                  <option value="7days">Last 7 Days</option>
-                  <option value="15days">Last 15 Days</option>
-                  <option value="1month">Last 30 Days</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Reset Button */}
-            <div className="flex items-end">
-              <button
-                onClick={() => setFilters({
-                  search: '',
-                  status: '',
-                  startDate: '',
-                  endDate: '',
-                  quickDateFilter: '',
-                  page: 1
-                })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium transition-all duration-150 flex items-center justify-center space-x-1.5"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Reset</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* FilterBar Component */}
+      <FilterBar
+        search={filters.search}
+        setSearch={(value) => handleFilterChange('search', value)}
+        searchLoading={searchLoading}
+        statusFilter={filters.status}
+        setStatusFilter={(value) => handleFilterChange('status', value)}
+        startDate={filters.startDate}
+        setStartDate={(value) => handleFilterChange('startDate', value)}
+        endDate={filters.endDate}
+        setEndDate={(value) => handleFilterChange('endDate', value)}
+        quickDateFilter={filters.quickDateFilter}
+        setQuickDateFilter={(value) => handleFilterChange('quickDateFilter', value)}
+        onQuickDateChange={handleQuickDateFilterChange}
+        onClearFilters={handleClearFilters}
+        placeholder="Search..."
+        statusOptions={mediaStatusOptions}
+        showStatus={true}
+        showDates={true}
+        showQuickFilter={true}
+        quickFilterOptions={[
+          { value: "", label: "Custom / All Time" },
+          { value: "today", label: "Today" },
+          { value: "7days", label: "Last 7 Days" },
+          { value: "15days", label: "Last 15 Days" },
+          { value: "1month", label: "Last 1 Month" }
+        ]}
+        className="mb-6"
+      />
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">

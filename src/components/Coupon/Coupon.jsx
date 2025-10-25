@@ -570,7 +570,7 @@ function Coupon() {
         setEndDate={setEndDate}
         quickDateFilter={quickDateFilter}
         setQuickDateFilter={setQuickDateFilter}
-        placeholder="Search by code..."
+        placeholder="Search..."
         statusOptions={[
           { value: "", label: "All Statuses" },
           { value: "active", label: "Active" },

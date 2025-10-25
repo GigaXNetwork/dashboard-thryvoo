@@ -16,15 +16,15 @@ export default function MetaDataSec({ cardData, openModal }) {
       value: cardData?.gplaceid || "--",
       icon: <MdPlace className="text-red-500" />,
     },
-    {
-      field: "keyword",
-      label: "Keyword",
-      value: cardData?.keyword || "--",
-      icon: <FaKey className="text-yellow-600" />,
-    },
+    // {
+    //   field: "keyword",
+    //   label: "Keyword",
+    //   value: cardData?.keyword || "--",
+    //   icon: <FaKey className="text-yellow-600" />,
+    // },
     {
       field: "map",
-      label: "Map",
+      label: "Map Link",
       value: cardData?.map || "--",
       icon: <FaMapMarkedAlt className="text-green-600" />,
     },

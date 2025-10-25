@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ClipboardCopy, Trash2, PencilLine, Check, Plus, Save, X } from 'lucide-react';
 import { usePushNotifications } from '../../hooks/pushNotifications';
+import { getAuthToken } from '../../Context/apiService';
 
 function RegistrationInfo() {
-     const { subscribeToPush } = usePushNotifications();
+    const { subscribeToPush } = usePushNotifications();
     const [copied, setCopied] = useState(false);
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -21,6 +22,10 @@ function RegistrationInfo() {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/whatsapp/registration`, {
                     credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': getAuthToken(),
+                    },
                 });
                 const result = await res.json();
                 if (result.status === 'success') {
@@ -87,7 +92,7 @@ function RegistrationInfo() {
                 setData(result.data.registration);
                 setIsEditing(false);
                 console.log(data);
-                
+
             } else {
                 alert(result.message || 'Failed to save registration');
             }
@@ -118,20 +123,20 @@ function RegistrationInfo() {
 
     return (
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 bg-white/80 backdrop-blur-lg rounded-3xl border border-gray-200 l">
-        <div className="min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center px-4">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800">🚀 React Push Notifications</h1>
-        <p className="text-gray-600 text-sm">
-          Click the button below to enable push notifications in your browser.
-        </p>
-        <button
-          onClick={subscribeToPush}
-          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md transition duration-300"
-        >
-          Enable Push Notifications
-        </button>
-      </div>
-    </div>
+            <div className="min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center px-4">
+                <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center space-y-6">
+                    <h1 className="text-3xl font-bold text-gray-800">🚀 React Push Notifications</h1>
+                    <p className="text-gray-600 text-sm">
+                        Click the button below to enable push notifications in your browser.
+                    </p>
+                    <button
+                        onClick={subscribeToPush}
+                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md transition duration-300"
+                    >
+                        Enable Push Notifications
+                    </button>
+                </div>
+            </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">
                 📋 WhatsApp Registration Details
             </h2>
@@ -254,7 +259,7 @@ function RegistrationInfo() {
                     </div>
                 </div>
             )}
-            
+
         </div>
     );
 }

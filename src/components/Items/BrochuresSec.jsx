@@ -24,7 +24,7 @@ export default function BrochuresSec({ cardData, openModal }) {
       >
         <div className="flex items-center gap-3">
           <FaFilePdf className="text-[#2563EB] text-2xl" />
-          <h2 className="text-lg font-bold text-gray-800">Brochures</h2>
+          <h2 className="text-lg font-bold text-gray-800">Price List / Brochures</h2>
         </div>
         <ChevronDown
           className={`w-6 h-6 text-gray-500 transform transition-transform duration-300 ${

@@ -323,7 +323,7 @@ const MyPreset = () => {
           {filteredPresets.length > 0 ? (
             filteredPresets.map((preset, index) => (
               <PresetCard
-                key={preset._id}
+                key={preset._id || `preset-${index}`}
                 preset={preset}
                 index={index}
                 openMenuIndex={openMenuIndex}

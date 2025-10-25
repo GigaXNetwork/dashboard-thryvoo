@@ -707,7 +707,7 @@ const SpecialOfferList = ({ items, openModal, onRemoveItem, error }) => {
             </div>
 
             {/* CSS for flip animation */}
-            <style jsx>{`
+            <style>{`
                 .perspective-1000 {
                 perspective: 1000px;
                 }
