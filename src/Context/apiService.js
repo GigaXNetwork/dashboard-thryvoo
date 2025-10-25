@@ -144,4 +144,11 @@ export const Api = {
   removeSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/remove-items", "POST", { itemId }),
   toggleSpecialOffer: (id) => apiRequest(`/api/special-offer/${id}/toggle`, "POST"),
   getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
+  // delete gallery api
+  deleteGalleryImage: ({ imageUrl }) => {
+   return apiRequest(`/api/user/card/gallery/delete-gallery-image`, "DELETE", { imageUrl })
+  },
+  deleteBrochure: ({ brochureUrl }) => {
+    return apiRequest(`/api/user/card/brochures/delete-brochure-file`, "DELETE", { fileUrl:brochureUrl })
+   }
 };

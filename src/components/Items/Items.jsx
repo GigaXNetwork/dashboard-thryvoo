@@ -86,8 +86,8 @@ function Items({ role }) {
       <AddressSec cardData={cardData} openModal={() => setAddressModal(true)} />
       <SocialSec cardData={cardData} openModal={handleOpenSocialModal} />
       <MetaDataSec cardData={cardData} openModal={handleOpenMetaModal} />
-      <BrochuresSec cardData={cardData} openModal={() => setBrochureModal(true)} />
-      <GallerySec cardData={cardData} openModal={() => setShowGalleryModal(true)} />
+      <BrochuresSec cardData={cardData} setCardData={setCardData} openModal={() => setBrochureModal(true)} />
+      <GallerySec cardData={cardData} setCardData={setCardData} openModal={() => setShowGalleryModal(true)} />
 
       {/* Modals */}
       {modalField && (
