@@ -58,7 +58,7 @@ function Sidebar({ onToggleSidebar }) {
     userData.user.role === "user" && {
       to: "/media",
       icon: <MdOutlinePermMedia />,
-      label: "Media",
+      label: "Social Media",
       subItems: [
         { to: "/media/setMedia", label: "Set Media" },
         { to: "/media/allMedia", label: "All Media" },
@@ -83,6 +83,7 @@ function Sidebar({ onToggleSidebar }) {
     isAdmin && { to: "/support", icon: <MdOutlineSupportAgent size={18} />, label: "Help & Support" },
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
     userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Categories" },
+    // userData.user.role === "user" && { to: "/businessCard", icon: <CreditCard size={18} />, label: "Business Card" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);

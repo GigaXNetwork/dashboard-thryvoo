@@ -1,6 +1,7 @@
 // src/components/Common/FilterBar.jsx
 import React from "react";
 import { Search, Filter, Calendar, X } from "lucide-react";
+import { formatLocalDate, addDays } from "../../utils/date";
 
 const FilterBar = ({
   search,
@@ -33,30 +34,63 @@ const FilterBar = ({
   onQuickDateChange,
   onClearFilters, // Optional callback for parent component
 }) => {
-  
+
   // Check if any filters are active
   const hasActiveFilters = search || statusFilter || startDate || endDate || quickDateFilter;
 
   // Quick date filter logic
+  // const handleQuickDateFilterChange = (value) => {
+  //   setQuickDateFilter(value);
+
+  //   const today = new Date();
+  //   let start = '';
+  //   let end = today.toISOString().split('T')[0];
+
+  //   switch (value) {
+  //     case 'today':
+  //       start = end;
+  //       break;
+  //     case '7days':
+  //       start = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
+  //       break;
+  //     case '15days':
+  //       start = new Date(today.setDate(today.getDate() - 15)).toISOString().split('T')[0];
+  //       break;
+  //     case '1month':
+  //       start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
+  //       break;
+  //     default:
+  //       start = '';
+  //       end = '';
+  //   }
+
+  //   setStartDate(start);
+  //   setEndDate(end);
+
+  //   if (onQuickDateChange) {
+  //     onQuickDateChange(value);
+  //   }
+  // };
+
   const handleQuickDateFilterChange = (value) => {
     setQuickDateFilter(value);
 
-    const today = new Date();
+    const todayLocal = new Date();
     let start = '';
-    let end = today.toISOString().split('T')[0];
+    let end = formatLocalDate(addDays(todayLocal, 1));
 
     switch (value) {
       case 'today':
-        start = end;
+        start = formatLocalDate(addDays(todayLocal, -1));
         break;
       case '7days':
-        start = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
+        start = formatLocalDate(addDays(todayLocal, -7));
         break;
       case '15days':
-        start = new Date(today.setDate(today.getDate() - 15)).toISOString().split('T')[0];
+        start = formatLocalDate(addDays(todayLocal, -15));
         break;
       case '1month':
-        start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
+        start = formatLocalDate(addDays(todayLocal, -30));
         break;
       default:
         start = '';
@@ -65,11 +99,13 @@ const FilterBar = ({
 
     setStartDate(start);
     setEndDate(end);
-    
-    if (onQuickDateChange) {
-      onQuickDateChange(value);
-    }
+
+    if (onQuickDateChange) onQuickDateChange(value);
+
+    // debug
+    console.log('quick filter:', value, 'start', start, 'end', end);
   };
+
 
   // Handle manual date changes (reset quick filter)
   const handleStartDateChange = (value) => {
@@ -89,7 +125,7 @@ const FilterBar = ({
     setStartDate('');
     setEndDate('');
     setQuickDateFilter('');
-    
+
     // Call parent callback if provided
     if (onClearFilters) {
       onClearFilters();
@@ -108,7 +144,7 @@ const FilterBar = ({
           className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
         />
         <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-        
+
         {searchLoading && (
           <div className="absolute right-4 top-3.5 animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
         )}
@@ -129,7 +165,7 @@ const FilterBar = ({
                 </option>
               ))}
             </select>
-            <Filter className="absolute left-4 text-gray-400 pointer-events-none" size={16}/>
+            <Filter className="absolute left-4 text-gray-400 pointer-events-none" size={16} />
           </div>
         )}
 
@@ -143,7 +179,7 @@ const FilterBar = ({
                 onChange={(e) => handleStartDateChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
               />
-              <Calendar className="absolute left-4 text-gray-400 pointer-events-none" size={16}/>
+              <Calendar className="absolute left-4 text-gray-400 pointer-events-none" size={16} />
             </div>
             <div className="relative flex items-center">
               <input
@@ -152,7 +188,7 @@ const FilterBar = ({
                 onChange={(e) => handleEndDateChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
               />
-              <Calendar className="absolute left-4 text-gray-400 pointer-events-none" size={16}/>
+              <Calendar className="absolute left-4 text-gray-400 pointer-events-none" size={16} />
             </div>
           </>
         )}

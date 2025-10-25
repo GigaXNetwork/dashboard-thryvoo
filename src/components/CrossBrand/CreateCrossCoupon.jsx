@@ -349,7 +349,7 @@ const CreateCrossPromotion = () => {
                 setEndDate={setEndDate}
                 quickDateFilter={quickDateFilter}
                 setQuickDateFilter={setQuickDateFilter}
-                placeholder="Search by coupon name..."
+                placeholder="Search by coupon or business name..."
                 statusOptions={[
                     { value: "", label: "All Statuses" },
                     { value: "active", label: "Active" },

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RegistrationInfo from './RegistrationInfo';
+import { getAuthToken } from '../../Context/apiService';
 
 function WhatsAppTemplates() {
   const [templates, setTemplates] = useState([]);
@@ -13,6 +14,10 @@ function WhatsAppTemplates() {
         setLoading(true);
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/whatsapp/getTemplates`, {
           credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getAuthToken(),
+          },
         });
         const data = await res.json();
         if (data.status === 'success') {

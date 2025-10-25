@@ -7,6 +7,7 @@ import VisitsByDay from "./VisitsByDay";
 import VisitsByTime from "./VisitsByTime";
 import CouponChart from "./StatisticsChart";
 import Cookies from "js-cookie";
+import { addDays, formatLocalDate } from "../../utils/date";
 
 const DATE_PRESETS = [
   { label: "Today", value: "1day" },
@@ -52,7 +53,8 @@ function Dashboard({ onFilter }) {
 
     switch (preset) {
       case "1day":
-        start.setDate(start.getDate() - 1);
+        start.setDate(start.getDate());
+        end.setDate(end.getDate() + 1);
         break;
       case "5day":
         start.setDate(start.getDate() - 5);
@@ -80,6 +82,48 @@ function Dashboard({ onFilter }) {
       endDate: end.toISOString().split('T')[0]
     };
   };
+
+  // const calculateDateRange = (preset) => {
+  //   const now = new Date();
+  //   const end = new Date(now); // copy
+  //   end.setHours(23, 59, 59, 999);
+
+  //   let start = new Date(now);
+
+  //   switch (preset) {
+  //     case "1day":
+  //       start = addDays(now, -1);
+  //       break;
+  //     case "5day":
+  //       start = addDays(now, -5);
+  //       break;
+  //     case "7day":
+  //       start = addDays(now, -7);
+  //       break;
+  //     case "30day":
+  //       start = addDays(now, -30);
+  //       break;
+  //     case "3month":
+  //       start.setMonth(start.getMonth() - 3);
+  //       break;
+  //     case "all":
+  //       return {
+  //         startDate: "",
+  //         endDate: formatLocalDate(end),
+  //       };
+  //     default:
+  //       start = addDays(now, -7);
+  //   }
+
+  //   // Ensure start and end are at local day boundaries
+  //   start.setHours(0, 0, 0, 0);
+  //   end.setHours(23, 59, 59, 999);
+
+  //   return {
+  //     startDate: formatLocalDate(start),
+  //     endDate: formatLocalDate(end),
+  //   };
+  // };
 
   const buildCouponsQuery = () => {
     if (!startDate && !endDate) return "";
