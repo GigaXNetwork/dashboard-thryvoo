@@ -16,8 +16,8 @@ const ExcelUploadModal = ({
   templateUrl = '/templates/sample.xlsx',
   templateFileName = 'sample.xlsx',
   uploadLoading = false,
-  allowedFileTypes = ['.xlsx', '.xls', '.csv'],
-  maxFileSize = 5 * 1024 * 1024,
+  allowedFileTypes = ['.xlsx'],
+  maxFileSize = 10 * 1024 * 1024,
   instructions = []
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,6 +30,8 @@ const ExcelUploadModal = ({
     'Required columns: Name, Email, Phone',
     'File will be processed immediately after upload'
   ];
+
+  console.log(maxFileSize)
 
   const finalInstructions = instructions.length > 0 ? instructions : defaultInstructions;
 

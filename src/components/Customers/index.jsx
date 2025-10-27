@@ -611,7 +611,7 @@ const Customers = () => {
       setError('');
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('excelFile', file);
 
       if (setProgress) setProgress(30);
 
@@ -620,8 +620,9 @@ const Customers = () => {
       if (response.status === "success" || response.data?.success) {
         if (setProgress) setProgress(100);
 
-        const successMessage = response.data?.message || '✅ Excel file uploaded successfully!';
+        const successMessage = response.data?.message || 'Excel file uploaded successfully!';
         setError(successMessage);
+        setShowExcelModal(false);
         fetchLeads();
       } else {
         const errorMessage = response.data?.message || 'Upload failed';
@@ -880,8 +881,8 @@ const Customers = () => {
         templateUrl="/templates/sample.xlsx"
         templateFileName="leads_template.xlsx"
         uploadLoading={uploadLoading}
-        allowedFileTypes={['.xlsx', '.xls', '.csv']}
-        maxFileSize={5 * 1024 * 1024}
+        allowedFileTypes={['.xlsx']}
+        maxFileSize={10 * 1024 * 1024}
         instructions={[
           'Required columns: Name, Email, Phone',
           'Ensure data follows the correct format in sample template',

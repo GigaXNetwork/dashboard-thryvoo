@@ -77,7 +77,7 @@ export const Api = {
   createLead: (leadData) => apiRequest("/api/lead", "POST", leadData),
   updateLead: (id, leadData) => apiRequest(`/api/lead/${id}`, "PATCH", leadData),
   deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
-  importCustomersExcel: (formData) => apiRequest("/api/customers/import-excel/", "POST", formData),
+  importCustomersExcel: (formData) => apiRequest("/api/lead/import-from-excel", "POST", formData),
   sendWhatsAppMessage : (leadId, messageData) => apiRequest(`/api/lead/${leadId}/send-whatsapp`, "POST", messageData),
 
   //categories

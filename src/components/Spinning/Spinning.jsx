@@ -4,6 +4,7 @@ import SpinList from "./SpinList";
 import CouponPresetSelector from "./CouponPresetSelector";
 import { apiRequest } from "../../Context/apiService";
 import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
+import { toast } from "react-toastify";
 
 const Spinning = () => {
   const [spinData, setSpinData] = useState(null);
@@ -46,49 +47,124 @@ const Spinning = () => {
     if (token) fetchSpinData();
   }, [token]);
 
-  const handleAddSpin = async (presetObj) => {
+  // const handleAddSpin = async (presetObj) => {
+  //   setAddError(null);
+
+  //   if (!presetObj || !presetObj._id) {
+  //     setAddError("Invalid preset");
+  //     return;
+  //   }
+
+  //   const spins = spinData?.spins || [];
+
+  //   if (spins.length >= 5) {
+  //     setAddError("Maximum limit of 5 spins reached");
+  //     return;
+  //   }
+
+  //   if (spins.find((s) => s._id === presetObj._id)) {
+  //     setAddError("This spin already exists");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/spin/add-items`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `${token}`,
+  //         },
+  //         credentials: "include",
+  //         body: JSON.stringify({ itemId: presetObj._id }),
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     if (data.status !== "success") {
+  //       setAddError(data.message || "Failed to add spin");
+  //       return;
+  //     }
+
+  //     // Refetch spin data after adding
+  //     await fetchSpinData();
+  //     setIsModalOpen(false);
+  //   } catch (err) {
+  //     setAddError("Something went wrong. Please try again.");
+  //   }
+  // };
+
+
+  const handleAddSpin = async (presetOrPresets) => {
     setAddError(null);
 
-    if (!presetObj || !presetObj._id) {
-      setAddError("Invalid preset");
-      return;
-    }
+    // Handle both single preset and array of presets
+    const presetsToAdd = Array.isArray(presetOrPresets) ? presetOrPresets : [presetOrPresets];
 
     const spins = spinData?.spins || [];
 
-    if (spins.length >= 5) {
-      setAddError("Maximum limit of 5 spins reached");
+    // Check if adding these presets would exceed the limit
+    if (spins.length + presetsToAdd.length > 5) {
+      setAddError(`Cannot add ${presetsToAdd.length} items. Maximum limit of 5 spins would be exceeded.`);
       return;
     }
 
-    if (spins.find((s) => s._id === presetObj._id)) {
-      setAddError("This spin already exists");
-      return;
-    }
+    let successCount = 0;
+    let errors = [];
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/spin/add-items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ itemId: presetObj._id }),
+      // Process each preset sequentially
+      for (const preset of presetsToAdd) {
+        if (!preset || !preset._id) {
+          errors.push("Invalid preset found");
+          continue;
         }
-      );
 
-      const data = await response.json();
-      if (data.status !== "success") {
-        setAddError(data.message || "Failed to add spin");
-        return;
+        // Check if spin already exists
+        if (spins.find((s) => s._id === preset._id)) {
+          errors.push(`"${preset.presetName}" already exists`);
+          continue;
+        }
+
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/spin/add-items`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `${token}`,
+              },
+              credentials: "include",
+              body: JSON.stringify({ itemId: preset._id }),
+            }
+          );
+
+          const data = await response.json();
+          if (data.status === "success") {
+            successCount++;
+          } else {
+            errors.push(`Failed to add "${preset.presetName}": ${data.message}`);
+          }
+        } catch (err) {
+          errors.push(`Failed to add "${preset.presetName}": Network error`);
+        }
       }
 
-      // Refetch spin data after adding
-      await fetchSpinData();
-      setIsModalOpen(false);
+      if (successCount > 0) {
+        if (successCount === presetsToAdd.length) {
+          toast.success(`${successCount} spin item${successCount !== 1 ? 's' : ''} added successfully!`);
+          await fetchSpinData();
+          setIsModalOpen(false);
+        } else {
+          setAddError(`Added ${successCount} item(s). ${errors.join(', ')}`);
+          await fetchSpinData();
+        }
+      } else if (errors.length > 0) {
+        setAddError(errors.join(', '));
+      }
+
     } catch (err) {
       setAddError("Something went wrong. Please try again.");
     }
