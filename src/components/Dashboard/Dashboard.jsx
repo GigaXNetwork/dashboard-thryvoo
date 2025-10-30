@@ -8,6 +8,7 @@ import VisitsByTime from "./VisitsByTime";
 import CouponChart from "./StatisticsChart";
 import Cookies from "js-cookie";
 import { addDays, formatLocalDate } from "../../utils/date";
+import DateRangePicker from "../Common/DatePicker";
 
 const DATE_PRESETS = [
   { label: "Today", value: "1day" },
@@ -212,19 +213,23 @@ function Dashboard({ onFilter }) {
   return (
     <div className="p-4 md:p-6">
       {/* Filter Section */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          {/* Date Presets */}
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-gray-600 mb-2">Quick Select</span>
-            <div className="flex flex-wrap gap-2">
+      <div className="mb-8 bg-white rounded-2xl p-6 shadow-sm overflow-x-auto">
+        <div className="flex flex-col gap-6">
+
+          {/* Quick Select */}
+          <div className="flex flex-col min-w-[300px]">
+            <span className="text-sm font-semibold text-gray-700 mb-2">Quick Select</span>
+
+            <div className="flex flex-row sm:flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-indigo-500">
               {DATE_PRESETS.map((preset) => (
                 <button
                   key={preset.value}
                   onClick={() => handlePresetChange(preset.value)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${datePreset === preset.value
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 shadow-xs"
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium 
+              transition-all whitespace-nowrap duration-200 
+              ${datePreset === preset.value
+                      ? "bg-indigo-600 text-white shadow"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                 >
                   {preset.label}
@@ -234,49 +239,56 @@ function Dashboard({ onFilter }) {
           </div>
 
           {/* Custom Date Range */}
-          <div className="flex flex-col flex-1 max-w-2xl">
-            <span className="text-sm font-medium text-gray-600 mb-2">Custom Range</span>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="flex flex-col">
-                  <label className="text-xs font-medium text-gray-500 mb-1">From</label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => {
-                        setDatePreset("custom");
-                        setStartDate(e.target.value);
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-xs font-medium text-gray-500 mb-1">To</label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => {
-                        setDatePreset("custom");
-                        setEndDate(e.target.value);
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    />
-                  </div>
-                </div>
+          <div className="flex flex-col flex-1">
+            <span className="text-sm font-semibold text-gray-700 mb-2">Custom Range</span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+              {/* From */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">From</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => {
+                    setDatePreset("custom");
+                    setStartDate(e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md 
+              focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                />
               </div>
+
+              {/* To */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">To</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    setDatePreset("custom");
+                    setEndDate(e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md 
+              focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                />
+              </div>
+
+              {/* Button */}
               <div className="flex items-end">
                 <button
                   onClick={handleFilter}
-                  className="h-[42px] bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
+                  className="w-full h-[42px] bg-indigo-600 hover:bg-indigo-700 text-white 
+              font-medium px-4 py-2 rounded-md transition-all duration-200 shadow-sm 
+              hover:shadow-md whitespace-nowrap"
                 >
                   Apply Filter
                 </button>
               </div>
             </div>
           </div>
+          
+          {/* <DateRangePicker /> */}
         </div>
       </div>
 

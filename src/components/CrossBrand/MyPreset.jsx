@@ -174,16 +174,7 @@ const MyPreset = () => {
       )}
 
       <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">Cross-Brand Coupons</h1>
-        <button
-          onClick={() => {
-            setSearch(prev => prev + ' ');
-            setTimeout(() => setSearch(prev => prev.trim()), 100);
-          }}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
-        >
-          🔄 Refresh
-        </button>
+        <h1 className="text-2xl font-bold text-gray-700">Cross-Brand Coupons</h1>
       </div>
 
       {/* 🔍 Filter Section */}
@@ -335,8 +326,8 @@ const MyPreset = () => {
             ))
           ) : (
             <div className="text-gray-500 col-span-full text-center py-10">
-              {presets.length === 0 
-                ? "No coupons available" 
+              {presets.length === 0
+                ? "No coupons available"
                 : "No coupons match your current filters."}
             </div>
           )}

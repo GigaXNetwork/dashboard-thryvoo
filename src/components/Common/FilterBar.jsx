@@ -39,38 +39,7 @@ const FilterBar = ({
   const hasActiveFilters = search || statusFilter || startDate || endDate || quickDateFilter;
 
   // Quick date filter logic
-  // const handleQuickDateFilterChange = (value) => {
-  //   setQuickDateFilter(value);
-
-  //   const today = new Date();
-  //   let start = '';
-  //   let end = today.toISOString().split('T')[0];
-
-  //   switch (value) {
-  //     case 'today':
-  //       start = end;
-  //       break;
-  //     case '7days':
-  //       start = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
-  //       break;
-  //     case '15days':
-  //       start = new Date(today.setDate(today.getDate() - 15)).toISOString().split('T')[0];
-  //       break;
-  //     case '1month':
-  //       start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
-  //       break;
-  //     default:
-  //       start = '';
-  //       end = '';
-  //   }
-
-  //   setStartDate(start);
-  //   setEndDate(end);
-
-  //   if (onQuickDateChange) {
-  //     onQuickDateChange(value);
-  //   }
-  // };
+ 
 
   const handleQuickDateFilterChange = (value) => {
     setQuickDateFilter(value);

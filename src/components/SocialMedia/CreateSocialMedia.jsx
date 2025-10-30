@@ -23,12 +23,12 @@ const CreateSocialMedia = ({
         mediaType: '',
         link: '',
         conditions: [''],
-        rewards: '' // Added rewards field
+        rewards: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [couponPresets, setCouponPresets] = useState([]); // State for coupon presets
-    const [loadingPresets, setLoadingPresets] = useState(false); // Loading state for presets
+    const [couponPresets, setCouponPresets] = useState([]);
+    const [loadingPresets, setLoadingPresets] = useState(false);
 
     // Fetch coupon presets on component mount
     useEffect(() => {
@@ -51,10 +51,12 @@ const CreateSocialMedia = ({
                 }
 
                 const data = await response.json();
-                setCouponPresets(data.data || []);
+                // Handle different possible response structures
+                const presets = data.data?.presetsName || [];
+                setCouponPresets(Array.isArray(presets) ? presets : []);
             } catch (error) {
                 console.error('Error fetching coupon presets:', error);
-                setError('Failed to load rewardss');
+                setError('Failed to load rewards');
             } finally {
                 setLoadingPresets(false);
             }
@@ -72,15 +74,14 @@ const CreateSocialMedia = ({
                 conditions: editingMedia.conditions && editingMedia.conditions.length > 0
                     ? [...editingMedia.conditions]
                     : [''],
-                rewards: editingMedia.rewards || '' // Initialize rewards if editing
+                rewards: editingMedia.rewards || ''
             });
         } else {
-            // Reset form for create mode
             setFormData({
                 mediaType: '',
                 link: '',
                 conditions: [''],
-                rewards: '' // Reset rewards field
+                rewards: ''
             });
         }
     }, [isEditing, editingMedia]);
@@ -88,21 +89,9 @@ const CreateSocialMedia = ({
     const mediaTypes = [
         { value: 'facebook', label: 'Facebook', icon: <FaFacebook className="text-blue-600" /> },
         { value: 'instagram', label: 'Instagram', icon: <FaInstagram className="text-pink-600" /> },
-        {
-            value: 'x',
-            label: 'X',
-            icon: <FaXTwitter className="text-black" />
-        },
-        {
-            value: 'threads',
-            label: 'Threads',
-            icon: <FaThreads className="text-black" />
-        },
-        {
-            value: 'whatsapp',
-            label: 'WhatsApp',
-            icon: <FaWhatsapp className="text-green-500" />
-        },
+        { value: 'x', label: 'X', icon: <FaXTwitter className="text-black" /> },
+        { value: 'threads', label: 'Threads', icon: <FaThreads className="text-black" /> },
+        { value: 'whatsapp', label: 'WhatsApp', icon: <FaWhatsapp className="text-green-500" /> },
         { value: 'youtube', label: 'YouTube', icon: <FaYoutube className="text-red-600" /> },
         { value: 'linkedin', label: 'LinkedIn', icon: <FaLinkedin className="text-blue-700" /> },
         { value: 'other', label: 'Other', icon: <FaGlobe className="text-gray-600" /> }
@@ -145,12 +134,10 @@ const CreateSocialMedia = ({
         setLoading(true);
         setError(null);
 
-        // Filter out empty conditions
         const filteredConditions = formData.conditions
             .map(condition => condition.trim())
             .filter(condition => condition !== '');
 
-        // Validation
         if (!formData.mediaType) {
             setError('Please select a social media platform');
             setLoading(false);
@@ -170,7 +157,7 @@ const CreateSocialMedia = ({
         }
 
         if (!formData.rewards) {
-            setError('Please select a rewards');
+            setError('Please select a reward');
             setLoading(false);
             return;
         }
@@ -193,7 +180,7 @@ const CreateSocialMedia = ({
                     mediaType: formData.mediaType,
                     link: formData.link,
                     conditions: filteredConditions,
-                    rewards: formData.rewards // Include rewards in the request
+                    rewards: formData.rewards
                 }),
                 credentials: 'include'
             });
@@ -219,11 +206,30 @@ const CreateSocialMedia = ({
         }
     };
 
-    useEffect(() => {
-        console.log('couponPresets:', couponPresets);
-        console.log('Type of couponPresets:', typeof couponPresets);
-        console.log('Is array?', Array.isArray(couponPresets));
-    }, [couponPresets]);
+    // Safe access to coupon presets
+    const getRewardOptions = () => {
+        // Check if couponPresets is an array
+        if (Array.isArray(couponPresets) && couponPresets.length > 0) {
+            return couponPresets;
+        }
+        return [];
+    };
+
+    // Get current reward value for the select
+    const getCurrentRewardValue = () => {
+        if (typeof formData.rewards === 'object') {
+            return formData.rewards._id;
+        }
+        return formData.rewards;
+    };
+
+    // Check if current reward exists in the preset list
+    const currentRewardExistsInPresets = () => {
+        const currentValue = getCurrentRewardValue();
+        if (!currentValue) return false;
+        
+        return getRewardOptions().some(preset => preset._id === currentValue);
+    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
@@ -295,25 +301,23 @@ const CreateSocialMedia = ({
                             <select
                                 id="rewards"
                                 name="rewards"
-                                value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
+                                value={getCurrentRewardValue()}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                 required
                                 disabled={loading || loadingPresets}
                             >
                                 <option value="">Select a reward</option>
+                                
                                 {/* Show current value first if it exists and isn't in the preset list */}
-                                {formData.rewards && !couponPresets.presetsName.some(preset =>
-                                    preset._id === (typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards)
-                                ) && (
-                                        <option
-                                            key={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
-                                            value={typeof formData.rewards === 'object' ? formData.rewards._id : formData.rewards}
-                                        >
-                                            {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
-                                        </option>
-                                    )}
-                                {couponPresets && couponPresets.presetsName && couponPresets.presetsName.length > 0 && couponPresets.presetsName.map((preset) => (
+                                {formData.rewards && !currentRewardExistsInPresets() && (
+                                    <option value={getCurrentRewardValue()}>
+                                        {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
+                                    </option>
+                                )}
+                                
+                                {/* Show available presets */}
+                                {getRewardOptions().map((preset) => (
                                     <option key={preset._id} value={preset._id}>
                                         {preset.presetName}
                                     </option>

@@ -104,7 +104,7 @@ export default function AddressModal({ cardData, cardId, role, onClose, onSubmit
   );
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999] backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[9999] backdrop-blur-sm overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 animate-fadeIn">
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b pb-3">

@@ -1,7 +1,25 @@
 import React from "react";
 
-const PresetToggle = ({ presetToDelete, setShowDeleteModal, handleDeletePreset, setPresetToDelete }) => {
+const PresetToggle = ({
+  presetToDelete,
+  setShowDeleteModal,
+  handleDeletePreset,
+  setPresetToDelete,
+  deleteLoading
+}) => {
   if (!presetToDelete) return null;
+
+  const handleDelete = async () => {
+    await handleDeletePreset(presetToDelete);
+    // Don't close modal here - let parent handle it after successful deletion
+  };
+
+  const handleCancel = () => {
+    if (!deleteLoading) {
+      setShowDeleteModal(false);
+      setPresetToDelete(null);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
@@ -23,9 +41,19 @@ const PresetToggle = ({ presetToDelete, setShowDeleteModal, handleDeletePreset, 
               setShowDeleteModal(false);
               setPresetToDelete(null);
             }}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm"
+            className={`px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 ${deleteLoading
+                ? "bg-red-400 text-white cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
           >
-            Delete
+            {deleteLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
           </button>
         </div>
       </div>
