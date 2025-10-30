@@ -26,7 +26,7 @@ const menuItems = [
   { to: "presets", icon: <BiSolidFoodMenu />, label: "Presets" },
   { to: "reviews", icon: <FaStar />, label: "Reviews" },
   { to: "redeem-store", icon: <FaGift />, label: "Reward Store" },
-  { to: "categories", icon: <BiCategory />, label: "Offer Design" },
+  { to: "categories", icon: <BiCategory />, label: "Social Media / Offer Design" },
 ];
 
 export default function UserData() {
@@ -37,7 +37,6 @@ export default function UserData() {
   const sidebarRef = useRef();
   const [sidebarHeight, setSidebarHeight] = useState();
 
-  // Responsive: Use window.matchMedia for desktop height sync
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   const userPhoto = user?.photo && user.photo !== "default-user.png" ? user.photo : null;

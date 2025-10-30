@@ -78,7 +78,14 @@ export const Api = {
   updateLead: (id, leadData) => apiRequest(`/api/lead/${id}`, "PATCH", leadData),
   deleteLead: (id) => apiRequest(`/api/lead/${id}`, "DELETE"),
   importCustomersExcel: (formData) => apiRequest("/api/lead/import-from-excel", "POST", formData),
-  sendWhatsAppMessage : (leadId, messageData) => apiRequest(`/api/lead/${leadId}/send-whatsapp`, "POST", messageData),
+  exportCustomersExcel: (searchTerm = '') => {
+    const queryParams = new URLSearchParams();
+    if (searchTerm && searchTerm.trim()) {
+      queryParams.append('search', searchTerm.trim());
+    }
+    return apiRequest(`/api/lead/export-to-excel?${queryParams.toString()}`, "GET");
+  },
+  sendWhatsAppMessage: (leadId, messageData) => apiRequest(`/api/lead/${leadId}/send-whatsapp`, "POST", messageData),
 
   //categories
   getCategories: (userId, page = 1, limit = 10, search = '') => {
@@ -98,7 +105,7 @@ export const Api = {
 
   // category-items
   getCategoryItems: (userId, categoryId) =>
-    apiRequest(`/api/user/banner/${userId}/category/${categoryId}`, "GET"),
+    apiRequest(`/api/admin/banner/${userId}/category/${categoryId}`, "GET"),
 
   addItemToCategory: (userId, categoryId, itemData) =>
     apiRequest(`/api/admin/banner/${userId}/category/${categoryId}/upload`, "POST", itemData),
@@ -146,9 +153,10 @@ export const Api = {
   getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
   // delete gallery api
   deleteGalleryImage: ({ imageUrl }) => {
-   return apiRequest(`/api/user/card/gallery/delete-gallery-image`, "DELETE", { imageUrl })
+    return apiRequest(`/api/user/card/gallery/delete-gallery-image`, "DELETE", { imageUrl })
   },
+  // delete brochure api
   deleteBrochure: ({ brochureUrl }) => {
-    return apiRequest(`/api/user/card/brochures/delete-brochure-file`, "DELETE", { fileUrl:brochureUrl })
-   }
+    return apiRequest(`/api/user/card/brochures/delete-brochure-file`, "DELETE", { fileUrl: brochureUrl })
+  }
 };

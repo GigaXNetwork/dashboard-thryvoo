@@ -76,9 +76,11 @@ export default function UploadBrochureModal({
       }
 
       const result = await response.json();
-      const uploadedFile = result?.data?.brochures;
+      const uploadedFile = result?.data;
 
-      if (onSubmit) onSubmit(uploadedFile);
+      if (onSubmit && uploadedFile) {
+        onSubmit({ brochures: uploadedFile });
+      }
       onClose();
     } catch (err) {
       console.error("Error uploading brochure:", err.message);
@@ -152,11 +154,10 @@ export default function UploadBrochureModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${
-                isSubmitting
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${isSubmitting
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-purple-700"
-              }`}
+                }`}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Uploading..." : "Upload"}

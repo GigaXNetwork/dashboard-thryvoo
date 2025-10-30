@@ -1618,6 +1618,7 @@ const SetDiscountPage = () => {
 
             if (res.ok) {
                 toast.success('Coupon deleted successfully!');
+                setOpenMenuIndex(null)
                 setPresets(prev => prev.filter(p => p._id !== preset._id));
             } else {
                 const data = await res.json();
@@ -1645,6 +1646,7 @@ const SetDiscountPage = () => {
             });
 
             if (res.ok) {
+                setOpenMenuIndex(null);
                 setPresets(prev =>
                     prev.map(p => ({
                         ...p,
@@ -1688,10 +1690,10 @@ const SetDiscountPage = () => {
     }, []);
 
     return (
-        <div className="p-6 max-w-7xl mx-auto rounded-lg min-h-screen">
+        <div className="p-8 mx-auto rounded-lg min-h-screen">
             {/* Header */}
             <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
-                <h1 className="text-3xl font-bold text-gray-900">All Presets</h1>
+                <h1 className="text-2xl font-bold text-gray-700">All Presets</h1>
                 <button
                     onClick={() => setShowForm(true)}
                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold px-6 py-2.5 rounded-md shadow transition"

@@ -70,9 +70,11 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
       }
 
       const result = await response.json();
-      const uploadedFiles = result?.data?.gallery;
+      const uploadedFiles = result?.data;
 
-      if (onSubmit) onSubmit(uploadedFiles);
+      if (onSubmit && uploadedFiles) {
+        onSubmit({ gallery: uploadedFiles });
+      }
       onClose();
     } catch (err) {
       console.error("Error uploading gallery photos:", err.message);
@@ -152,11 +154,10 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
-                isSubmitting
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-blue-700"
-              }`}
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${isSubmitting
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-blue-700"
+                }`}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Uploading..." : "Upload"}

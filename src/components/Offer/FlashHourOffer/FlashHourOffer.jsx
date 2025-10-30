@@ -6,6 +6,7 @@ import PresetToggle from './PresetToggle';
 import PresetCard from './PresetCard';
 import { useUser } from '../../../Context/ContextApt';
 import Cookies from "js-cookie"
+import { getAuthToken } from '../../../Context/apiService';
 
 const FlashHourOffer = () => {
     const [presets, setPresets] = useState([]);
@@ -19,6 +20,7 @@ const FlashHourOffer = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingPresetId, setEditingPresetId] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     // Filter states
     const [search, setSearch] = useState('');
@@ -240,6 +242,8 @@ const FlashHourOffer = () => {
     }, [openMenuIndex]);
 
     const handleDeletePreset = useCallback(async (preset) => {
+        setDeleteLoading(true); 
+
         try {
             const deleteUrl = userRole === 'admin'
                 ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}`
@@ -248,6 +252,9 @@ const FlashHourOffer = () => {
             const res = await fetch(deleteUrl, {
                 method: 'DELETE',
                 credentials: 'include',
+                headers: {
+                    "Authorization": `${getAuthToken()}`
+                }
             });
 
             if (res.ok) {
@@ -262,6 +269,8 @@ const FlashHourOffer = () => {
         } catch (err) {
             console.error("Delete failed:", err);
             setMessage('❌ Error deleting offer.');
+        } finally {
+            setDeleteLoading(false); 
         }
     }, [userRole, userId]);
 
@@ -329,7 +338,7 @@ const FlashHourOffer = () => {
     }, []);
 
     return (
-        <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md min-h-screen">
+        <div className="p-8 mx-auto bg-white rounded-lg shadow-md min-h-screen">
             {message && (
                 <MessagePopup
                     message={message}
@@ -342,7 +351,7 @@ const FlashHourOffer = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Flash Hour Offers</h1>
                 <button
                     onClick={() => setShowForm(true)}
-                    className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 font-semibold px-4 py-2 rounded-md shadow transition"
                 >
                     + Create Offer
                 </button>
@@ -521,6 +530,7 @@ const FlashHourOffer = () => {
                     setShowDeleteModal={setShowDeleteModal}
                     handleDeletePreset={handleDeletePreset}
                     setPresetToDelete={setPresetToDelete}
+                    deleteLoading={deleteLoading}
                     title="Delete Offer"
                     message="Are you sure you want to delete this offer?"
                 />

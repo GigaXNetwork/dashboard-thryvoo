@@ -8,12 +8,17 @@
 //   AlertCircle,
 //   X,
 //   Search,
-//   Upload
+//   Upload,
+//   MessageCircle,
+//   Loader2
 // } from 'lucide-react';
 // import LeadFormModal from './LeadFormModal';
 // import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
 // import Pagination from '../Common/Pagination';
 // import ExcelUploadModal from './ExcelUploadModal';
+// import WhatsAppCampaignModal from './WhatsAppCampaignModal';
+// import userLogo from '../../assets/images/default-user.png';
+// import { toast } from 'react-toastify';
 
 // const Customers = () => {
 //   const [leads, setLeads] = useState([]);
@@ -22,11 +27,14 @@
 //   const [showForm, setShowForm] = useState(false);
 //   const [showDeleteModal, setShowDeleteModal] = useState(false);
 //   const [showExcelModal, setShowExcelModal] = useState(false);
+//   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 //   const [editingLead, setEditingLead] = useState(null);
 //   const [deletingLead, setDeletingLead] = useState(null);
+//   const [selectedLead, setSelectedLead] = useState(null);
 //   const [submitting, setSubmitting] = useState(false);
 //   const [deleteLoading, setDeleteLoading] = useState(false);
 //   const [uploadLoading, setUploadLoading] = useState(false);
+//   const [messageLoading, setMessageLoading] = useState(false);
 
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [totalPages, setTotalPages] = useState(1);
@@ -59,6 +67,7 @@
 //     };
 //   }, [debounceTimer]);
 
+//   // Debounced search function
 //   const debouncedSearch = useCallback((term) => {
 //     if (debounceTimer) {
 //       clearTimeout(debounceTimer);
@@ -107,21 +116,20 @@
 //       setError('');
 
 //       const formData = new FormData();
-//       formData.append('file', file);
+//       formData.append('excelFile', file);
+
 //       if (setProgress) setProgress(30);
 
 //       const response = await Api.importCustomersExcel(formData);
 
-//       if (response.status === "success" || response.data?.success) {
+//       if (response.status === "success") {
 //         if (setProgress) setProgress(100);
 
-//         const successMessage = response.data?.message || response.message || '✅ Excel file uploaded successfully!';
-//         setError(successMessage);
-
-//         fetchLeads();
-
+//         toast.success(response?.message || 'Excel file uploaded successfully!');
+//         setShowExcelModal(false);
+//         await fetchLeads();
 //       } else {
-//         const errorMessage = response.data?.message || response.message || 'Upload failed';
+//         const errorMessage = response.data?.message || 'Upload failed';
 //         throw new Error(errorMessage);
 //       }
 
@@ -133,7 +141,26 @@
 //     }
 //   };
 
-//   // Removed downloadExcelTemplate function since it's now handled in the modal
+//   // WhatsApp Message Handler
+//   const handleSendWhatsAppMessage = async (messageData) => {
+//     try {
+//       setMessageLoading(true);
+
+//       const response = await Api.sendWhatsAppMessage(messageData);
+
+//       setError(`✅ WhatsApp message sent to ${messageData.lead.name}!`);
+
+//       setShowWhatsAppModal(false);
+//       setSelectedLead(null);
+
+//     } catch (err) {
+//       setError(err.message || 'Failed to send WhatsApp message');
+//       throw err;
+//     } finally {
+//       setMessageLoading(false);
+//     }
+//   };
+
 //   const handleSearchInputChange = (e) => {
 //     const value = e.target.value;
 //     debouncedSearch(value);
@@ -239,8 +266,9 @@
 
 //   if (loading) {
 //     return (
-//       <div className="flex items-center justify-center min-h-64">
-//         <Loader className="w-8 h-8 animate-spin text-blue-600" />
+//       <div className="flex items-center justify-center min-h-64 gap-2">
+//         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+//         Loading...
 //       </div>
 //     );
 //   }
@@ -259,6 +287,7 @@
 //         </div>
 //         <div className="flex items-center gap-3">
 //           <div className="flex justify-between items-center">
+//             {/* Search Info */}
 //             <div className="flex-1 mr-2">
 //               {searchTerm && (
 //                 <p className="text-sm text-gray-600">
@@ -272,15 +301,14 @@
 //               )}
 //             </div>
 
-//             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full flex-wrap mt-2 mb-4">
-//               {/* Search Input */}
-//               <div className="relative w-full sm:w-64">
+//             <div className="flex items-center gap-3">
+//               <div className="relative">
 //                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 //                 <input
 //                   type="text"
 //                   placeholder="Search..."
 //                   onChange={handleSearchInputChange}
-//                   className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                   className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 //                 />
 //                 {searchTerm && (
 //                   <button
@@ -297,10 +325,10 @@
 //                 )}
 //               </div>
 
-//               {/* Upload Excel Modal Trigger */}
+//               {/* Excel Upload Modal Trigger */}
 //               <button
 //                 onClick={() => setShowExcelModal(true)}
-//                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors w-full sm:w-auto"
+//                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
 //               >
 //                 <Upload className="w-4 h-4" />
 //                 Import
@@ -309,7 +337,7 @@
 //               {/* Add Button */}
 //               <button
 //                 onClick={() => setShowForm(true)}
-//                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
+//                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
 //               >
 //                 <Plus className="w-4 h-4" />
 //                 Add
@@ -321,12 +349,13 @@
 
 //       {/* Error Message */}
 //       {error && (
-//         <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${error.includes('✅')
-//           ? 'bg-green-50 border border-green-200 text-green-700'
-//           : 'bg-red-50 border border-red-200 text-red-700'
-//           }`}>
+//         <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${
+//           error.includes('✅') 
+//             ? 'bg-green-50 border border-green-200 text-green-700'
+//             : 'bg-red-50 border border-red-200 text-red-700'
+//         }`}>
 //           {error.includes('✅') ? (
-//             <FileSpreadsheet className="w-5 h-5" />
+//             <MessageCircle className="w-5 h-5" />
 //           ) : (
 //             <AlertCircle className="w-5 h-5" />
 //           )}
@@ -354,10 +383,28 @@
 //         onClose={() => setShowExcelModal(false)}
 //         onUpload={handleExcelUpload}
 //         templateUrl="/templates/sample.xlsx"
-//         templateFileName="sample.xlsx"
+//         templateFileName="leads_template.xlsx"
 //         uploadLoading={uploadLoading}
-//         allowedFileTypes={['.xlsx', '.xls', '.csv']}
-//         maxFileSize={5 * 1024 * 1024}
+//         allowedFileTypes={['.xlsx']}
+//         maxFileSize={10 * 1024 * 1024}
+//         instructions={[
+//           'Required columns: Name, Email, Phone',
+//           'Ensure data follows the correct format in sample template',
+//           'Remove any empty rows before uploading',
+//           'File will be processed immediately after upload'
+//         ]}
+//       />
+
+//       {/* WhatsApp Campaign Modal */}
+//       <WhatsAppCampaignModal
+//         isOpen={showWhatsAppModal}
+//         onClose={() => {
+//           setShowWhatsAppModal(false);
+//           setSelectedLead(null);
+//         }}
+//         selectedLead={selectedLead}
+//         onSendMessage={handleSendWhatsAppMessage}
+//         isLoading={messageLoading}
 //       />
 
 //       {/* Delete Confirmation Modal */}
@@ -381,116 +428,149 @@
 //       <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
 //         {tableRefreshLoading ? (
 //           <div className="flex items-center justify-center py-16">
-//             <Loader className="w-8 h-8 animate-spin text-blue-600" />
+//             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
 //             <p className="ml-3 text-gray-600">Refreshing data...</p>
 //           </div>
 //         ) : leads.length === 0 ? (
-//           <div className="text-center py-12">
-//             <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-//             <p className="text-gray-500 text-lg">
-//               {searchTerm ? 'No leads found matching your search' : 'No leads found'}
-//             </p>
-//             {searchTerm ? (
-//               <button
-//                 onClick={clearSearch}
-//                 className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-//               >
-//                 Clear search
-//               </button>
-//             ) : (
-//               <button
-//                 onClick={() => setShowForm(true)}
-//                 className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-//               >
-//                 Create your first lead
-//               </button>
-//             )}
-//           </div>
-//         ) : (
-//           <>
-//             <div className="overflow-x-auto">
-//               <table className="w-full">
-//                 <thead className="bg-gray-50 border-b border-gray-200">
-//                   <tr>
-//                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       Name
-//                     </th>
-//                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       Email
-//                     </th>
-//                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       Phone
-//                     </th>
-//                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       Created Date
-//                     </th>
-//                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       Actions
-//                     </th>
-//                   </tr>
-//                 </thead>
-//                 <tbody className="bg-white divide-y divide-gray-200">
-//                   {leads.map((lead) => (
-//                     <tr key={lead._id} className="hover:bg-gray-50">
-//                       <td className="px-6 py-4 whitespace-nowrap">
-//                         <div className="text-sm font-medium text-gray-900">
-//                           {lead.name}
-//                         </div>
-//                       </td>
-//                       <td className="px-6 py-4 whitespace-nowrap">
-//                         <div className="text-sm text-gray-600">{lead.email}</div>
-//                       </td>
-//                       <td className="px-6 py-4 whitespace-nowrap">
-//                         <div className="text-sm text-gray-600">{lead.phone}</div>
-//                       </td>
-//                       <td className="px-6 py-4 whitespace-nowrap">
-//                         <div className="text-sm text-gray-600">
-//                           {formatDate(lead.createdAt)}
-//                         </div>
-//                       </td>
-//                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-//                         <div className="flex items-center gap-3">
-//                           <button
-//                             onClick={() => handleEdit(lead)}
-//                             className="text-blue-600 hover:text-blue-900 transition-colors"
-//                             title="Edit lead"
-//                           >
-//                             <Edit className="w-4 h-4" />
-//                           </button>
-//                           <button
-//                             onClick={() => handleDeleteClick(lead)}
-//                             className="text-red-600 hover:text-red-900 transition-colors"
-//                             title="Delete lead"
-//                           >
-//                             <Trash2 className="w-4 h-4" />
-//                           </button>
-//                         </div>
-//                       </td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
+//             <div className="text-center py-12">
+//               <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+//               <p className="text-gray-500 text-lg">
+//                 {searchTerm ? 'No leads found matching your search' : 'No leads found'}
+//               </p>
+//               {searchTerm ? (
+//                 <button
+//                   onClick={clearSearch}
+//                   className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+//                 >
+//                   Clear search
+//                 </button>
+//               ) : (
+//                 <div className="mt-4 space-x-4">
+//                   <button
+//                     onClick={() => setShowForm(true)}
+//                     className="text-blue-600 hover:text-blue-700 font-medium"
+//                   >
+//                     Create your first lead
+//                   </button>
+//                   <span className="text-gray-400">or</span>
+//                   <button
+//                     onClick={() => setShowExcelModal(true)}
+//                     className="text-blue-600 hover:text-blue-700 font-medium"
+//                   >
+//                     Upload Excel file
+//                   </button>
+//                 </div>
+//               )}
 //             </div>
+//           ) : (
+//             <>
+//               <div className="overflow-x-auto">
+//                 <table className="w-full">
+//                   <thead className="bg-gray-50 border-b border-gray-200">
+//                     <tr>
+//                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         User
+//                       </th>
+//                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         Email
+//                       </th>
+//                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         Phone
+//                       </th>
+//                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         Created Date
+//                       </th>
+//                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         Actions
+//                       </th>
+//                     </tr>
+//                   </thead>
+//                   <tbody className="bg-white divide-y divide-gray-200">
+//                     {leads.map((lead, index) => (
+//                       <tr key={lead._id} className="hover:bg-gray-50">
+//                         <td className="px-6 py-4">
+//                           <div className="flex items-center space-x-3">
+//                             <div className="flex-shrink-0">
+//                               <img
+//                                 src={lead.photo || userLogo}
+//                                 alt={lead.name}
+//                                 className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+//                               />
+//                             </div>
+//                             <div className="flex flex-col space-y-1">
+//                               <div className="flex items-center space-x-2">
+//                                 <span className="font-normal text-gray-900 capitalize">{lead.name}</span>
+//                               </div>
+//                             </div>
+//                           </div>
+//                         </td>
+//                         <td className="px-6 py-4 whitespace-nowrap">
+//                           <div className="text-sm text-gray-600">{lead.email}</div>
+//                         </td>
+//                         <td className="px-6 py-4 whitespace-nowrap">
+//                           <div className="text-sm text-gray-600">{lead.phone || '-'}</div>
+//                         </td>
+//                         <td className="px-6 py-4 whitespace-nowrap">
+//                           <div className="text-sm text-gray-600">
+//                             {formatDate(lead.createdAt)}
+//                           </div>
+//                         </td>
+//                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+//                           <div className="flex items-center gap-3">
+//                             {/* WhatsApp Button */}
+//                             {lead.phone && (
+//                               <button
+//                                 onClick={() => {
+//                                   setSelectedLead(lead);
+//                                   setShowWhatsAppModal(true);
+//                                 }}
+//                                 className="text-green-600 hover:text-green-900 transition-colors"
+//                                 title="Send WhatsApp message"
+//                               >
+//                                 <MessageCircle className="w-4 h-4" />
+//                               </button>
+//                             )}
 
-//             {/* Pagination */}
-//             {totalPages > 1 && (
-//               <div className="border-t border-gray-200 px-6 py-4">
-//                 <Pagination
-//                   currentPage={currentPage}
-//                   totalPages={totalPages}
-//                   onPageChange={handlePageChange}
-//                 />
+//                             <button
+//                               onClick={() => handleEdit(lead)}
+//                               className="text-blue-600 hover:text-blue-900 transition-colors"
+//                               title="Edit lead"
+//                             >
+//                               <Edit className="w-4 h-4" />
+//                             </button>
+//                             <button
+//                               onClick={() => handleDeleteClick(lead)}
+//                               className="text-red-600 hover:text-red-900 transition-colors"
+//                               title="Delete lead"
+//                             >
+//                               <Trash2 className="w-4 h-4" />
+//                             </button>
+//                           </div>
+//                         </td>
+//                       </tr>
+//                     ))}
+//                   </tbody>
+//                 </table>
 //               </div>
-//             )}
-//           </>
-//         )}
+
+//               {/* Pagination */}
+//               {totalPages > 1 && (
+//                 <div className="border-t border-gray-200 px-6 py-4">
+//                   <Pagination
+//                     currentPage={currentPage}
+//                     totalPages={totalPages}
+//                     onPageChange={handlePageChange}
+//                   />
+//                 </div>
+//               )}
+//             </>
+//           )}
 //       </div>
 //     </div>
 //   );
 // };
 
 // export default Customers;
-
 
 
 
@@ -505,8 +585,11 @@ import {
   X,
   Search,
   Upload,
+  Download,
   MessageCircle,
-  Loader2
+  Loader2,
+  ChevronDown,
+  Sheet
 } from 'lucide-react';
 import LeadFormModal from './LeadFormModal';
 import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
@@ -514,6 +597,7 @@ import Pagination from '../Common/Pagination';
 import ExcelUploadModal from './ExcelUploadModal';
 import WhatsAppCampaignModal from './WhatsAppCampaignModal';
 import userLogo from '../../assets/images/default-user.png';
+import { toast } from 'react-toastify';
 
 const Customers = () => {
   const [leads, setLeads] = useState([]);
@@ -530,6 +614,8 @@ const Customers = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [messageLoading, setMessageLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [showExcelDropdown, setShowExcelDropdown] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -616,14 +702,13 @@ const Customers = () => {
       if (setProgress) setProgress(30);
 
       const response = await Api.importCustomersExcel(formData);
-      
-      if (response.status === "success" || response.data?.success) {
+
+      if (response.status === "success") {
         if (setProgress) setProgress(100);
 
-        const successMessage = response.data?.message || 'Excel file uploaded successfully!';
-        setError(successMessage);
+        toast.success(response?.message || 'Excel file uploaded successfully!');
         setShowExcelModal(false);
-        fetchLeads();
+        await fetchLeads();
       } else {
         const errorMessage = response.data?.message || 'Upload failed';
         throw new Error(errorMessage);
@@ -637,18 +722,81 @@ const Customers = () => {
     }
   };
 
+  // Excel Export Handler
+  const handleExcelExport = async () => {
+    try {
+      setExportLoading(true);
+      setShowExcelDropdown(false);
+
+      const response = await Api.exportCustomersExcel(searchTerm);
+
+      if (response.status === "success" && response.data) {
+        // If your API returns a file URL or path
+        if (response.data.filePath) {
+          // Create download link from the file path
+          const url = `${import.meta.env.VITE_API_URL}${response.data.filePath}`;
+          const link = document.createElement('a');
+          link.href = url;
+          link.target = '_blank';
+
+          // Set filename with current date
+          const date = new Date().toISOString().split('T')[0];
+          link.download = `customers_${date}.xlsx`;
+
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          // If your API returns the file as binary data
+          const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+
+          const date = new Date().toISOString().split('T')[0];
+          link.download = `customers_${date}.xlsx`;
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }
+
+        toast.success('Excel file downloaded successfully!');
+      } else {
+        throw new Error(response.message || 'Failed to export data');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to export Excel file. Please try again.');
+      console.error('Error exporting Excel:', err);
+      toast.error('Failed to export Excel file');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   // WhatsApp Message Handler
   const handleSendWhatsAppMessage = async (messageData) => {
     try {
       setMessageLoading(true);
-      
-      const response = await Api.sendWhatsAppMessage(messageData);
-      
-      setError(`✅ WhatsApp message sent to ${messageData.lead.name}!`);
-      
-      setShowWhatsAppModal(false);
-      setSelectedLead(null);
-      
+
+      // Use the correct API method signature from your apiService
+      const response = await Api.sendWhatsAppMessage(messageData.lead._id, {
+        message: messageData.message
+      });
+
+      if (response.status === "success") {
+        toast.success(`✅ WhatsApp message sent to ${messageData.lead.name}!`);
+        setShowWhatsAppModal(false);
+        setSelectedLead(null);
+      } else {
+        throw new Error(response.message || 'Failed to send message');
+      }
+
     } catch (err) {
       setError(err.message || 'Failed to send WhatsApp message');
       throw err;
@@ -821,14 +969,52 @@ const Customers = () => {
                 )}
               </div>
 
-              {/* Excel Upload Modal Trigger */}
-              <button
-                onClick={() => setShowExcelModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-              >
-                <Upload className="w-4 h-4" />
-                Import
-              </button>
+              {/* Excel Dropdown Button */}
+              {/* Excel Dropdown Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowExcelDropdown(!showExcelDropdown)}
+                  className="flex items-center gap-2 px-2 py-2 h-10 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-xs hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {exportLoading ? (
+                    <Loader className="w-4 h-4 animate-spin text-blue-600" />
+                  ) : (
+                    <Sheet className="w-4 h-4" />
+                  )}
+                  <span className="text-sm font-medium">Excel</span>
+                  <div className="h-5 w-px bg-gray-300" />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showExcelDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showExcelDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                    <button
+                      onClick={() => {
+                        setShowExcelModal(true);
+                        setShowExcelDropdown(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-center text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span className="font-medium">Import</span>
+                    </button>
+                    <div className="border-t border-gray-100" />
+                    <button
+                      onClick={handleExcelExport}
+                      disabled={exportLoading || leads.length === 0}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-center text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-700"
+                    >
+                      {exportLoading ? (
+                        <Loader className="w-4 h-4 animate-spin text-blue-600" />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )}
+                      <span className="font-medium">Export</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Add Button */}
               <button
@@ -843,13 +1029,20 @@ const Customers = () => {
         </div>
       </div>
 
+      {/* Close dropdown when clicking outside */}
+      {showExcelDropdown && (
+        <div
+          className="fixed inset-0 z-0"
+          onClick={() => setShowExcelDropdown(false)}
+        />
+      )}
+
       {/* Error Message */}
       {error && (
-        <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${
-          error.includes('✅') 
-            ? 'bg-green-50 border border-green-200 text-green-700'
-            : 'bg-red-50 border border-red-200 text-red-700'
-        }`}>
+        <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${error.includes('✅')
+          ? 'bg-green-50 border border-green-200 text-green-700'
+          : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
           {error.includes('✅') ? (
             <MessageCircle className="w-5 h-5" />
           ) : (
@@ -928,139 +1121,139 @@ const Customers = () => {
             <p className="ml-3 text-gray-600">Refreshing data...</p>
           </div>
         ) : leads.length === 0 ? (
-            <div className="text-center py-12">
-              <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">
-                {searchTerm ? 'No leads found matching your search' : 'No leads found'}
-              </p>
-              {searchTerm ? (
+          <div className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">
+              {searchTerm ? 'No leads found matching your search' : 'No leads found'}
+            </p>
+            {searchTerm ? (
+              <button
+                onClick={clearSearch}
+                className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Clear search
+              </button>
+            ) : (
+              <div className="mt-4 space-x-4">
                 <button
-                  onClick={clearSearch}
-                  className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                  onClick={() => setShowForm(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  Clear search
+                  Create your first lead
                 </button>
-              ) : (
-                <div className="mt-4 space-x-4">
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    Create your first lead
-                  </button>
-                  <span className="text-gray-400">or</span>
-                  <button
-                    onClick={() => setShowExcelModal(true)}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    Upload Excel file
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Phone
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Created Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {leads.map((lead, index) => (
-                      <tr key={lead._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0">
-                              <img
-                                src={lead.photo || userLogo}
-                                alt={lead.name}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
-                              />
-                            </div>
-                            <div className="flex flex-col space-y-1">
-                              <div className="flex items-center space-x-2">
-                                <span className="font-normal text-gray-900 capitalize">{lead.name}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">{lead.email}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">{lead.phone || '-'}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">
-                            {formatDate(lead.createdAt)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center gap-3">
-                            {/* WhatsApp Button */}
-                            {lead.phone && (
-                              <button
-                                onClick={() => {
-                                  setSelectedLead(lead);
-                                  setShowWhatsAppModal(true);
-                                }}
-                                className="text-green-600 hover:text-green-900 transition-colors"
-                                title="Send WhatsApp message"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                              </button>
-                            )}
-                            
-                            <button
-                              onClick={() => handleEdit(lead)}
-                              className="text-blue-600 hover:text-blue-900 transition-colors"
-                              title="Edit lead"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(lead)}
-                              className="text-red-600 hover:text-red-900 transition-colors"
-                              title="Delete lead"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <span className="text-gray-400">or</span>
+                <button
+                  onClick={() => setShowExcelModal(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Upload Excel file
+                </button>
               </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Phone
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {leads.map((lead, index) => (
+                    <tr key={lead._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            <img
+                              src={lead.photo || userLogo}
+                              alt={lead.name}
+                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                            />
+                          </div>
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-normal text-gray-900 capitalize">{lead.name}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-600">{lead.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-600">{lead.phone || '-'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-600">
+                          {formatDate(lead.createdAt)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center gap-3">
+                          {/* WhatsApp Button */}
+                          {lead.phone && (
+                            <button
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setShowWhatsAppModal(true);
+                              }}
+                              className="text-green-600 hover:text-green-900 transition-colors"
+                              title="Send WhatsApp message"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                            </button>
+                          )}
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="border-t border-gray-200 px-6 py-4">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
-              )}
-            </>
-          )}
+                          <button
+                            onClick={() => handleEdit(lead)}
+                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            title="Edit lead"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(lead)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            title="Delete lead"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="border-t border-gray-200 px-6 py-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

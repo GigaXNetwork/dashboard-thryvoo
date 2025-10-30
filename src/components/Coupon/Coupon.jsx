@@ -492,33 +492,43 @@ function Coupon() {
     setDialogOpen(true);
   };
 
-  const handleConfirmRedeem = async () => {
-    if (!selectedCoupon) return;
+const handleConfirmRedeem = async () => {
+  if (!selectedCoupon) return;
 
-    setRedeemLoading(true);
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/coupon/${selectedCoupon._id}/redeem`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${getAuthToken()}`
-          }
+  setRedeemLoading(true);
+  try {
+    await axios.patch(
+      `${import.meta.env.VITE_API_URL}/api/coupon/${selectedCoupon._id}/redeem`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${getAuthToken()}`
         }
-      );
-      toast.success('Coupon redeemed successfully!');
-      setSearch("");
-    } catch (error) {
-      console.error("Error redeeming coupon:", error);
-      toast.error('Failed to redeem coupon');
-    } finally {
-      setRedeemLoading(false);
-      setDialogOpen(false);
-      setSelectedCoupon(null);
-    }
-  };
+      }
+    );
+    
+    // Update the local state to reflect the redeemed status
+    setCoupons(prevCoupons => 
+      prevCoupons.map(coupon => 
+        coupon._id === selectedCoupon._id 
+          ? { ...coupon, status: 'redeemed' }
+          : coupon
+      )
+    );
+    
+    toast.success('Coupon redeemed successfully!');
+    setSearch("");
+  } catch (error) {
+    console.error("Error redeeming coupon:", error);
+    toast.error('Failed to redeem coupon');
+  } finally {
+    setRedeemLoading(false);
+    setDialogOpen(false);
+    setSelectedCoupon(null);
+  }
+};
 
   const handleCancel = () => {
     setDialogOpen(false);
@@ -538,10 +548,10 @@ function Coupon() {
   const tableHeaders = ["Sl. No", "Code", "Name", "Status", "Expiration Date", "View Details", "Manage"];
 
   return (
-    <div className="p-6">
+    <div className="p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         {/* Title */}
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-2xl font-bold text-gray-700 tracking-tight">
           Coupon Management
         </h1>
 
@@ -694,15 +704,15 @@ function Coupon() {
               <p><strong>Expiration:</strong> {selectedCoupon.expirationDate}</p>
             </div>
             <div className="flex justify-end gap-2">
-              <button 
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50" 
+              <button
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                 onClick={handleCancel}
                 disabled={redeemLoading}
               >
                 Cancel
               </button>
-              <button 
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center gap-2" 
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
                 onClick={handleConfirmRedeem}
                 disabled={redeemLoading}
               >

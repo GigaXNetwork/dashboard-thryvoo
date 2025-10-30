@@ -168,11 +168,11 @@ const SocialMedia = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto p-6">
+        <div className="px-8 py-6">
             {/* Header Section */}
             <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Social Media Offers</h1>
+                    <h1 className="text-2xl font-bold text-gray-700 mb-2">Social Media Offers</h1>
                     <p className="text-gray-600">Exclusive discounts from your favorite platforms</p>
                 </div>
                 <button
@@ -180,7 +180,7 @@ const SocialMedia = () => {
                         setEditingMedia(null);
                         setShowCreateModal(true);
                     }}
-                    className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 font-semibold px-4 py-2 rounded-md shadow transition"
                 >
                     + Create Offer
                 </button>
