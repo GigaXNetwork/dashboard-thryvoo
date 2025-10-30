@@ -613,6 +613,7 @@ import DeleteConfirmationModal from '../../Common/DeleteConfirmationModal';
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -642,15 +643,22 @@ const Categories = () => {
   const { userId } = useParams();
 
   // Fetch categories
-  const fetchCategories = async () => {
+  const fetchCategories = async (isSearch = false) => {
     if (!userId) {
       setError('User ID not available');
       setLoading(false);
+      setSearchLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      // Set loading states based on whether this is a search or initial load
+      if (isSearch) {
+        setSearchLoading(true);
+      } else {
+        setLoading(true);
+      }
+
       setError('');
       const response = await Api.getCategories(userId, currentPage, itemsPerPage, searchTerm);
       const categoriesData = response.data;
@@ -661,6 +669,7 @@ const Categories = () => {
       setError(err.message || 'Failed to fetch categories');
     } finally {
       setLoading(false);
+      setSearchLoading(false);
     }
   };
 
@@ -689,18 +698,29 @@ const Categories = () => {
     }
   };
 
-  useEffect(() => { fetchCategories(); }, [currentPage, searchTerm]);
+  // Initial load and page changes
+  useEffect(() => {
+    fetchCategories(false);
+  }, [currentPage]);
 
+  // Search functionality with proper loading states
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setCurrentPage(1);
-      fetchCategories();
+      if (searchTerm) {
+        setCurrentPage(1);
+        fetchCategories(true); // This is a search operation
+      } else if (searchTerm === '') {
+        // When search is cleared, fetch all categories
+        setCurrentPage(1);
+        fetchCategories(false);
+      }
     }, 500);
+    
     return () => clearTimeout(timeout);
   }, [searchTerm]);
 
   const handlePageChange = (newPage) => setCurrentPage(newPage);
-  
+
   // Items pagination handler
   const handleItemsPageChange = (newPage) => {
     setItemsCurrentPage(newPage);
@@ -776,7 +796,7 @@ const Categories = () => {
     try {
       await Api.deleteItemFromCategory(userId, selectedCategory._id, selectedItem);
       toast.success('Item deleted successfully!');
-      
+
       // Check if we need to go back to previous page after deletion
       const currentItems = viewingItems?.items || [];
       if (currentItems.length === 1 && itemsCurrentPage > 1) {
@@ -834,7 +854,10 @@ const Categories = () => {
     setModalCategory(null);
   };
 
-  const clearSearch = () => setSearchTerm('');
+  const clearSearch = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
 
   // YouTube URL parsing function
   const getYouTubeVideoId = (url) => {
@@ -866,369 +889,374 @@ const Categories = () => {
 
   return (
     <>
-      {loading ? (
-        <div className="flex items-center justify-center min-h-64">
-          <Loader className="w-8 h-8 animate-spin text-blue-600" />
-        </div>
-      ) : (
-        <div className="max-w-7xl mx-auto p-6">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {viewingItems ? `Items in ${viewingItems.name}` : 'Categories'}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {viewingItems
-                  ? `Showing ${viewingItems.items?.length || 0} of ${itemsTotalResults} items${itemsTotalPages > 1 ? ` • Page ${itemsCurrentPage} of ${itemsTotalPages}` : ''}`
-                  : `Showing ${categories.length} of ${totalResults} categories${totalPages > 1 ? ` • Page ${currentPage} of ${totalPages}` : ''}`
-                }
-              </p>
-            </div>
-
-            {viewingItems ? (
-              <div className="flex gap-3">
-                <button
-                  onClick={handleBackToCategories}
-                  className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors font-medium"
-                >
-                  <List className="w-4 h-4" />
-                  Back to Categories
-                </button>
-                <button
-                  onClick={() => handleAddItemClick(viewingItems)}
-                  className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Item
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-                {/* Search Input */}
-                <div className="relative w-full sm:w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search categories..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={clearSearch}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                {/* Add Category Button */}
-                <button
-                  onClick={handleCreateCategoryClick}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Category
-                </button>
-              </div>
-            )}
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header - Always visible */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {viewingItems ? `Items in ${viewingItems.name}` : 'Categories'}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              {viewingItems
+                ? `Showing ${viewingItems.items?.length || 0} of ${itemsTotalResults} items${itemsTotalPages > 1 ? ` • Page ${itemsCurrentPage} of ${itemsTotalPages}` : ''}`
+                : `Showing ${categories.length} of ${totalResults} categories${totalPages > 1 ? ` • Page ${currentPage} of ${totalPages}` : ''}`
+              }
+            </p>
           </div>
 
-          {/* Messages */}
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
-              <AlertCircle className="w-5 h-5" />
-              {error}
-              <button onClick={() => setError('')} className="ml-auto">
-                <X className="w-4 h-4" />
+          {viewingItems ? (
+            <div className="flex gap-3">
+              <button
+                onClick={handleBackToCategories}
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              >
+                <List className="w-4 h-4" />
+                Back to Categories
+              </button>
+              <button
+                onClick={() => handleAddItemClick(viewingItems)}
+                className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-colors font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add Item
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+              {/* Search Input */}
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              {/* Add Category Button */}
+              <button
+                onClick={handleCreateCategoryClick}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                Add Category
               </button>
             </div>
           )}
-          {message && (
-            <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${message.includes('✅')
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
-              {message}
-            </div>
-          )}
+        </div>
 
-          {/* Items View */}
-          {viewingItems && (
-            <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-              {itemsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader className="w-8 h-8 animate-spin text-blue-600" />
-                </div>
-              ) : (!viewingItems.items || viewingItems.items.length === 0) ? (
-                <div className="text-center py-12">
-                  <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No items yet</h3>
-                  <p className="text-gray-500 mb-4">
-                    Get started by adding your first item to this category
-                  </p>
-                  <button
-                    onClick={() => handleAddItemClick(viewingItems)}
-                    className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add First Item
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {viewingItems.items.map((item) => (
-                        <div
-                          key={item._id}
-                          className="bg-gray-50 rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition"
-                        >
-                          {/* Item Header */}
-                          <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-                            <div className="flex items-center gap-2">
-                              {item.type === 'image' ? (
-                                <>
-                                  <ImageIcon className="w-4 h-4 text-green-600" />
-                                  <span className="text-sm font-medium text-gray-700">Image</span>
-                                </>
-                              ) : item.type === 'video' ? (
-                                <>
-                                  <Video className="w-4 h-4 text-blue-600" />
-                                  <span className="text-sm font-medium text-gray-700">Video</span>
-                                </>
-                              ) : null}
-                            </div>
-                            {/* <button
+        {/* Messages - Always visible */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+            <AlertCircle className="w-5 h-5" />
+            {error}
+            <button onClick={() => setError('')} className="ml-auto">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        {message && (
+          <div className={`mb-4 p-4 rounded-lg flex items-center gap-2 ${message.includes('✅')
+            ? 'bg-green-50 text-green-700 border border-green-200'
+            : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+            {message}
+          </div>
+        )}
+
+        {/* Loading State for Content */}
+        {(loading || searchLoading) ? (
+          <div className="flex items-center justify-center min-h-64">
+            <Loader className="w-8 h-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-gray-600">
+              {searchLoading ? 'Searching...' : 'Loading...'}
+            </span>
+          </div>
+        ) : (
+          <>
+            {/* Items View */}
+            {viewingItems && (
+              <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                {itemsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader className="w-8 h-8 animate-spin text-blue-600" />
+                  </div>
+                ) : (!viewingItems.items || viewingItems.items.length === 0) ? (
+                  <div className="text-center py-12">
+                    <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No items yet</h3>
+                    <p className="text-gray-500 mb-4">
+                      Get started by adding your first item to this category
+                    </p>
+                    <button
+                      onClick={() => handleAddItemClick(viewingItems)}
+                      className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add First Item
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {viewingItems.items.map((item) => (
+                          <div
+                            key={item._id}
+                            className="bg-gray-50 rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition"
+                          >
+                            {/* Item Header */}
+                            <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+                              <div className="flex items-center gap-2">
+                                {item.type === 'image' ? (
+                                  <>
+                                    <ImageIcon className="w-4 h-4 text-green-600" />
+                                    <span className="text-sm font-medium text-gray-700">Image</span>
+                                  </>
+                                ) : item.type === 'video' ? (
+                                  <>
+                                    <Video className="w-4 h-4 text-blue-600" />
+                                    <span className="text-sm font-medium text-gray-700">Video</span>
+                                  </>
+                                ) : null}
+                              </div>
+                              {/* <button
                               onClick={() => handleDeleteItem(viewingItems, item._id)}
                               className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition"
                               title="Delete item"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button> */}
+                            </div>
+
+                            {/* Item Content */}
+                            <div className="p-4">
+                              {item.type === 'image' ? (
+                                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                  <img
+                                    src={item.url}
+                                    alt={item.name || 'Item image'}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ) : item.type === 'video' ? (
+                                <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
+                                  {getYouTubeVideoId(item.url) ? (
+                                    <iframe
+                                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(item.url)}`}
+                                      title={item.name || 'YouTube video'}
+                                      className="w-full h-full"
+                                      frameBorder="0"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white">
+                                      <div className="text-center">
+                                        <Video className="w-8 h-8 mx-auto mb-2" />
+                                        <p className="text-sm">Invalid YouTube URL</p>
+                                        <p className="text-xs text-gray-400 mt-1">{item.url}</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                                  <div className="text-center text-gray-500">
+                                    <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+                                    <p className="text-sm">Unknown item type</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Item Name */}
+                              {item.name && (
+                                <div className="mt-3">
+                                  <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
+                                </div>
+                              )}
+
+                              {item.type === 'video' && item.url && (
+                                <div className="mt-3">
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                  >
+                                    <LinkIcon className="w-4 h-4" />
+                                    Visit Link
+                                  </a>
+                                </div>
+                              )}
+
+                              {/* Created Date */}
+                              <div className="mt-2 text-xs text-gray-500">
+                                Added: {new Date(item.createdAt).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Items Pagination */}
+                    {itemsTotalPages > 1 && (
+                      <div className="border-t border-gray-200 px-6 py-4">
+                        <Pagination
+                          currentPage={itemsCurrentPage}
+                          totalPages={itemsTotalPages}
+                          onPageChange={handleItemsPageChange}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Categories Grid */}
+            {!viewingItems && (
+              <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                {categories.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {searchTerm ? 'No categories found' : 'No categories yet'}
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      {searchTerm
+                        ? 'Try adjusting your search terms'
+                        : 'Get started by creating your first category'
+                      }
+                    </p>
+                    {!searchTerm && (
+                      <button
+                        onClick={handleCreateCategoryClick}
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Create Category
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 p-6">
+                      {categories.map((category) => (
+                        <div
+                          key={category._id}
+                          className="bg-gray-50 rounded-lg shadow border border-gray-200 p-5 hover:shadow-lg transition min-h-[140px] flex flex-col"
+                        >
+                          {/* Category Header */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3
+                                className="font-semibold text-gray-900 text-base capitalize truncate"
+                                title={category.name}
+                              >
+                                {category.name}
+                              </h3>
+                              <p className="text-xs text-gray-500">
+                                Created: {new Date(category.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleViewCategory(category)}
+                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                title="View category details"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
 
-                          {/* Item Content */}
-                          <div className="p-4">
-                            {item.type === 'image' ? (
-                              <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                                <img
-                                  src={item.url}
-                                  alt={item.name || 'Item image'}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            ) : item.type === 'video' ? (
-                              <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
-                                {getYouTubeVideoId(item.url) ? (
-                                  <iframe
-                                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(item.url)}`}
-                                    title={item.name || 'YouTube video'}
-                                    className="w-full h-full"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-white">
-                                    <div className="text-center">
-                                      <Video className="w-8 h-8 mx-auto mb-2" />
-                                      <p className="text-sm">Invalid YouTube URL</p>
-                                      <p className="text-xs text-gray-400 mt-1">{item.url}</p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                                <div className="text-center text-gray-500">
-                                  <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-                                  <p className="text-sm">Unknown item type</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Item Name */}
-                            {item.name && (
-                              <div className="mt-3">
-                                <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
-                              </div>
-                            )}
-
-                            {item.type === 'video' && item.url && (
-                              <div className="mt-3">
-                                <a
-                                  href={item.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                                >
-                                  <LinkIcon className="w-4 h-4" />
-                                  Visit Link
-                                </a>
-                              </div>
-                            )}
-
-                            {/* Created Date */}
-                            <div className="mt-2 text-xs text-gray-500">
-                              Added: {new Date(item.createdAt).toLocaleDateString()}
+                          {/* Items Count */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Items:</span>
+                              <span className="font-semibold text-gray-900">
+                                {category.items?.length || 0}
+                              </span>
                             </div>
+                            {category.items && category.items.length > 0 && (
+                              <div className="mt-1 text-xs text-gray-500">
+                                {category.items.filter(item => item.image).length} images,
+                                {' '}{category.items.filter(item => item.url).length} videos
+                              </div>
+                            )}
+                          </div>
+
+                          {/* View Items Button */}
+                          <div className="mt-auto">
+                            <button
+                              onClick={() => handleViewItems(category)}
+                              className="w-full flex items-center justify-center gap-2 border border-blue-500 text-blue-600 py-2 px-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-500 hover:text-white transition-colors font-medium text-sm"
+                            >
+                              <List className="w-4 h-4" />
+                              View Items
+                            </button>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
 
-                  {/* Items Pagination */}
-                  {itemsTotalPages > 1 && (
-                    <div className="border-t border-gray-200 px-6 py-4">
-                      <Pagination
-                        currentPage={itemsCurrentPage}
-                        totalPages={itemsTotalPages}
-                        onPageChange={handleItemsPageChange}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Categories Grid */}
-          {!viewingItems && (
-            <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-              {categories.length === 0 ? (
-                <div className="text-center py-12">
-                  <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {searchTerm ? 'No categories found' : 'No categories yet'}
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    {searchTerm
-                      ? 'Try adjusting your search terms'
-                      : 'Get started by creating your first category'
-                    }
-                  </p>
-                  {!searchTerm && (
-                    <button
-                      onClick={handleCreateCategoryClick}
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Create Category
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 p-6">
-                    {categories.map((category) => (
-                      <div
-                        key={category._id}
-                        className="bg-gray-50 rounded-lg shadow border border-gray-200 p-5 hover:shadow-lg transition min-h-[140px] flex flex-col"
-                      >
-                        {/* Category Header */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3
-                              className="font-semibold text-gray-900 text-base capitalize truncate"
-                              title={category.name}
-                            >
-                              {category.name}
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              Created: {new Date(category.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleViewCategory(category)}
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                              title="View category details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Items Count */}
-                        <div className="mb-4">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Items:</span>
-                            <span className="font-semibold text-gray-900">
-                              {category.items?.length || 0}
-                            </span>
-                          </div>
-                          {category.items && category.items.length > 0 && (
-                            <div className="mt-1 text-xs text-gray-500">
-                              {category.items.filter(item => item.image).length} images,
-                              {' '}{category.items.filter(item => item.url).length} videos
-                            </div>
-                          )}
-                        </div>
-
-                        {/* View Items Button */}
-                        <div className="mt-auto">
-                          <button
-                            onClick={() => handleViewItems(category)}
-                            className="w-full flex items-center justify-center gap-2 border border-blue-500 text-blue-600 py-2 px-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-500 hover:text-white transition-colors font-medium text-sm"
-                          >
-                            <List className="w-4 h-4" />
-                            View Items
-                          </button>
-                        </div>
+                    {totalPages > 1 && (
+                      <div className="border-t border-gray-200 px-6 py-4">
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={handlePageChange}
+                        />
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </>
+        )}
 
-                  {totalPages > 1 && (
-                    <div className="border-t border-gray-200 px-6 py-4">
-                      <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
+        {/* Modals - Always available */}
+        <CategoryModal
+          isOpen={showCategoryModal}
+          onClose={handleModalClose}
+          onSubmit={handleCategorySubmit}
+          mode={modalMode}
+          category={modalCategory}
+          loading={submitting}
+          onEdit={handleEditFromModal}
+        />
 
-          {/* Category Modal */}
-          <CategoryModal
-            isOpen={showCategoryModal}
-            onClose={handleModalClose}
-            onSubmit={handleCategorySubmit}
-            mode={modalMode}
-            category={modalCategory}
-            loading={submitting}
-            onEdit={handleEditFromModal}
-          />
+        <ItemModal
+          isOpen={showItemModal}
+          onClose={handleModalClose}
+          onSubmit={(formData) => handleAddItem(modalCategory, formData)}
+          loading={submitting}
+          category={modalCategory}
+          error={error}
+        />
 
-          {/* Item Modal */}
-          <ItemModal
-            isOpen={showItemModal}
-            onClose={handleModalClose}
-            onSubmit={(formData) => handleAddItem(modalCategory, formData)}
-            loading={submitting}
-            category={modalCategory}
-            error={error}
-          />
-
-          <DeleteConfirmationModal
-            isOpen={showDeleteModal}
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={confirmDelete}
-            title="Delete Item"
-            description="Are you sure you want to delete this item from this category? This action cannot be undone."
-            confirmButtonText="Delete"
-            cancelButtonText="Cancel"
-          />
-        </div>
-      )}
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmDelete}
+          title="Delete Item"
+          description="Are you sure you want to delete this item from this category? This action cannot be undone."
+          confirmButtonText="Delete"
+          cancelButtonText="Cancel"
+        />
+      </div>
     </>
   );
 };

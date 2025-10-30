@@ -1,202 +1,4 @@
 // import React, { useEffect, useState } from "react";
-// import { ArrowLeft, Download, ImageIcon, RefreshCcw } from "lucide-react";
-// import { apiRequest } from "../../Context/apiService"; // adjust import if needed
-
-// export default function MyCategories() {
-//   const [categories, setCategories] = useState([]);
-//   const [selectedCategory, setSelectedCategory] = useState(null);
-//   const [items, setItems] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   // Fetch all categories
-//   const fetchCategories = async () => {
-//     try {
-//       setLoading(true);
-//       const response = await apiRequest("/api/user/mybanner", "get");
-//       if (response.status === "success") {
-//         setCategories(response.data?.categories || []);
-//       } else {
-//         setError("Failed to fetch categories");
-//       }
-//     } catch (err) {
-//       console.log(err)
-//       setError("Something went wrong while fetching categories");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // Fetch items for a selected category
-//   const fetchCategoryItems = async (categoryId) => {
-//     try {
-//       setLoading(true);
-//       const response = await apiRequest(`/api/user/mybanner/${categoryId}`);
-//       console.log(response.data)
-//       if (response.status === "success") {
-//         setItems(response.data.banners || []); // adjust based on actual API response
-//       } else {
-//         setError("Failed to fetch category items");
-//       }
-//     } catch (err) {
-//       setError("Something went wrong while fetching category items");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchCategories();
-//   }, []);
-
-//   const handleDownload = (imageUrl, name) => {
-//     if (!imageUrl) return;
-//     const link = document.createElement("a");
-//     link.href = imageUrl;
-//     link.download = `${name}.jpg`;
-//     document.body.appendChild(link);
-//     link.click();
-//     document.body.removeChild(link);
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 px-6 py-10">
-//       {/* Header */}
-//       <div className="flex justify-between items-center mb-8">
-//         <div className="flex items-center gap-3">
-//           {selectedCategory && (
-//             <button
-//               onClick={() => {
-//                 setSelectedCategory(null);
-//                 setItems([]);
-//               }}
-//               className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-300 p-2 rounded-full transition"
-//             >
-//               <ArrowLeft size={20} />
-//             </button>
-//           )}
-//           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-//             {selectedCategory ? selectedCategory.name : "My Categories"}
-//           </h1>
-//         </div>
-//       </div>
-
-//       {/* Loading / Error States */}
-//       {loading ? (
-//         <div className="flex items-center justify-center h-64 text-gray-500">
-//           Loading...
-//         </div>
-//       ) : error ? (
-//         <div className="text-center text-red-500">{error}</div>
-//       ) : selectedCategory ? (
-//         items.length === 0 ? (
-//           <div className="text-center text-gray-600">No items found in this category.</div>
-//         ) : (
-//           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-//             {items.map((item) => (
-//               <div
-//                 key={item._id}
-//                 className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between"
-//               >
-//                 {/* Image or Placeholder */}
-//                 <div className="relative w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-//                   {item.image ? (
-//                     <img
-//                       src={item.image}
-//                       alt={item.name || "Item"}
-//                       className="w-full h-full object-cover"
-//                     />
-//                   ) : (
-//                     <div className="text-gray-400 flex flex-col items-center">
-//                       <ImageIcon size={40} />
-//                       <span className="text-sm mt-2">No Image</span>
-//                     </div>
-//                   )}
-//                 </div>
-
-//                 {/* Info */}
-//                 <div className="mt-4 flex flex-col flex-1">
-//                   {item.url && (
-//                     <a
-//                       href={item.url}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       className="text-sm text-blue-600 hover:underline mt-1 truncate"
-//                     >
-//                       {item.url}
-//                     </a>
-//                   )}
-//                 </div>
-
-//                 {/* Download */}
-//                 <button
-//                   onClick={() => handleDownload(item.image, item.name)}
-//                   disabled={!item.image}
-//                   className={`mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition 
-//                     ${item.image
-//                       ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-//                       : "bg-gray-200 text-gray-500 cursor-not-allowed"
-//                     }`}
-//                 >
-//                   <Download size={16} />
-//                   {item.image ? "Download Image" : "No Image Available"}
-//                 </button>
-//               </div>
-//             ))}
-//           </div>
-//         )
-//       ) : (
-//         /* CATEGORY VIEW */
-//         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-//           {categories.length === 0 ? (
-//             <div className="text-center text-gray-600">No items found in this category.</div>
-//           ) : (
-//             categories.map((category) => (
-//               <div
-//                 key={category._id}
-//                 onClick={() => {
-//                   setSelectedCategory(category);
-//                   fetchCategoryItems(category._id);
-//                 }}
-//                 className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition p-4 flex flex-col justify-between"
-//               >
-//                 <div className="relative w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-//                   {category.image ? (
-//                     <img
-//                       src={category.image}
-//                       alt={category.name}
-//                       className="w-full h-full object-cover"
-//                     />
-//                   ) : (
-//                     <div className="text-gray-400 flex flex-col items-center">
-//                       <ImageIcon size={40} />
-//                       <span className="text-sm mt-2">No Image</span>
-//                     </div>
-//                   )}
-//                 </div>
-
-//                 <div className="mt-4">
-//                   <h2 className="text-lg font-semibold text-gray-900">
-//                     {category.name}
-//                   </h2>
-//                   <p className="text-xs text-gray-500 mt-1">
-//                     Created: {new Date(category.createdAt).toLocaleString()}
-//                   </p>
-//                 </div>
-//               </div>
-//             ))
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
 // import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText } from "lucide-react";
 // import { apiRequest } from "../../Context/apiService";
 
@@ -495,8 +297,9 @@
 // }
 
 
+
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText } from "lucide-react";
+import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText, Search, X } from "lucide-react";
 import { apiRequest } from "../../Context/apiService";
 import Pagination from "../Common/Pagination";
 
@@ -506,7 +309,8 @@ export default function MyCategories() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Pagination state for categories
   const [currentCategoryPage, setCurrentCategoryPage] = useState(1);
   const [categoriesPerPage] = useState(10);
@@ -519,11 +323,18 @@ export default function MyCategories() {
   const [totalItemPages, setTotalItemPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Fetch all categories with pagination
-  const fetchCategories = async (page = 1) => {
+  // Fetch all categories with pagination and search
+  const fetchCategories = async (page = 1, search = '') => {
     try {
       setLoading(true);
-      const response = await apiRequest(`/api/user/mybanner?page=${page}&limit=${categoriesPerPage}`, "get");
+      let url = `/api/user/mybanner?page=${page}&limit=${categoriesPerPage}`;
+
+      // Add search parameter if search term exists
+      if (search.trim()) {
+        url += `&search=${encodeURIComponent(search.trim())}`;
+      }
+
+      const response = await apiRequest(url, "get");
       if (response.status === "success") {
         setCategories(response.data?.categories || []);
         setTotalCategoryPages(response.data?.pagination?.totalPages || 1);
@@ -560,8 +371,24 @@ export default function MyCategories() {
   };
 
   useEffect(() => {
-    fetchCategories(currentCategoryPage);
+    fetchCategories(currentCategoryPage, searchTerm);
   }, [currentCategoryPage]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCurrentCategoryPage(1); // Reset to first page when searching
+      fetchCategories(1, searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+    setCurrentCategoryPage(1);
+  };
 
   // Handle category page change
   const handleCategoryPageChange = (newPage) => {
@@ -603,24 +430,46 @@ export default function MyCategories() {
     if (!imageUrl) return;
 
     try {
+      // Method 2: Use fetch but preserve original file
       const response = await fetch(imageUrl);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Get the original content type and size
+      const contentType = response.headers.get('content-type');
+      const contentLength = response.headers.get('content-length');
+
+      console.log('Original file info:', { contentType, contentLength });
+
+      // Create blob with exact same content type
       const blob = await response.blob();
 
+      console.log('Downloaded blob size:', blob.size);
+
+      // Create object URL with original content type
       const blobUrl = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
       link.href = blobUrl;
       link.download = `${name || 'image'}.jpg`;
 
+      // Force download with right-click save as behavior
+      link.style.display = 'none';
       document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
 
-      URL.revokeObjectURL(blobUrl);
+      // Use setTimeout to ensure the click happens
+      setTimeout(() => {
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      }, 100);
 
     } catch (err) {
       console.error('Download failed:', err);
-      // Fallback: simple download method
+
+      // Final fallback: Simple direct download
       const link = document.createElement("a");
       link.href = imageUrl;
       link.download = `${name || 'image'}.jpg`;
@@ -650,27 +499,28 @@ export default function MyCategories() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="flex items-center gap-3">
           {selectedCategory && (
             <button
               onClick={() => {
                 setSelectedCategory(null);
                 setItems([]);
-                setCurrentItemPage(1); // Reset item page when going back
+                setCurrentItemPage(1);
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-300 p-2 rounded-full transition"
             >
               <ArrowLeft size={20} />
             </button>
           )}
-          <div>
+          <div className="flex flex-col">
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               {selectedCategory ? `Items in ${selectedCategory.name}` : "My Categories"}
             </h1>
             {!selectedCategory ? (
               <p className="text-gray-600 mt-1">
                 Showing {categories.length} of {totalCategories} categories{totalCategoryPages > 1 ? ` • Page ${currentCategoryPage} of ${totalCategoryPages}` : ''}
+                {searchTerm && ` • Searching for "${searchTerm}"`}
               </p>
             ) : (
               <p className="text-gray-600 mt-1">
@@ -679,17 +529,42 @@ export default function MyCategories() {
             )}
           </div>
         </div>
+
+        {!selectedCategory && (
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Loading / Error States */}
       {loading ? (
-        <div className="flex items-center justify-center h-64 text-gray-500">
-          Loading...
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
+          <span className="text-gray-600 text-lg">Loading...</span>
+          <span className="text-gray-400 text-sm mt-1">Please wait while we fetch your data</span>
         </div>
       ) : error ? (
         <div className="text-center text-red-500">{error}</div>
       ) : selectedCategory ? (
-        /* ITEMS VIEW */
         items.length === 0 ? (
           <div className="text-center text-gray-600 py-12">
             <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
@@ -795,7 +670,24 @@ export default function MyCategories() {
             {getUniqueCategories().length === 0 ? (
               <div className="text-center text-gray-600 py-12 col-span-full">
                 <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-lg">No categories found.</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {searchTerm ? 'No categories found' : 'No categories yet'}
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  {searchTerm
+                    ? 'Try adjusting your search terms'
+                    : 'Categories will appear here once created'
+                  }
+                </p>
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="inline-flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                    Clear Search
+                  </button>
+                )}
               </div>
             ) : (
               getUniqueCategories().map((category) => (
