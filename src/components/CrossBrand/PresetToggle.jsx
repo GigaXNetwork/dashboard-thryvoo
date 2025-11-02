@@ -1,8 +1,8 @@
 import React from "react";
 
-const PresetToggle = ({ 
-  presetToDelete, 
-  setShowDeleteModal, 
+const PresetToggle = ({
+  presetToDelete,
+  setShowDeleteModal,
   handleDeletePreset,
   title = "Delete Coupon",
   message = "Are you sure you want to delete this coupon?"
@@ -15,11 +15,13 @@ const PresetToggle = ({
 
   const handleConfirmDelete = async () => {
 
-    console.log(presetToDelete);
-    
-    await handleDeletePreset(presetToDelete.crossBrand);
+
+    await handleDeletePreset(presetToDelete);
     setShowDeleteModal(false);
   };
+
+  console.log('presetToDelete', presetToDelete);
+
 
   return (
     <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
@@ -31,7 +33,7 @@ const PresetToggle = ({
         {presetToDelete && (
           <div className="bg-gray-50 p-3 rounded-md mb-4">
             <p className="text-sm font-medium text-gray-800">
-              {presetToDelete.preset.presetName || presetToDelete.name || "Untitled Coupon"}
+              {presetToDelete.presetName || presetToDelete.preset.presetName || "Untitled Coupon"}
             </p>
           </div>
         )}

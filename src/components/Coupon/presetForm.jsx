@@ -394,7 +394,7 @@ export default function OfferForm({
             />
 
             {/* Expiry Duration Field */}
-            <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 form-field">
+            {/* <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 form-field">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-gray-700 flex items-center">
                   <Clock className="w-4 h-4 mr-2" />
@@ -437,7 +437,7 @@ export default function OfferForm({
                   </div>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Validity Period Field */}
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 form-field">

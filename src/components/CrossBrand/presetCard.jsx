@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import React from "react";
 
 const PresetCard = ({
@@ -108,6 +109,10 @@ const PresetCard = ({
             ref={(el) => (menuRefs.current[index] = el)}
             className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden py-2 transition-all duration-200"
           >
+            <button className="w-full text-left px-4 py-2.5 text-sm text-blue-500 hover:bg-blue-50 transition-colors flex items-center gap-2">
+              <ArrowRight size={16} />
+              Assign To
+            </button>
             <button
               onClick={() => handleDeleteClick(preset)}
               className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors flex items-center"

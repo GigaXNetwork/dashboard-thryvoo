@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import "./Card.css";
 
-export default function CreateCard({ onClose, onSubmit, userId }) {
+export default function CreateCard({ onClose, onSubmit, userId, user }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [category, setCategory] = useState(""); // Added missing state
+  const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -18,10 +18,21 @@ export default function CreateCard({ onClose, onSubmit, userId }) {
   });
 
   useEffect(() => {
+    if (user) {
+      if (user.email) {
+        setEmail(user.email);
+      }
+      
+      if (user.phone) {
+        setPhone(user.phone);
+      }
+
+    }
+  }, [user]);
+
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setErrors({...errors}); // Reset errors
-
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/category`, {
           headers: {
             'Accept': 'application/json',
@@ -35,7 +46,6 @@ export default function CreateCard({ onClose, onSubmit, userId }) {
         const data = await response.json();
         setCategories(data.data.category || []);
       } catch (err) {
-        setErrors({...errors, fetch: err.message});
         console.error('Error fetching categories:', err);
       }
     };
@@ -106,7 +116,7 @@ export default function CreateCard({ onClose, onSubmit, userId }) {
       const result = await response.json();
       setMessage("✅ Card created successfully!");
 
-      if (onSubmit) onSubmit(result);
+      if (onSubmit) onSubmit(result.data.card);
 
       // Reset form
       setName("");

@@ -55,8 +55,6 @@ import SpecialOffer from './components/Offer/SpecialOffer/SpecialOffer';
 import MyCategories from './components/MyCategories/MyCategories';
 import CreateCrossCoupon from './components/CrossBrand/CreateCrossCoupon';
 import Support from './components/Support/Support';
-import BusinessCard from './components/BusinessCard/BusinessCard';
-
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -173,7 +171,6 @@ function App() {
               { path: 'whatsapp/registration', element: <RegistrationInfo /> },
               { path: 'customers', element: <Customers /> },
               { path: 'myCategories', element: <MyCategories /> },
-              { path: 'businessCard', element: <BusinessCard /> },
             ] : [])
           ]
         }

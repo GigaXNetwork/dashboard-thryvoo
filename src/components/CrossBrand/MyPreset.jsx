@@ -3,6 +3,7 @@ import MessagePopup from '../Common/MessagePopup';
 import PresetToggle from './PresetToggle';
 import PresetCard from './presetCard';
 import Cookies from "js-cookie";
+import { getAuthToken } from '../../Context/apiService';
 
 const MyPreset = () => {
   const [presets, setPresets] = useState([]);
@@ -142,11 +143,16 @@ const MyPreset = () => {
   }, [openMenuIndex]);
 
   // Delete preset
-  const handleDeletePreset = async (id) => {
+  const handleDeletePreset = async (presetToDelete) => {
+    console.log("delete preset", presetToDelete)
+    const id = presetToDelete.crossBrand
     try {
       const res = await fetch(`${API_URL}/api/cross-brand/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers : {
+          'Authorization' : getAuthToken()
+        }
       });
 
       if (res.ok) {
@@ -206,7 +212,7 @@ const MyPreset = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
             >
               <option value="">All Statuses</option>
               <option value="true">Active</option>
@@ -222,7 +228,7 @@ const MyPreset = () => {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
             >
               <option value="">All Types</option>
               <option value="cross">Cross Brand</option>
@@ -243,7 +249,7 @@ const MyPreset = () => {
                 setQuickDateFilter('');
                 setStartDate(e.target.value);
               }}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
             />
           </div>
 
@@ -256,7 +262,7 @@ const MyPreset = () => {
                 setQuickDateFilter('');
                 setEndDate(e.target.value);
               }}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
             />
           </div>
 
@@ -265,7 +271,7 @@ const MyPreset = () => {
             <select
               value={quickDateFilter}
               onChange={(e) => handleQuickDateFilterChange(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200 outline-none"
             >
               <option value="">Custom / All Time</option>
               <option value="today">Today</option>

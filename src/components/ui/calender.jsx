@@ -404,7 +404,7 @@ function Calendar({
           defaultClassNames.day
         ),
         today: cn(
-          "bg-indigo-100 text-indigo-700 rounded-md data-[selected=true]:rounded-none",
+          "bg-blue-100 text-blue-700 rounded-md data-[selected=true]:rounded-none",
           defaultClassNames.today
         ),
         outside: cn(
@@ -465,19 +465,19 @@ function CalendarDayButton({ className, day, modifiers, ...props }) {
         "flex aspect-square w-full justify-center items-center text-sm font-medium transition-all",
 
         // Selected date
-        "data-[selected-single=true]:bg-indigo-600 data-[selected-single=true]:text-white data-[selected-single=true]:shadow-lg data-[selected-single=true]:scale-[1.08]",
+        "data-[selected-single=true]:bg-blue-600 data-[selected-single=true]:text-white data-[selected-single=true]:shadow-lg data-[selected-single=true]:scale-[1.08]",
 
         // Range start
-        "data-[range-start=true]:bg-indigo-600 data-[range-start=true]:text-white data-[range-start=true]:shadow-md data-[range-start=true]:rounded-l-md",
+        "data-[range-start=true]:bg-blue-600 data-[range-start=true]:text-white data-[range-start=true]:shadow-md data-[range-start=true]:rounded-l-md",
 
         // Range end
-        "data-[range-end=true]:bg-indigo-600 data-[range-end=true]:text-white data-[range-end=true]:shadow-md data-[range-end=true]:rounded-r-md",
+        "data-[range-end=true]:bg-blue-600 data-[range-end=true]:text-white data-[range-end=true]:shadow-md data-[range-end=true]:rounded-r-md",
 
         // Inside range
-        "data-[range-middle=true]:bg-indigo-50 data-[range-middle=true]:text-indigo-600 data-[range-middle=true]:shadow-inner",
+        "data-[range-middle=true]:bg-blue-50 data-[range-middle=true]:text-blue-600 data-[range-middle=true]:shadow-inner",
 
         // Hover state
-        "hover:bg-indigo-100 hover:text-indigo-700 hover:border hover:border-indigo-300 active:scale-[0.96]",
+        "hover:bg-blue-100 hover:text-blue-700 hover:border hover:border-blue-300 active:scale-[0.96]",
 
         // Smooth UI feel
         "rounded-md border border-transparent duration-200 ease-in-out cursor-pointer select-none",

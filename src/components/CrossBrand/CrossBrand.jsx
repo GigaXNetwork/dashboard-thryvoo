@@ -474,6 +474,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Calendar, ExternalLink, ChevronDown, X } from "lucide-react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const CrossBrand = () => {
   const [data, setData] = useState(null);
@@ -591,7 +592,7 @@ const CrossBrand = () => {
 
         // Add search filter
         if (search) {
-          queryParams.presetName = search.trim();
+          queryParams.search = search.trim();
         }
 
         if (statusFilter !== '') {
@@ -785,9 +786,9 @@ const CrossBrand = () => {
       console.log(result);
 
       if (response.ok) {
-        alert("Coupon set successfully!");
+        toast.success("Coupon set successfully!")
       } else {
-        alert("Failed to set coupon. Please try again.");
+        toast.error( result.message || "Failed to set coupon. Please try again.")
       }
     } catch (err) {
       console.error("Failed to set coupon:", err);

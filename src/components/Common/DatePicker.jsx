@@ -514,7 +514,7 @@ export default function DateRangePicker({ onDateRangeChange }) {
                                 size="sm"
                                 className={`rounded-full transition-all ${
                                     datePreset === preset.value 
-                                        ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700" 
+                                        ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700" 
                                         : "bg-white hover:bg-gray-50"
                                 }`}
                             >
@@ -552,16 +552,17 @@ export default function DateRangePicker({ onDateRangeChange }) {
                                                 onClick={handleCancel} 
                                                 variant="outline"
                                                 size="sm"
+                                                className="hover:bg-gray-50"
                                             >
                                                 Cancel
                                             </Button>
                                             <Button 
                                                 onClick={handleApply} 
                                                 size="sm"
-                                                className="bg-indigo-600 hover:bg-indigo-700"
+                                                className="bg-blue-600 hover:bg-blue-700"
                                                 disabled={!tempDateRange?.from || !tempDateRange?.to}
                                             >
-                                                Apply
+                                                <span className="text-white">Apply</span>
                                             </Button>
                                         </div>
                                     </Card>
@@ -573,9 +574,9 @@ export default function DateRangePicker({ onDateRangeChange }) {
                     {/* Selected Range Display - Same Row */}
                     {getSelectedRangeText() && (
                         <div className="flex-1 min-w-[200px]">
-                            <div className="bg-indigo-50 border border-indigo-200 rounded-full px-4 py-2 inline-flex items-center gap-2">
+                            <div className="bg-blue-50 border border-blue-200 rounded-full px-4 py-2 inline-flex items-center gap-2">
                                 <span className="text-sm font-medium text-gray-700">Selected Range:</span>
-                                <span className="text-sm font-semibold text-indigo-700">{getSelectedRangeText()}</span>
+                                <span className="text-sm font-semibold text-blue-700">{getSelectedRangeText()}</span>
                             </div>
                         </div>
                     )}

@@ -520,7 +520,7 @@ const FlashHourOffer = () => {
                 resetForm={resetForm}
                 loading={loading}
                 isEditing={isEditing}
-                title={isEditing ? "Edit Offer" : "Create New Offer"}
+                title={isEditing ? "Edit Offer" : "Create Flash Offer"}
                 onClose={closeForm}
             />
 

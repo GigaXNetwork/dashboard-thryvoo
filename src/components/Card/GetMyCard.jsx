@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
 import { Badge, CheckCircle, ExternalLink, Eye, Loader2, Pencil, Plus } from "lucide-react";
 import Active from "./Active";
 import Cookies from "js-cookie"
+import { useUser } from "../../Context/ContextApt";
 
 function GetMyCard({ role }) {
   const { userId } = useParams();
+  const { userData, loading: userLoading } = useUser(); // Properly destructure useUser
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,7 +64,11 @@ function GetMyCard({ role }) {
     setIsCreateCardForm(true);
   };
 
-  if (loading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
+  // Get the actual user object from userData
+  const currentUser = userData?.user;
+
+  // Combine both loading states
+  if (loading || userLoading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
 
   return (
@@ -137,6 +143,7 @@ function GetMyCard({ role }) {
                 {isCreateCardForm && (
                   <CreateCard
                     userId={userId}
+                    user={currentUser} // Pass the actual user object
                     onClose={() => setIsCreateCardForm(false)}
                     onSubmit={(newCard) => {
                       setCard(newCard);

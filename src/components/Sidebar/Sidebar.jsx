@@ -74,16 +74,15 @@ function Sidebar({ onToggleSidebar }) {
       icon: <Handshake size={18} />,
       label: "Cross Brand",
       subItems: [
-        { to: "/cross-brand/presets", label: "Presets" },
         { to: "/cross-brand/store", label: "Store" },
+        { to: "/cross-brand/presets", label: "Presets" },
         { to: "/cross-brand/coupon", label: "Coupon" },
       ]
     },
     { to: "/reviews", icon: <MdOutlineReviews size={18} />, label: "Reviews" },
     isAdmin && { to: "/support", icon: <MdOutlineSupportAgent size={18} />, label: "Help & Support" },
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
-    userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Categories" },
-    // userData.user.role === "user" && { to: "/businessCard", icon: <CreditCard size={18} />, label: "Business Card" },
+    userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Social Media / Offer Design" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);
