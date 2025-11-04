@@ -147,10 +147,12 @@ export const Api = {
   // Special Offer
   getMySpecialOffers: () => apiRequest("/api/special-offer/my-special-offers", "GET"),
   createSpecialOffer: () => apiRequest("/api/special-offer/create-special-offer", "POST"),
-  addSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/add-items", "POST", { itemId }),
+  createSpecialOfferCoupon: (formData) => apiRequest("/api/user/coupon/presets/special-offer", "POST", formData),
   removeSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/remove-items", "POST", { itemId }),
   toggleSpecialOffer: (id) => apiRequest(`/api/special-offer/${id}/toggle`, "POST"),
   getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
+  //assign cross brand coupon to special offer
+  assignToSpecialOffer: (crossBrandId) => apiRequest(`/api/cross-brand/${crossBrandId}/special-offer`, "POST"),
   // delete gallery api
   deleteGalleryImage: ({ imageUrl }) => {
     return apiRequest(`/api/user/card/gallery/delete-gallery-image`, "DELETE", { imageUrl })
