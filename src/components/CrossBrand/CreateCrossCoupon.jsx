@@ -331,7 +331,7 @@ const CreateCrossPromotion = () => {
                 <h1 className="text-2xl font-bold text-gray-700 flex-shrink-0">Cross Brand Coupons</h1>
                 <button
                     onClick={handleCreateCoupon}
-                    className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md shadow transition flex items-center gap-2 justify-center"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow transition flex items-center gap-2 justify-center"
                 >
                     <Plus className="w-4 h-4" />
                     Create Coupon
@@ -363,7 +363,7 @@ const CreateCrossPromotion = () => {
             {/* Preset Cards */}
             {loading && !searchTerm && !statusFilter && !startDate && !endDate ? (
                 <div className="flex items-center justify-center h-64 text-gray-500">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
                     Loading...
                 </div>
             ) : presets.length === 0 ? (

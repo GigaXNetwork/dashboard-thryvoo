@@ -44,7 +44,7 @@
 //         iconColor: 'bg-purple-500'
 //       }
 //     };
-    
+
 //     return types[type] || types.offer;
 //   };
 
@@ -105,7 +105,7 @@
 //                 {currentlyActive ? "🟢 Active" : "⏰ Scheduled"}
 //               </span>
 //             )}
-            
+
 //             {/* 3-dot Actions Menu */}
 //             <div className="relative">
 //               <button
@@ -287,7 +287,7 @@
 //         badgeColor: 'bg-purple-100 text-purple-800'
 //       }
 //     };
-    
+
 //     return types[type] || types.offer;
 //   };
 
@@ -354,7 +354,7 @@
 //                 {currentlyActive ? "🟢 Active" : "⏰ Scheduled"}
 //               </span>
 //             )}
-            
+
 //             {/* 3-dot Actions Menu */}
 //             <div className="relative">
 //               <button
@@ -488,6 +488,7 @@
 
 import React, { useRef } from "react";
 import { Tag, Gift, Crosshair, Calendar, Clock, CheckCircle, Trash2, SquarePen, MoreVertical } from "lucide-react";
+import { MdOutlineHandshake } from "react-icons/md";
 
 const PresetCard = ({
   preset,
@@ -506,7 +507,7 @@ const PresetCard = ({
   const getTypeConfig = (type) => {
     const types = {
       cross: {
-        icon: Crosshair,
+        icon: MdOutlineHandshake,
         label: 'Cross Promotion',
         gradient: 'from-blue-500 to-white',
         bg: 'bg-blue-50',
@@ -536,7 +537,7 @@ const PresetCard = ({
         badgeColor: 'bg-purple-100 text-purple-800'
       }
     };
-    
+
     return types[type] || types.offer;
   };
 
@@ -547,10 +548,19 @@ const PresetCard = ({
   const formatDateRange = (startAt, expireAt) => {
     if (!startAt || !expireAt) return "No validity period set";
 
-    const start = new Date(startAt);
-    const end = new Date(expireAt);
+    // Directly extract from ISO string (no timezone conversion)
+    const formatFromISO = (isoString) => {
+      const date = new Date(isoString);
+      const utcDate = date.getUTCDate();
+      const utcMonth = date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+      const utcYear = date.getUTCFullYear();
+      const utcHours = date.getUTCHours().toString().padStart(2, '0');
+      const utcMinutes = date.getUTCMinutes().toString().padStart(2, '0');
 
-    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleDateString()} ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `${utcMonth} ${utcDate}, ${utcYear} ${utcHours}:${utcMinutes}`;
+    };
+
+    return `${formatFromISO(startAt)} - ${formatFromISO(expireAt)}`;
   };
 
   // Check if offer is currently active based on validity period
@@ -595,15 +605,14 @@ const PresetCard = ({
           {/* Status and Actions - Better mobile layout */}
           <div className="flex items-center justify-between sm:justify-end gap-2 flex-shrink-0">
             {preset.isActive && (
-              <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                currentlyActive 
-                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200" 
+              <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${currentlyActive
+                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
                   : "bg-amber-100 text-amber-700 border border-amber-200"
-              }`}>
+                }`}>
                 {currentlyActive ? "🟢 Active" : "⏰ Scheduled"}
               </span>
             )}
-            
+
             {/* 3-dot Actions Menu */}
             <div className="relative">
               <button
@@ -629,11 +638,10 @@ const PresetCard = ({
                   <button
                     onClick={() => handleToggleActive(preset)}
                     disabled={preset.isActive}
-                    className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
-                      preset.isActive 
-                        ? "text-gray-400 cursor-not-allowed" 
+                    className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${preset.isActive
+                        ? "text-gray-400 cursor-not-allowed"
                         : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     ✅ Activate
                   </button>
@@ -659,8 +667,8 @@ const PresetCard = ({
           </div>
           <div className={`${typeConfig.bg} border ${typeConfig.border} p-2 sm:p-3 rounded-lg`}>
             <div className="text-xs font-medium text-gray-600 uppercase tracking-wide truncate">
-              {preset.discountType === 'percentage' ? 'Discount %' : 
-               preset.discountType === 'fixed' ? 'Discount Amount' : 'Custom Offer'}
+              {preset.discountType === 'percentage' ? 'Discount %' :
+                preset.discountType === 'fixed' ? 'Discount Amount' : 'Custom Offer'}
             </div>
             <div className="font-semibold text-sm sm:text-base text-gray-900 mt-1 truncate">{preset.discountAmount}</div>
           </div>

@@ -54,7 +54,7 @@
 //     try {
 //       setLoading(true);
 //       const data = await Api.createSpecialOffer();
-      
+
 //       if (data.status === "success") {
 //         toast.success("Special offer session created successfully!");
 //         await fetchSpecialOfferData();
@@ -88,7 +88,7 @@
 
 //     try {
 //       const data = await Api.addSpecialOfferItem(itemObj._id);
-      
+
 //       if (data.status === "success") {
 //         toast.success("Coupon preset added to special offer successfully!");
 //         await fetchSpecialOfferData();
@@ -280,7 +280,7 @@ import { Api } from "../../../Context/apiService";
 import { toast } from "react-toastify";
 import SpecialOfferList from "./SpecialOfferList";
 import DeleteConfirmationModal from "../../Common/DeleteConfirmationModal";
-import OfferForm from "../../Coupon/presetForm"; // Import OfferForm
+import OfferForm from "../../Coupon/presetForm";
 
 const SpecialOffer = () => {
   const [specialOfferData, setSpecialOfferData] = useState(null);
@@ -293,8 +293,7 @@ const SpecialOffer = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [isToggling, setIsToggling] = useState(false);
-  
-  // New states for OfferForm
+
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [formData, setFormData] = useState({
     presetName: "",
@@ -305,7 +304,7 @@ const SpecialOffer = () => {
     conditions: [""],
     link: "",
     usageLimit: "",
-    type: "offer", // Set default type to "special"
+    type: "own",
     day: null,
     hour: null,
     startAt: null,
@@ -348,7 +347,7 @@ const SpecialOffer = () => {
     try {
       setLoading(true);
       const data = await Api.createSpecialOffer();
-      
+
       if (data.status === "success") {
         toast.success("Special offer session created successfully!");
         await fetchSpecialOfferData();
@@ -364,64 +363,31 @@ const SpecialOffer = () => {
     }
   };
 
-  // New function to handle form submission for creating coupon
-  const handleCreateCoupon = async (e) => {
+  const handleCreateSpecialOfferCoupon = async (e) => {
     e.preventDefault();
     setFormLoading(true);
 
+    console.log("payload", formData)
+
     try {
-      // Call your API to create coupon preset
-      const response = await Api.createCouponPreset(formData);
-      
+      const response = await Api.createSpecialOfferCoupon(formData);
+
       if (response.status === "success") {
-        toast.success("Coupon preset created successfully!");
-        
-        // Add the newly created coupon to special offer
-        await handleAddItem(response.data.coupon);
-        
+        toast.success("Special offer coupon created successfully!");
+
+        await fetchSpecialOfferData();
+
         // Reset form and close
         resetForm();
         setShowOfferForm(false);
       } else {
-        toast.error(response.message || "Failed to create coupon preset");
+        toast.error(response.message || "Failed to create special offer coupon");
       }
     } catch (err) {
-      toast.error("Failed to create coupon preset");
-      console.error("Error creating coupon preset:", err);
+      toast.error("Failed to create special offer coupon");
+      console.error("Error creating special offer coupon:", err);
     } finally {
       setFormLoading(false);
-    }
-  };
-
-  const handleAddItem = async (itemObj) => {
-    setAddError(null);
-
-    if (!itemObj || !itemObj._id) {
-      setAddError("Invalid item");
-      return;
-    }
-
-    const items = specialOfferData?.items || [];
-
-    // Check if item already exists
-    if (items.find((item) => item._id === itemObj._id)) {
-      setAddError("This coupon preset already exists in special offer");
-      return;
-    }
-
-    try {
-      const data = await Api.addSpecialOfferItem(itemObj._id);
-      
-      if (data.status === "success") {
-        toast.success("Coupon preset added to special offer successfully!");
-        await fetchSpecialOfferData();
-        setIsModalOpen(false);
-      } else {
-        setAddError(data.message || "Failed to add coupon preset");
-      }
-    } catch (err) {
-      setAddError("Something went wrong. Please try again.");
-      console.error("Error adding coupon preset:", err);
     }
   };
 
@@ -466,8 +432,6 @@ const SpecialOffer = () => {
         toast.error("Failed to toggle special offer");
       } else {
         toast.success(`Special offer ${newStatus ? 'enabled' : 'disabled'} successfully!`);
-        // Refresh data to get updated status
-        // await fetchSpecialOfferData();
       }
     } catch (err) {
       setSpecialOfferEnabled(!newStatus);
@@ -497,7 +461,7 @@ const SpecialOffer = () => {
       conditions: [""],
       link: "",
       usageLimit: "",
-      type: "special",
+      type: "own",
       day: null,
       hour: null,
       startAt: null,
@@ -595,11 +559,11 @@ const SpecialOffer = () => {
         setShowForm={setShowOfferForm}
         form={formData}
         handleChange={handleFormChange}
-        handleSubmit={handleCreateCoupon}
+        handleSubmit={handleCreateSpecialOfferCoupon}
         resetForm={resetForm}
         loading={formLoading}
         isEditing={false}
-        type="offer"
+        type="own"
         onClose={() => {
           setShowOfferForm(false);
           resetForm();
