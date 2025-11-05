@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { apiRequest } from './apiService';
 
 
-const UserContext = createContext();
+const UserContext = createContext({});
 
 export const getAuthToken = () => {
   const tokenNames = ['authToken'];

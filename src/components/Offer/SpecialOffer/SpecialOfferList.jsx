@@ -426,7 +426,6 @@ const SpecialOfferList = ({ items, openModal, onRemoveItem, error }) => {
     };
 
     const getStatusBadge = (item) => {
-        console.log("item.expireAt--", item.expireAt)
         const isExpired = (item.expireAt && new Date(item.expireAt) < new Date());
         if (isExpired) {
             return { text: 'Expired', color: 'bg-red-100' };

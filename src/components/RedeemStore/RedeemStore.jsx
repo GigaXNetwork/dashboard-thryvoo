@@ -75,7 +75,6 @@ const handleSubmit = useCallback(
         },
         withCredentials: true,
       };
-      console.log(data);
       
       if (isEditing && storeItem?._id) {
         res = await axios.patch(

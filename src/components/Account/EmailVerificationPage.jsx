@@ -38,9 +38,7 @@ export default function EmailVerificationPage({ email }) {
     setLoading(true);
     setMessage("");
 
-    try {
-        console.log(email,code);
-        
+    try {        
       const res = await fetch(`${import.meta.env.VITE_API_URL}/account/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

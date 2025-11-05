@@ -36,7 +36,7 @@ const ProfileBanner = ({
           </div>
         )}
         <img
-          src={photo}
+          src={photo ? `${photo}?t=${new Date().getTime()}` : photo}
           alt={bannerAlt}
           className={`w-full h-80 object-cover transition-opacity duration-300 ${imageLoaded.banner ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => handleImageLoad('banner')}
@@ -74,7 +74,7 @@ const ProfileBanner = ({
             </div>
           )}
           <img
-            src={logo}
+            src={logo ? `${logo}?t=${new Date().getTime()}` : logo}
             alt={logoAlt}
             className={`w-20 h-20 object-contain rounded-full transition-opacity duration-300 ${imageLoaded.logo ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => handleImageLoad('logo')}

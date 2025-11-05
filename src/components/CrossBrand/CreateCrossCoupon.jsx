@@ -232,7 +232,6 @@ const CreateCrossPromotion = () => {
     const handleDeletePreset = useCallback(async (preset) => {
         try {
 
-            console.log("preset", preset)
             const deleteUrl = userRole === 'admin'
                 ? `${API}/api/admin/user/${userId}/presets/${preset._id}`
                 : `${API}/api/user/coupon/presets/${preset._id}`;

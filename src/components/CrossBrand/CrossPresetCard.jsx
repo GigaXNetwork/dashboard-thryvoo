@@ -1,13 +1,15 @@
 import { ArrowRight } from "lucide-react";
 import React from "react";
 
-const PresetCard = ({
+const CrossPresetCard = ({
   preset,
   index,
   openMenuIndex,
   setOpenMenuIndex,
   setPresetToDelete,
   setShowDeleteModal,
+  setPresetToAssign,
+  setShowAssignModal,
   menuRefs,
 }) => {
   const handleMenuToggle = (index) => {
@@ -17,6 +19,13 @@ const PresetCard = ({
   const handleDeleteClick = (preset) => {
     setPresetToDelete(preset);
     setShowDeleteModal(true);
+    setOpenMenuIndex(null);
+  };
+
+  // ✅ Handle Assign To click
+  const handleAssignClick = (preset) => {
+    setPresetToAssign(preset);
+    setShowAssignModal(true);
     setOpenMenuIndex(null);
   };
 
@@ -109,10 +118,17 @@ const PresetCard = ({
             ref={(el) => (menuRefs.current[index] = el)}
             className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden py-2 transition-all duration-200"
           >
-            <button className="w-full text-left px-4 py-2.5 text-sm text-blue-500 hover:bg-blue-50 transition-colors flex items-center gap-2">
+            {/* ✅ Assign To Button - Now Functional */}
+            <button 
+              onClick={() => handleAssignClick(preset)}
+              className="w-full text-left px-4 py-2.5 text-sm text-blue-500 hover:bg-blue-50 transition-colors flex items-center gap-2"
+            >
               <ArrowRight size={16} />
               Assign To
             </button>
+            
+            <div className="border-t border-gray-200 my-1" />
+            
             <button
               onClick={() => handleDeleteClick(preset)}
               className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors flex items-center"
@@ -127,23 +143,23 @@ const PresetCard = ({
       </div>
 
       {/* Brand Header */}
-    <div className="flex items-center gap-3 mb-5">
-      {preset.card.logo ? (
-        <img
-          src={preset.card.logo}
-          alt={preset.card.name}
-          className="w-12 h-12 rounded-full object-cover"
-        />
-      ) : (
-        <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-          {preset.card.name?.[0]?.toUpperCase() || "B"}
+      <div className="flex items-center gap-3 mb-5">
+        {preset.card.logo ? (
+          <img
+            src={preset.card.logo}
+            alt={preset.card.name}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+            {preset.card.name?.[0]?.toUpperCase() || "B"}
+          </div>
+        )}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900">{preset.card.name}</h3>
+          <p className="text-xs text-gray-500">{preset.card.address || "No address"}</p>
         </div>
-      )}
-      <div>
-        <h3 className="text-lg font-bold text-gray-900">{preset.card.name}</h3>
-        <p className="text-xs text-gray-500">{preset.card.address || "No address"}</p>
       </div>
-    </div>
 
       {/* Preset Content */}
       <div className="mb-5">
@@ -214,11 +230,11 @@ const PresetCard = ({
       </div>
 
       {/* Status Badge */}
-      {/* <div className="mt-5 pt-3 border-t border-gray-100">
+      <div className="mt-5 pt-3 border-t border-gray-100">
         <span className={`inline-block ${status.color} text-xs px-3 py-1.5 rounded-full font-semibold tracking-wide shadow-sm`}>
           {status.text}
         </span>
-      </div> */}
+      </div>
 
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
@@ -226,4 +242,4 @@ const PresetCard = ({
   );
 };
 
-export default PresetCard;
+export default CrossPresetCard;

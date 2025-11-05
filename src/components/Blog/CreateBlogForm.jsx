@@ -317,7 +317,6 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
         }
       }
     }
-
     return Object.keys(newErrors).length === 0;
   };
 
@@ -603,8 +602,10 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   onChange={handleFeaturedFileChange}
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all"
                 />
-                {featuredUploadError && (
-                  <p className="mt-1 text-sm text-red-600">{featuredUploadError}</p>
+                {(errors.b_image || featuredUploadError) && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.b_image || featuredUploadError}
+                  </p>
                 )}
                 {(formData.b_image && formData.b_image.startsWith('data:image')) && (
                   <div className="mt-4 relative inline-block">

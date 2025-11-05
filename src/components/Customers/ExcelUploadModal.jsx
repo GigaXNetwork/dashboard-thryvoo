@@ -31,8 +31,6 @@ const ExcelUploadModal = ({
     'File will be processed immediately after upload'
   ];
 
-  console.log(maxFileSize)
-
   const finalInstructions = instructions.length > 0 ? instructions : defaultInstructions;
 
   const handleDragOver = (e) => {

@@ -33,24 +33,23 @@ export async function apiRequest(endpoint, method = "GET", data = null, headers 
     };
 
     if (data) {
-      // For FormData, use the data directly
-      // For JSON, stringify it
       options.body = isFormData ? data : JSON.stringify(data);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP Error ${response.status}`);
+    const contentType = response.headers.get("content-type");
+
+    let result = {};
+    if (contentType && contentType.includes("application/json")) {
+      result = await response.json().catch(() => ({}));
     }
 
-    const contentLength = response.headers.get('content-length');
-    if (contentLength === '0' || response.status === 204) {
-      return { status: 'success' }; // Return a success object for empty responses
-    }
-
-    return await response.json();
+    return {
+      ok: response.ok,
+      httpStatus: response.status,
+      ...result,
+    };
   } catch (error) {
     console.error("API Request Failed:", error);
     throw error;

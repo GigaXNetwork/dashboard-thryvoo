@@ -9,8 +9,6 @@ export default function BasicData({ handleNext, handleBack, cardId, role }) {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [categories, setCategories] = useState([]);
     const { cardData, setCardData, error, loading } = useCard();
-    console.log(cardId);
-
 
 
     useEffect(() => {

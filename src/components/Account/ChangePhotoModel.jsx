@@ -57,7 +57,6 @@ export default function ChangePhotoModal({ onClose }) {
       if (!res.ok) {
         throw new Error(result.message || "Failed to upload photo");
       }
-      console.log(result.user.photo);
 
       // Safely access the photo property
       if (!result?.user.photo) {

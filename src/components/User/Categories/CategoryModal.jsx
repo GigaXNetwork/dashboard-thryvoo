@@ -71,7 +71,7 @@ const CategoryModal = ({
           >
             <div className="text-gray-600 text-sm font-medium mb-1">Category Name *</div>
             <input
-              className="w-full border rounded-lg px-4 py-2.5 mb-2"
+              className="w-full border rounded-lg px-4 py-2.5 mb-2 focus:ring-2 focus:to-blue-800 outline-none"
               placeholder="Enter category name"
               value={input}
               onChange={e => setInput(e.target.value)}
