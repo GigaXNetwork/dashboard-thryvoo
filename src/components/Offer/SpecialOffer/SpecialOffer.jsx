@@ -283,6 +283,7 @@ const SpecialOffer = () => {
         resetForm={resetForm}
         loading={formLoading}
         isEditing={false}
+        title="Create Special Offer"
         type="own"
         onClose={() => {
           setShowOfferForm(false);
