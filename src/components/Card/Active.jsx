@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { getAuthToken } from '../../Context/apiService';
 /*
  * Show "Activate" button if status is inactive and handle API request in activateCard.
  * Already implemented in the component's render and activateCard function.
@@ -24,7 +25,7 @@ const Active = ({ card }) => {
 
             const data = await res.json();
             console.log("Status update response:", data);
-            
+
             if (res.ok) {
                 setStatus(data.data.status);
                 setMsg(`✅ Card ${newStatus === 'active' ? 'activated' : 'inactivated'}.`);
@@ -48,14 +49,17 @@ const Active = ({ card }) => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/card/${card._id}/updateExpire`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': `${getAuthToken()}`,
+                    'Content-Type': 'application/json'
+                },
                 credentials: 'include',
                 body: JSON.stringify({ days: parseInt(days) })
             });
 
             const data = await res.json();
             console.log(data);
-            
+
             if (res.ok) {
                 setExpireAt(data.data.card.expire);
                 setMsg('✅ Expiration updated.');
@@ -110,19 +114,19 @@ const Active = ({ card }) => {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                     <input
                         type="number"
                         placeholder="Days to add"
                         min="1"
                         value={days}
                         onChange={e => setDays(e.target.value)}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         onClick={updateExpiration}
                         disabled={loading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition"
                     >
                         {loading ? (
                             <span className="flex items-center">
@@ -149,7 +153,7 @@ const Active = ({ card }) => {
                                 Updating...
                             </span>
                         ) : (
-                            'Update Expiry'
+                            'Update'
                         )}
                     </button>
                 </div>

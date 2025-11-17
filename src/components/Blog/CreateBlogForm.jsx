@@ -15,7 +15,7 @@ export const getAuthToken = () => {
 };
 
 export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
-  const isEditMode = Boolean(blog && blog.id);
+  const isEditMode = Boolean(blog && blog.id);   
 
   const getInitialState = () => ({
     b_title: blog?.b_title || '',
@@ -262,7 +262,87 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
     }));
   };
 
-  const validateForm = () => {
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   if (!formData.b_title.trim()) newErrors.b_title = 'Title is required';
+  //   if (!formData.b_content.trim()) newErrors.b_content = 'Content is required';
+  //   if (!formData.b_author.trim()) newErrors.b_author = 'Author is required';
+
+  //   if (!formData.b_description.trim()) {
+  //     newErrors.b_description = 'Description is required';
+  //   } else if (formData.b_description.length > DESCRIPTION_MAX_LENGTH) {
+  //     newErrors.b_description = `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`;
+  //   }
+
+  //   if (!formData.b_category.trim() || !categories.includes(formData.b_category)) {
+  //     newErrors.b_category = 'Category is required and must be valid';
+  //   }
+  //   if (!formData.meta_title.trim()) newErrors.meta_title = 'Meta Title is required';
+
+  //   if (!formData.meta_description.trim()) {
+  //     newErrors.meta_description = 'Meta Description is required';
+  //   } else if (formData.meta_description.length > META_DESCRIPTION_MAX_LENGTH) {
+  //     newErrors.meta_description = `Meta Description cannot exceed ${META_DESCRIPTION_MAX_LENGTH} characters`;
+  //   }
+
+  //   if (!formData.meta_tag.trim()) newErrors.meta_tag = 'Meta Tags are required';
+  //   if (formData.b_tags.length === 0) newErrors.b_tags = 'At least one tag is required';
+
+  //   // Enhanced file validation - check both formData and file states
+  //   const hasFeaturedImage = formData.b_image || featuredImageFile;
+  //   const hasMetaPhoto = formData.meta_photo || metaPhotoFile;
+  //   const hasAuthorImage = formData.author_image || authorImageFile;
+  //   const hasGallery = formData.b_gallery.length > 0 || galleryFiles.length > 0;
+
+  //   if (!hasFeaturedImage) newErrors.b_image = 'Featured Image is required';
+  //   if (!hasMetaPhoto) newErrors.meta_photo = 'Meta Photo is required';
+  //   if (!hasAuthorImage) newErrors.author_image = 'Author Image is required';
+  //   if (!hasGallery) newErrors.b_gallery = 'At least one gallery image is required';
+
+  //   setErrors(newErrors);
+
+  //   const firstErrorKey = Object.keys(newErrors)[0];
+  //   if (firstErrorKey) {
+  //     const fieldMap = {
+  //       b_title: titleRef,
+  //       b_author: authorRef,
+  //       b_category: categoryRef,
+  //       b_description: descriptionRef,
+  //       b_content: contentRef,
+  //       b_tags: tagRef,
+  //       meta_title: metaTitleRef,
+  //       meta_description: metaDescriptionRef,
+  //       meta_tag: metaTagsRef,
+  //       b_image: featuredInputRef,
+  //       meta_photo: metaPhotoInputRef,
+  //       author_image: authorImageInputRef,
+  //       b_gallery: galleryInputRef,
+  //     };
+
+  //     const ref = fieldMap[firstErrorKey];
+  //     if (ref?.current) {
+  //       setTimeout(() => {
+  //         if (firstErrorKey === "b_content") {
+  //           ref.current.getEditor().root.scrollIntoView({ behavior: "smooth", block: "center" });
+  //           ref.current.getEditor().focus();
+  //         } else {
+  //           ref.current.scrollIntoView({
+  //             behavior: "smooth",
+  //             block: "center",
+  //             inline: "nearest"
+  //           });
+  //           ref.current.focus?.();
+  //         }
+  //       }, 100);
+  //     }
+  //   }
+
+  //   return Object.keys(newErrors).length === 0;
+  // };
+
+
+    const validateForm = () => {
     const newErrors = {};
 
     if (!formData.b_title.trim()) newErrors.b_title = 'Title is required';
@@ -288,10 +368,25 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
 
     if (!formData.meta_tag.trim()) newErrors.meta_tag = 'Meta Tags are required';
     if (formData.b_tags.length === 0) newErrors.b_tags = 'At least one tag is required';
-    if (!formData.b_image) newErrors.b_image = 'Featured Image is required';
-    if (!formData.meta_photo) newErrors.meta_photo = 'Meta Photo is required';
+    
+    // Enhanced file validation - check both formData and file states
+    const hasFeaturedImage = formData.b_image || featuredImageFile;
+    const hasMetaPhoto = formData.meta_photo || metaPhotoFile;
+    const hasAuthorImage = formData.author_image || authorImageFile;
+    const hasGallery = formData.b_gallery.length > 0 || galleryFiles.length > 0;
+
+    if (!hasFeaturedImage) newErrors.b_image = 'Featured Image is required';
+    if (!hasMetaPhoto) newErrors.meta_photo = 'Meta Photo is required';
+    
+    // Make author image required only for new blogs, not for edits
+    if (!isEditMode && !hasAuthorImage) {
+      newErrors.author_image = 'Author Image is required';
+    }
+    
+    if (!hasGallery) newErrors.b_gallery = 'At least one gallery image is required';
 
     setErrors(newErrors);
+    console.log("newErrors", newErrors)
 
     const firstErrorKey = Object.keys(newErrors)[0];
     if (firstErrorKey) {
@@ -305,18 +400,31 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
         meta_title: metaTitleRef,
         meta_description: metaDescriptionRef,
         meta_tag: metaTagsRef,
+        b_image: featuredInputRef,
+        meta_photo: metaPhotoInputRef,
+        author_image: authorImageInputRef,
+        b_gallery: galleryInputRef,
       };
 
       const ref = fieldMap[firstErrorKey];
       if (ref?.current) {
-        if (firstErrorKey === "b_content") {
-          ref.current.getEditor().root.scrollIntoView({ behavior: "smooth", block: "center" });
-          ref.current.getEditor().focus();
-        } else {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
+        // Use setTimeout to ensure the scroll happens after state update
+        setTimeout(() => {
+          if (firstErrorKey === "b_content") {
+            ref.current.getEditor().root.scrollIntoView({ behavior: "smooth", block: "center" });
+            ref.current.getEditor().focus();
+          } else {
+            ref.current.scrollIntoView({ 
+              behavior: "smooth", 
+              block: "center",
+              inline: "nearest"
+            });
+            ref.current.focus?.(); // Safe focus call
+          }
+        }, 100);
       }
     }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -498,14 +606,18 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Author Image</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Author Image *</label>
                 <input
                   ref={authorImageInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleAuthorImageChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.author_image ? 'border-red-300' : 'border-gray-200'
+                    }`}
                 />
+                {errors.author_image && (
+                  <p className="mt-1 text-sm text-red-600">{errors.author_image}</p>
+                )}
                 {authorImageError && (
                   <p className="mt-1 text-sm text-red-600">{authorImageError}</p>
                 )}
@@ -600,7 +712,8 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleFeaturedFileChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none focus:border-transparent transition-all ${errors.b_image ? 'border-red-300' : 'border-gray-200'
+                    }`}
                 />
                 {(errors.b_image || featuredUploadError) && (
                   <p className="mt-1 text-sm text-red-600">
@@ -628,7 +741,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
 
               <div className="lg:col-span-2">
                 <label className="block text-sm font-semibold text-gray-800 mb-3">
-                  Gallery Images <span className="text-gray-500 font-normal">(Max 10 images, each ≤ 5MB)</span>
+                  Gallery Images * <span className="text-gray-500 font-normal">(Max 10 images, each ≤ 5MB)</span>
                 </label>
                 <input
                   ref={galleryInputRef}
@@ -637,8 +750,12 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   multiple
                   onChange={handleGalleryFileChange}
                   disabled={uploadingGallery || galleryFiles.length >= 10}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none ${errors.b_gallery ? 'border-red-300' : 'border-gray-200'
+                    }`}
                 />
+                {errors.b_gallery && (
+                  <p className="mt-2 text-sm text-red-600">{errors.b_gallery}</p>
+                )}
                 {galleryUploadError && (
                   <p className="mt-2 text-sm text-red-600">{galleryUploadError}</p>
                 )}
@@ -748,8 +865,12 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
                   accept="image/*"
                   ref={metaPhotoInputRef}
                   onChange={handleMetaPhotoChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none ${errors.meta_photo ? 'border-red-300' : 'border-gray-200'
+                    }`}
                 />
+                {errors.meta_photo && (
+                  <p className="mt-1 text-sm text-red-600">{errors.meta_photo}</p>
+                )}
                 {metaPhotoError && <p className="mt-1 text-sm text-red-600">{metaPhotoError}</p>}
                 {formData.meta_photo && formData.meta_photo.startsWith('data:image') && (
                   <div className="mt-4 relative inline-block">

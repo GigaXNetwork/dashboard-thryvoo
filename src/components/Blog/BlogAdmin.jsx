@@ -6,8 +6,8 @@ import { SearchBar } from './SearchBar';
 import { Pagination } from './Pagination';
 import { LoadingGrid } from './LoadingSpinner';
 import { ErrorState } from './ErrorState';
+import MessagePopup from '../../components/Common/MessagePopup';
 import { BookOpen, Users, Eye, Plus } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 export const BlogAdmin = () => {
   const { blogs, loading, error, totalPages, currentPage, totalResults, refetch, changePage, deleteBlog } = useBlogs();
@@ -16,6 +16,9 @@ export const BlogAdmin = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [popupType, setPopupType] = useState('success');
 
   const filteredBlogs = useMemo(() => {
     if (!searchTerm.trim()) return blogs;
@@ -37,6 +40,16 @@ export const BlogAdmin = () => {
       uniqueAuthors,
     };
   }, [blogs, totalResults]);
+
+  const handleShowPopup = (message, type = 'success') => {
+    setPopupMessage(message);
+    setPopupType(type);
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
 
   const handleCreateNew = () => {
     setShowCreateForm(true);
@@ -70,9 +83,9 @@ export const BlogAdmin = () => {
     
     try {
       await deleteBlog(selectedBlog);
-      toast.success("Blog deleted successfully");
+      handleShowPopup("Blog deleted successfully", "success");
     } catch (err) {
-      toast.error("Failed to delete blog");
+      handleShowPopup("Failed to delete blog", "error");
       console.error("Delete failed:", err.message);
     } finally {
       setDeleteLoading(null);
@@ -228,6 +241,8 @@ export const BlogAdmin = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
@@ -256,11 +271,19 @@ export const BlogAdmin = () => {
                 ) : (
                   'Yes'
                 )}
-
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Message Popup */}
+      {showPopup && (
+        <MessagePopup
+          message={popupMessage}
+          type={popupType}
+          onClose={handleClosePopup}
+        />
       )}
     </div>
   );

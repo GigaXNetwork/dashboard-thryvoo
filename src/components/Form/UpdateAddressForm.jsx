@@ -57,7 +57,7 @@ export default function UpdateAddressForm({ onClose, onSubmit }) {
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -71,7 +71,7 @@ export default function UpdateAddressForm({ onClose, onSubmit }) {
             </button>
             <button
               type="submit"
-              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Continue
             </button>

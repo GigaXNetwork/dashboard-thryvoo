@@ -63,6 +63,8 @@ const FlashHourOffer = () => {
         minPurchase: '',
         day: '',
         usageLimit: '',
+        startAt: '',
+        expireAt: '',
         type: 'offer'
     }), []);
 
@@ -165,9 +167,15 @@ const FlashHourOffer = () => {
     }, [initialFormState]);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        // Prevent default if it's a regular event
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
 
-        if (!form.presetName || !form.discountAmount) {
+        // Use formData from the custom event or fall back to form state
+        const submitData = e.formData || form;
+
+        if (!submitData.presetName || !submitData.discountAmount) {
             setMessage('❌ Please fill in all required fields');
             return;
         }
@@ -178,7 +186,20 @@ const FlashHourOffer = () => {
         const {
             discountType, presetName, discountAmount,
             maxDiscount, minPurchase, usageLimit, startAt, expireAt
-        } = form;
+        } = submitData;
+
+        // Debug log to verify the payload
+        console.log('Final payload with dates:', {
+            discountType,
+            presetName,
+            discountAmount,
+            maxDiscount: maxDiscount ? parseFloat(maxDiscount) : undefined,
+            minPurchase: minPurchase ? parseFloat(minPurchase) : undefined,
+            usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
+            startAt: startAt || undefined,
+            expireAt: expireAt || undefined,
+            type: 'offer'
+        });
 
         try {
             const method = isEditing ? 'PATCH' : 'POST';
@@ -198,8 +219,8 @@ const FlashHourOffer = () => {
                     maxDiscount: maxDiscount ? parseFloat(maxDiscount) : undefined,
                     minPurchase: minPurchase ? parseFloat(minPurchase) : undefined,
                     usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
-                    startAt: startAt ? new Date(startAt).toISOString() : undefined,
-                    expireAt: expireAt ? new Date(expireAt).toISOString() : undefined,
+                    startAt: startAt || undefined,
+                    expireAt: expireAt || undefined,
                     type: 'offer'
                 })
             });
@@ -226,6 +247,7 @@ const FlashHourOffer = () => {
         }
     };
 
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -242,7 +264,7 @@ const FlashHourOffer = () => {
     }, [openMenuIndex]);
 
     const handleDeletePreset = useCallback(async (preset) => {
-        setDeleteLoading(true); 
+        setDeleteLoading(true);
 
         try {
             const deleteUrl = userRole === 'admin'
@@ -270,7 +292,7 @@ const FlashHourOffer = () => {
             console.error("Delete failed:", err);
             setMessage('❌ Error deleting offer.');
         } finally {
-            setDeleteLoading(false); 
+            setDeleteLoading(false);
         }
     }, [userRole, userId]);
 
@@ -279,6 +301,10 @@ const FlashHourOffer = () => {
             const res = await fetch(apiUrls.toggleUrl(preset._id), {
                 method: 'PATCH',
                 credentials: 'include',
+                headers: {
+                    "Authorization": `${getAuthToken()}`,
+                    'Content-Type': 'application/json',
+                },
             });
 
             const data = await res.json();
@@ -307,8 +333,8 @@ const FlashHourOffer = () => {
             day: preset.day || '',
             usageLimit: preset.usageLimit || '',
             type: preset.type || 'offer',
-            startAt: preset.startAt ? preset.startAt.split('T')[0] : '',
-            expireAt: preset.expireAt ? preset.expireAt.split('T')[0] : ''
+            startAt: preset.startAt || '',
+            expireAt: preset.expireAt || '',
         });
 
         setIsEditing(true);

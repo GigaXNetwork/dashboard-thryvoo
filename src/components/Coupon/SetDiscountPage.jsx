@@ -9,7 +9,6 @@
 // import { toast } from 'react-toastify';
 
 // const SetDiscountPage = () => {
-//     // State management
 //     const [presets, setPresets] = useState([]);
 //     const [loading, setLoading] = useState(false);
 //     const [presetLoading, setPresetLoading] = useState(true);
@@ -27,27 +26,28 @@
 //     const [endDate, setEndDate] = useState('');
 //     const [quickDateFilter, setQuickDateFilter] = useState('');
 //     const [searchTerm, setSearchTerm] = useState('');
+//     const [typeFilter, setTypeFilter] = useState('');
 
 //     // Refs and context
 //     const menuRefs = useRef([]);
 //     const { userData } = useUser();
-//     const user = userData.user.role;
+//     const userRole = userData?.user?.role;
 //     const { userId } = useParams();
 
 //     // Memoized URLs
 //     const getUrl = useMemo(() => (
-//         user === 'admin'
+//         userRole === 'admin'
 //             ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/getDiscount`
 //             : `${import.meta.env.VITE_API_URL}/api/user/getCoupon`
-//     ), [user, userId]);
+//     ), [userRole, userId]);
 
 //     const setUrl = useMemo(() => (
-//         user === 'admin'
+//         userRole === 'admin'
 //             ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/setDiscount`
 //             : `${import.meta.env.VITE_API_URL}/api/user/setCoupon`
-//     ), [user, userId]);
+//     ), [userRole, userId]);
 
-//     // Form state
+//     // Form state - Dynamic type based on user role
 //     const [form, setForm] = useState({
 //         discountType: 'percentage',
 //         presetName: '',
@@ -56,7 +56,7 @@
 //         minPurchase: '',
 //         day: '',
 //         usageLimit: '',
-//         type: 'own'
+//         type: userRole === 'admin' ? 'own' : 'own'
 //     });
 
 //     // Debounced search effect
@@ -69,14 +69,16 @@
 //         return () => clearTimeout(timeout);
 //     }, [search]);
 
-//     // Optimized fetch function
+//     // Optimized fetch function - Include type filter for admin
 //     const fetchPresets = useCallback(async () => {
 //         setPresetLoading(true);
 //         try {
 //             const params = new URLSearchParams({
-//                 type: 'own',
+//                 // For admin, don't hardcode type - use filter or fetch all
+//                 ...(userRole !== 'admin' && { type: 'own' }), // Only restrict for non-admin
 //                 ...(searchTerm && { presetName: searchTerm.trim() }),
 //                 ...(statusFilter && { status: statusFilter }),
+//                 ...(typeFilter && { type: typeFilter }), // Add type filter for admin
 //                 ...(startDate && { 'createdAt[gt]': startDate }),
 //                 ...(endDate && { 'createdAt[lt]': endDate }),
 //             });
@@ -103,7 +105,7 @@
 //         } finally {
 //             setPresetLoading(false);
 //         }
-//     }, [getUrl, searchTerm, statusFilter, startDate, endDate]);
+//     }, [getUrl, searchTerm, statusFilter, typeFilter, startDate, endDate, userRole]);
 
 //     // Fetch data effect
 //     useEffect(() => {
@@ -125,7 +127,12 @@
 //     }, [openMenuIndex]);
 
 //     const handleClearFilters = () => {
-//         toast.info('All filters cleared');
+//         setSearch('');
+//         setStatusFilter('');
+//         setTypeFilter('');
+//         setStartDate('');
+//         setEndDate('');
+//         setQuickDateFilter('');
 //     };
 
 //     // Form handlers
@@ -143,11 +150,11 @@
 //             minPurchase: '',
 //             day: '',
 //             usageLimit: '',
-//             type: 'own'
+//             type: userRole === 'admin' ? 'own' : 'own'
 //         });
-//     }, []);
+//     }, [userRole]);
 
-//     // Form submission
+//     // Form submission - Remove hardcoded type override
 //     const handleSubmit = useCallback(async (e) => {
 //         e.preventDefault();
 //         setLoading(true);
@@ -162,10 +169,24 @@
 //         try {
 //             const method = isEditing ? 'PATCH' : 'POST';
 //             const url = isEditing
-//                 ? (user === 'admin'
+//                 ? (userRole === 'admin'
 //                     ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${editingPresetId}`
 //                     : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${editingPresetId}`)
 //                 : setUrl;
+
+//             const requestBody = {
+//                 ...form,
+//                 maxDiscount: form.maxDiscount ? parseFloat(form.maxDiscount) : undefined,
+//                 minPurchase: form.minPurchase ? parseFloat(form.minPurchase) : undefined,
+//                 day: form.day ? parseInt(form.day) : undefined, // Expiry duration in days
+//                 usageLimit: form.usageLimit ? parseInt(form.usageLimit) : undefined,
+//                 // Type is already in form state, no need to override
+//             };
+
+//             // For non-admin users, ensure type is always 'own'
+//             if (userRole !== 'admin') {
+//                 requestBody.type = 'own';
+//             }
 
 //             const response = await fetch(url, {
 //                 method,
@@ -174,14 +195,7 @@
 //                     'Authorization': `${getAuthToken()}`
 //                 },
 //                 credentials: 'include',
-//                 body: JSON.stringify({
-//                     ...form,
-//                     maxDiscount: form.maxDiscount ? parseFloat(form.maxDiscount) : undefined,
-//                     minPurchase: form.minPurchase ? parseFloat(form.minPurchase) : undefined,
-//                     day: form.day ? parseInt(form.day) : undefined,
-//                     usageLimit: form.usageLimit ? parseInt(form.usageLimit) : undefined,
-//                     type: 'own',
-//                 })
+//                 body: JSON.stringify(requestBody)
 //             });
 
 //             const data = await response.json();
@@ -203,12 +217,12 @@
 //         } finally {
 //             setLoading(false);
 //         }
-//     }, [form, isEditing, editingPresetId, resetForm, fetchPresets, setUrl, user, userId]);
+//     }, [form, isEditing, editingPresetId, resetForm, fetchPresets, setUrl, userRole, userId]);
 
 //     // Delete preset
 //     const handleDeletePreset = useCallback(async (preset) => {
 //         try {
-//             const deleteUrl = user === 'admin'
+//             const deleteUrl = userRole === 'admin'
 //                 ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}`
 //                 : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}`;
 
@@ -232,14 +246,17 @@
 //             console.error("Delete failed:", err);
 //             toast.error('Error deleting coupon.');
 //         }
-//     }, [user, userId]);
+//     }, [userRole, userId]);
 
 //     // Toggle active status
 //     const handleToggleActive = useCallback(async (preset) => {
 //         try {
-//             const toggleUrl = user === "admin"
-//                 ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/setActive`
-//                 : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/setActive`;
+//             const isCurrentlyActive = preset.isActive;
+//             const action = isCurrentlyActive ? 'setDeactive' : 'setActive';
+
+//             const toggleUrl = userRole === "admin"
+//                 ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/${action}`
+//                 : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/${action}`;
 
 //             const res = await fetch(toggleUrl, {
 //                 method: 'PATCH',
@@ -254,19 +271,19 @@
 //                 setPresets(prev =>
 //                     prev.map(p => ({
 //                         ...p,
-//                         isActive: p._id === preset._id
+//                         isActive: p._id === preset._id ? !isCurrentlyActive : p.isActive
 //                     }))
 //                 );
-//                 toast.success('✅ Status updated successfully!');
+//                 toast.success(`✅ Status ${isCurrentlyActive ? 'deactivated' : 'activated'} successfully!`);
 //             } else {
 //                 const data = await res.json();
-//                 toast.error(data.message || '❌ Failed to update status.');
+//                 toast.error(data.message || `❌ Failed to ${isCurrentlyActive ? 'deactivate' : 'activate'} coupon.`);
 //             }
 //         } catch (err) {
 //             console.error("Toggle error:", err);
 //             toast.error('Error updating status.');
 //         }
-//     }, [user, userId]);
+//     }, [userRole, userId]);
 
 //     // Edit preset
 //     const handleEditPreset = useCallback((preset) => {
@@ -276,18 +293,17 @@
 //             discountAmount: preset.discountAmount || '',
 //             maxDiscount: preset.maxDiscount || '',
 //             minPurchase: preset.minPurchase || '',
-//             day: preset.day || '',
+//             day: preset.day || '', // Expiry duration in days
 //             usageLimit: preset.usageLimit || '',
-//             type: 'own',
+//             type: preset.type || (userRole === 'admin' ? 'own' : 'own'),
 //             conditions: preset.conditions || '',
-//             link: preset.link || '',
-//             startAt: preset.startAt || '',
-//             expireAt: preset.expireAt || ''
+//             link: preset.link || ''
+//             // Removed startAt and expireAt
 //         });
 //         setIsEditing(true);
 //         setEditingPresetId(preset._id);
 //         setShowForm(true);
-//     }, []);
+//     }, [userRole]);
 
 //     const toggleMenu = useCallback((index) => {
 //         setOpenMenuIndex(prevIndex => prevIndex === index ? null : index);
@@ -297,7 +313,9 @@
 //         <div className="p-8 mx-auto rounded-lg min-h-screen">
 //             {/* Header */}
 //             <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
-//                 <h1 className="text-2xl font-bold text-gray-700">All Presets</h1>
+//                 <h1 className="text-2xl font-bold text-gray-700">
+//                     {userRole === 'admin' ? 'All Coupons' : 'My Coupons'}
+//                 </h1>
 //                 <button
 //                     onClick={() => setShowForm(true)}
 //                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold px-6 py-2.5 rounded-md shadow transition"
@@ -306,7 +324,7 @@
 //                 </button>
 //             </div>
 
-//             {/* FilterBar Component */}
+//             {/* FilterBar Component - Enhanced for admin */}
 //             <FilterBar
 //                 search={search}
 //                 setSearch={setSearch}
@@ -325,21 +343,34 @@
 //                     { value: "active", label: "Active" },
 //                     { value: "inactive", label: "Inactive" }
 //                 ]}
+//                 // Add type filter for admin
+//                 showTypeFilter={userRole === 'admin'}
+//                 typeFilter={typeFilter}
+//                 setTypeFilter={setTypeFilter}
+//                 typeOptions={[
+//                     { value: "", label: "All Types" },
+//                     { value: "own", label: "Own Promotion" },
+//                     { value: "cross", label: "Cross Promotion" },
+//                     { value: "offer", label: "Special Offer" }
+//                 ]}
 //                 onClearFilters={handleClearFilters}
 //             />
 
 //             {/* Preset Cards */}
-//             {presetLoading && !searchTerm && !statusFilter && !startDate && !endDate ? (
+//             {presetLoading && !searchTerm && !statusFilter && !startDate && !endDate && !typeFilter ? (
 //                 <div className="flex items-center justify-center h-64 text-gray-500">
 //                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
 //                     Loading...
 //                 </div>
 //             ) : presets.length === 0 ? (
 //                 <div className="text-gray-500 col-span-full text-center py-10">
-//                     No Own Brand coupons found.
+//                     {userRole === 'admin' ? 'No coupons found.' : 'No Own Brand coupons found.'}
 //                 </div>
 //             ) : (
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 my-6">
+//                 <div className={`grid grid-cols-1 gap-6 my-6 ${userRole === 'admin'
+//                     ? 'md:grid-cols-2'
+//                     : 'sm:grid-cols-2 lg:grid-cols-3'
+//                     }`}>
 //                     {presets.map((preset, index) => (
 //                         <PresetCard
 //                             key={preset._id}
@@ -353,6 +384,7 @@
 //                             setShowDeleteModal={setShowDeleteModal}
 //                             handleToggleActive={handleToggleActive}
 //                             menuRefs={menuRefs}
+//                             showTypeBadge={userRole === 'admin'}
 //                         />
 //                     ))}
 //                 </div>
@@ -363,6 +395,7 @@
 //                 <div className="fixed inset-0 bg-black/15 backdrop-blur-sm z-40" onClick={() => setShowForm(false)} />
 //             )}
 
+//             {/* CRITICAL FIX: Don't pass 'type' prop for admin users */}
 //             <PresetForm
 //                 showForm={showForm}
 //                 setShowForm={setShowForm}
@@ -372,7 +405,7 @@
 //                 resetForm={resetForm}
 //                 loading={loading}
 //                 isEditing={isEditing}
-//                 type="own"
+//                 type={userRole === 'admin' ? undefined : 'own'}
 //             />
 
 //             {/* Delete Confirmation */}
@@ -392,6 +425,7 @@
 
 
 
+
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import PresetForm from './presetForm';
@@ -403,7 +437,6 @@ import { getAuthToken } from '../../Context/apiService';
 import { toast } from 'react-toastify';
 
 const SetDiscountPage = () => {
-    // State management
     const [presets, setPresets] = useState([]);
     const [loading, setLoading] = useState(false);
     const [presetLoading, setPresetLoading] = useState(true);
@@ -421,7 +454,7 @@ const SetDiscountPage = () => {
     const [endDate, setEndDate] = useState('');
     const [quickDateFilter, setQuickDateFilter] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [typeFilter, setTypeFilter] = useState(''); // Add type filter
+    const [typeFilter, setTypeFilter] = useState('');
 
     // Refs and context
     const menuRefs = useRef([]);
@@ -451,7 +484,7 @@ const SetDiscountPage = () => {
         minPurchase: '',
         day: '',
         usageLimit: '',
-        type: userRole === 'admin' ? 'own' : 'own' // Admin can change this in form
+        type: userRole === 'admin' ? 'own' : 'own'
     });
 
     // Debounced search effect
@@ -466,7 +499,9 @@ const SetDiscountPage = () => {
 
     // Optimized fetch function - Include type filter for admin
     const fetchPresets = useCallback(async () => {
-        setPresetLoading(true);
+        const startTime = Date.now();
+        setLoading(true);
+
         try {
             const params = new URLSearchParams({
                 // For admin, don't hardcode type - use filter or fetch all
@@ -498,7 +533,14 @@ const SetDiscountPage = () => {
             toast.error('Error loading coupons');
             setPresets([]);
         } finally {
-            setPresetLoading(false);
+            const elapsedTime = Date.now() - startTime;
+            const minLoadingTime = 500;
+
+            if (elapsedTime < minLoadingTime) {
+                setTimeout(() => setLoading(false), minLoadingTime - elapsedTime);
+            } else {
+                setLoading(false);
+            }
         }
     }, [getUrl, searchTerm, statusFilter, typeFilter, startDate, endDate, userRole]);
 
@@ -528,7 +570,6 @@ const SetDiscountPage = () => {
         setStartDate('');
         setEndDate('');
         setQuickDateFilter('');
-        toast.info('All filters cleared');
     };
 
     // Form handlers
@@ -546,7 +587,7 @@ const SetDiscountPage = () => {
             minPurchase: '',
             day: '',
             usageLimit: '',
-            type: userRole === 'admin' ? 'own' : 'own' // Reset to default based on role
+            type: userRole === 'admin' ? 'own' : 'own'
         });
     }, [userRole]);
 
@@ -574,7 +615,7 @@ const SetDiscountPage = () => {
                 ...form,
                 maxDiscount: form.maxDiscount ? parseFloat(form.maxDiscount) : undefined,
                 minPurchase: form.minPurchase ? parseFloat(form.minPurchase) : undefined,
-                day: form.day ? parseInt(form.day) : undefined,
+                day: form.day ? parseInt(form.day) : undefined, // Expiry duration in days
                 usageLimit: form.usageLimit ? parseInt(form.usageLimit) : undefined,
                 // Type is already in form state, no need to override
             };
@@ -647,9 +688,12 @@ const SetDiscountPage = () => {
     // Toggle active status
     const handleToggleActive = useCallback(async (preset) => {
         try {
+            const isCurrentlyActive = preset.isActive;
+            const action = isCurrentlyActive ? 'setDeactive' : 'setActive';
+
             const toggleUrl = userRole === "admin"
-                ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/setActive`
-                : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/setActive`;
+                ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/${action}`
+                : `${import.meta.env.VITE_API_URL}/api/user/coupon/presets/${preset._id}/${action}`;
 
             const res = await fetch(toggleUrl, {
                 method: 'PATCH',
@@ -664,13 +708,13 @@ const SetDiscountPage = () => {
                 setPresets(prev =>
                     prev.map(p => ({
                         ...p,
-                        isActive: p._id === preset._id
+                        isActive: p._id === preset._id ? !isCurrentlyActive : p.isActive
                     }))
                 );
-                toast.success('✅ Status updated successfully!');
+                toast.success(`✅ Status ${isCurrentlyActive ? 'deactivated' : 'activated'} successfully!`);
             } else {
                 const data = await res.json();
-                toast.error(data.message || '❌ Failed to update status.');
+                toast.error(data.message || `❌ Failed to ${isCurrentlyActive ? 'deactivate' : 'activate'} coupon.`);
             }
         } catch (err) {
             console.error("Toggle error:", err);
@@ -688,11 +732,9 @@ const SetDiscountPage = () => {
             minPurchase: preset.minPurchase || '',
             day: preset.day || '',
             usageLimit: preset.usageLimit || '',
-            type: preset.type || (userRole === 'admin' ? 'own' : 'own'), // Use preset type or default
+            type: preset.type || (userRole === 'admin' ? 'own' : 'own'),
             conditions: preset.conditions || '',
-            link: preset.link || '',
-            startAt: preset.startAt || '',
-            expireAt: preset.expireAt || ''
+            link: preset.link || ''
         });
         setIsEditing(true);
         setEditingPresetId(preset._id);
@@ -750,23 +792,47 @@ const SetDiscountPage = () => {
                 onClearFilters={handleClearFilters}
             />
 
-            {/* Preset Cards */}
-            {presetLoading && !searchTerm && !statusFilter && !startDate && !endDate && !typeFilter ? (
-                <div className="flex items-center justify-center h-64 text-gray-500">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
-                    Loading...
+            {/* Results Count - Only show when not loading */}
+            {!loading && !presetLoading && (
+                <div className="mb-4 text-sm text-gray-600">
+                    Showing {presets.length} coupon{presets.length !== 1 ? 's' : ''}
+                    {(search || statusFilter || startDate || endDate || typeFilter) && " (filtered)"}
+                    {search && (
+                        <span className="ml-1">for "{search}"</span>
+                    )}
+                </div>
+            )}
+
+            {/* Preset Cards with Loading State */}
+            {loading ? (
+                <div className="col-span-full">
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
+                        <span className="text-gray-600 text-lg">Loading coupons...</span>
+                        <span className="text-gray-400 text-sm mt-1">Please wait while we fetch your data</span>
+                    </div>
                 </div>
             ) : presets.length === 0 ? (
                 <div className="text-gray-500 col-span-full text-center py-10">
-                    {userRole === 'admin' ? 'No coupons found.' : 'No Own Brand coupons found.'}
+                    <div className="flex flex-col items-center">
+                        <svg className="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-lg font-medium text-gray-600">
+                            {userRole === 'admin' ? 'No coupons found.' : 'No Own Brand coupons found.'}
+                        </span>
+                        {search && (
+                            <span className="text-sm text-gray-400 mt-1">
+                                No results for "{search}"
+                            </span>
+                        )}
+                    </div>
                 </div>
             ) : (
-                // <div className={`grid grid-cols-1 ${userRole === 'admin' ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'} gap-8 my-6`}>
                 <div className={`grid grid-cols-1 gap-6 my-6 ${userRole === 'admin'
-                        ? 'md:grid-cols-2'
-                        : 'sm:grid-cols-2 lg:grid-cols-3'
+                    ? 'md:grid-cols-2'
+                    : 'sm:grid-cols-2 lg:grid-cols-3'
                     }`}>
-
                     {presets.map((preset, index) => (
                         <PresetCard
                             key={preset._id}
@@ -801,8 +867,6 @@ const SetDiscountPage = () => {
                 resetForm={resetForm}
                 loading={loading}
                 isEditing={isEditing}
-                // For admin: don't pass type prop (or pass undefined) to show type selector
-                // For users: pass type="own" to hide type selector
                 type={userRole === 'admin' ? undefined : 'own'}
             />
 

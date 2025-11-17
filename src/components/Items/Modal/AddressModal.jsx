@@ -95,7 +95,7 @@ export default function AddressModal({ cardData, cardId, role, onClose, onSubmit
         value={form[name]}
         onChange={handleChange}
         required
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <div className="text-right text-xs text-gray-400 mt-1">
         {form[name].length}/{charLimits[name]} characters
@@ -143,8 +143,8 @@ export default function AddressModal({ cardData, cardId, role, onClose, onSubmit
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700"
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
               }`}
             >
               {isSubmitting ? "Updating..." : "Save"}

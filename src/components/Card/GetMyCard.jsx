@@ -1,30 +1,202 @@
+// import { useEffect, useState } from "react";
+// import { useParams, useOutletContext } from "react-router-dom";
+// import CreateCard from "./CreateCard";
+// import QRCodeGenerator from "./QRCodeGenerator";
+// import { Badge, CheckCircle, ExternalLink, Eye, Loader2, Pencil, Plus } from "lucide-react";
+// import Active from "./Active";
+// import Cookies from "js-cookie"
+// import { useUser } from "../../Context/ContextApt";
+
+// function GetMyCard({ role }) {
+//   const { userId } = useParams();
+//   const { userData, loading: userLoading } = useUser(); // Properly destructure useUser
+//   const [card, setCard] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [isCreateCardForm, setIsCreateCardForm] = useState(false);
+//   const [cardUrl, setcardUrl] = useState("");
+//   const [activeTab, setActiveTab] = useState("card");
+
+//   let url;
+//   if (role === "admin") {
+//     url = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`;
+//   } else {
+//     url = `${import.meta.env.VITE_API_URL}/api/user/card`;
+//   }
+
+//   const token = Cookies.get('authToken');
+
+//   useEffect(() => {
+//     const fetchCard = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await fetch(url, {
+//           method: "GET",
+//           headers: {
+//             "Content-Type": "application/json",
+//             "Authorization": `${token}`
+//           },
+//           credentials: "include",
+//         });
+
+//         if (response.status === 404) {
+//           setCard(null);
+//         } else if (!response.ok) {
+//           throw new Error("Failed to fetch card");
+//         } else {
+//           const data = await response.json();
+//           setCard(data.data.card);
+//           if (data.data.card?.slug) {
+//             setcardUrl(`https://thryvoo.com/b/${data.data.card.slug}`);
+//           }
+//         }
+//       } catch (err) {
+//         setError(err.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchCard();
+//   }, [userId, url]);
+
+//   const handleCreateCard = () => {
+//     setIsCreateCardForm(true);
+//   };
+
+//   // Get the actual user object from userData
+//   const currentUser = userData?.user;
+
+//   // Combine both loading states
+//   if (loading || userLoading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
+//   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center p-4">
+//       <div className="w-full max-w-md">
+//         <div className="bg-white border rounded-sm p-4 ">
+//           <div className="p-8">
+//             {card ? (
+//               <div className="text-center space-y-6">
+//                 {/* Card Details */}
+//                 <div className="space-y-4">
+//                   <div className="p-4 bg-gray-50 rounded-xl">
+//                     <h2 className="text-xl font-semibold text-gray-900 mb-2">{card.name}</h2>
+//                   </div>
+//                 </div>
+
+//                 {/* Action buttons */}
+//                 <div className="space-y-3">
+//                   <button
+//                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block"
+//                   >
+//                     <a href={cardUrl} className="flex items-center rounded-sm justify-center gap-2">
+//                       <ExternalLink className="w-5 h-5" />
+//                       Visit Business Profile
+//                     </a>
+//                   </button>
+
+//                   <a
+//                     href={`/card/${card._id}`}
+//                     className="inline-flex items-center gap-1.5 text-base font-normal text-black hover:text-blue-600 transition-colors"
+//                   >
+//                     <Pencil className="w-4 h-4" />
+//                     Edit Business card
+//                   </a>
+//                 </div>
+
+//                 {/* QR Code Section */}
+//                 <div className="pt-4 border-t border-gray-200">
+//                   <QRCodeGenerator url={cardUrl} />
+//                 </div>
+
+//                 {/* Safely render Active component only when needed */}
+//                 {activeTab && role === "admin" && card?._id && (
+//                   <Active card={{
+//                     _id: card._id,
+//                     status: card.status || "active", // default value if undefined
+//                     expireAt: card.expire || null    // default value if undefined
+//                   }} />
+//                 )}
+//               </div>
+//             ) : (
+//               <div className="text-center space-y-6">
+//                 {/* No Card Header */}
+//                 <div className="space-y-3">
+//                   <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+//                     <Plus className="w-8 h-8 text-gray-400" />
+//                   </div>
+//                   <h1 className="text-3xl font-bold text-gray-900">No Card Found</h1>
+//                   <p className="text-gray-600 text-lg">Looks like this user hasn't created a business card yet.</p>
+//                 </div>
+
+//                 {/* Create Card button */}
+//                 <button
+//                   onClick={handleCreateCard}
+//                   className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+//                 >
+//                   <Plus className="w-5 h-5" />
+//                   Create Business Card
+//                 </button>
+
+//                 {/* Create Card Form */}
+//                 {isCreateCardForm && (
+//                   <CreateCard
+//                     userId={userId}
+//                     user={currentUser} // Pass the actual user object
+//                     onClose={() => setIsCreateCardForm(false)}
+//                     onSubmit={(newCard) => {
+//                       setCard(newCard);
+//                       if (newCard?.slug) {
+//                         setcardUrl(`https://thryvoo.com/b/${newCard.slug}`);
+//                       }
+//                       setIsCreateCardForm(false);
+//                     }}
+//                   />
+//                 )}
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default GetMyCard;
+
+
+
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import CreateCard from "./CreateCard";
 import QRCodeGenerator from "./QRCodeGenerator";
-import { Badge, CheckCircle, ExternalLink, Eye, Loader2, Pencil, Plus } from "lucide-react";
+import { ExternalLink, Loader2, Pencil, Plus } from "lucide-react";
 import Active from "./Active";
-import Cookies from "js-cookie"
-import { useUser } from "../../Context/ContextApt";
+import Cookies from "js-cookie";
 
 function GetMyCard({ role }) {
   const { userId } = useParams();
-  const { userData, loading: userLoading } = useUser(); // Properly destructure useUser
+  const outletContext = useOutletContext();
+  const [selectedUser, setSelectedUser] = useState(null);
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCreateCardForm, setIsCreateCardForm] = useState(false);
   const [cardUrl, setcardUrl] = useState("");
-  const [activeTab, setActiveTab] = useState("card");
 
-  let url;
-  if (role === "admin") {
-    url = `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`;
-  } else {
-    url = `${import.meta.env.VITE_API_URL}/api/user/card`;
-  }
+  const url = role === "admin" 
+    ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/card`
+    : `${import.meta.env.VITE_API_URL}/api/user/card`;
 
   const token = Cookies.get('authToken');
+
+  // Get selected user data for admin
+  useEffect(() => {
+    if (role === "admin" && outletContext?.selectedUser) {
+      setSelectedUser(outletContext.selectedUser);
+    }
+  }, [outletContext, role]);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -58,39 +230,31 @@ function GetMyCard({ role }) {
     };
 
     fetchCard();
-  }, [userId, url]);
+  }, [url, token]);
 
   const handleCreateCard = () => {
     setIsCreateCardForm(true);
   };
 
-  // Get the actual user object from userData
-  const currentUser = userData?.user;
-
-  // Combine both loading states
-  if (loading || userLoading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
+  if (loading) return <div className="flex items-center justify-center mt-20"><Loader2 className="animate-spin mr-2"/>Loading ...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white border rounded-sm p-4 ">
+        <div className="bg-white border rounded-sm p-4">
           <div className="p-8">
             {card ? (
               <div className="text-center space-y-6">
-                {/* Card Details */}
                 <div className="space-y-4">
                   <div className="p-4 bg-gray-50 rounded-xl">
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">{card.name}</h2>
                   </div>
                 </div>
 
-                {/* Action buttons */}
                 <div className="space-y-3">
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block"
-                  >
-                    <a href={cardUrl} className="flex items-center rounded-sm justify-center gap-2">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300 m-auto mt-4 block">
+                    <a href={cardUrl} className="flex items-center justify-center gap-2">
                       <ExternalLink className="w-5 h-5" />
                       Visit Business Profile
                     </a>
@@ -105,45 +269,49 @@ function GetMyCard({ role }) {
                   </a>
                 </div>
 
-                {/* QR Code Section */}
                 <div className="pt-4 border-t border-gray-200">
                   <QRCodeGenerator url={cardUrl} />
                 </div>
 
-                {/* Safely render Active component only when needed */}
-                {activeTab && role === "admin" && card?._id && (
+                {role === "admin" && card?._id && (
                   <Active card={{
                     _id: card._id,
-                    status: card.status || "active", // default value if undefined
-                    expireAt: card.expire || null    // default value if undefined
+                    status: card.status || "active",
+                    expireAt: card.expire || null
                   }} />
                 )}
               </div>
             ) : (
               <div className="text-center space-y-6">
-                {/* No Card Header */}
                 <div className="space-y-3">
                   <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
                     <Plus className="w-8 h-8 text-gray-400" />
                   </div>
                   <h1 className="text-3xl font-bold text-gray-900">No Card Found</h1>
-                  <p className="text-gray-600 text-lg">Looks like this user hasn't created a business card yet.</p>
+                  <p className="text-gray-600 text-lg">
+                    {/* {role === "admin" 
+                      ? "This user hasn't created a business card yet." 
+                      : "You haven't created a business card yet."
+                    } */}
+                    Looks like this user hasn't created a business card yet.
+                  </p>
                 </div>
 
-                {/* Create Card button */}
-                <button
-                  onClick={handleCreateCard}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  <Plus className="w-5 h-5" />
-                  Create Business Card
-                </button>
+                {/* Show Create Card button ONLY for admin */}
+                {role === "admin" && (
+                  <button
+                    onClick={handleCreateCard}
+                    className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Create Business Card
+                  </button>
+                )}
 
-                {/* Create Card Form */}
-                {isCreateCardForm && (
+                {isCreateCardForm && role === "admin" && (
                   <CreateCard
                     userId={userId}
-                    user={currentUser} // Pass the actual user object
+                    user={selectedUser}
                     onClose={() => setIsCreateCardForm(false)}
                     onSubmit={(newCard) => {
                       setCard(newCard);

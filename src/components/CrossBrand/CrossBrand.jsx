@@ -355,7 +355,7 @@ const CrossBrand = () => {
           </div>
 
           {/* 🔧 Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {/* Status Filter */}
             <div className="relative">
               <select
@@ -373,7 +373,7 @@ const CrossBrand = () => {
             </div>
 
             {/* Type Filter */}
-            <div className="relative">
+            {/* <div className="relative">
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
@@ -387,7 +387,7 @@ const CrossBrand = () => {
               <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </div>
+            </div> */}
 
             {/* Start Date */}
             <div className="relative">

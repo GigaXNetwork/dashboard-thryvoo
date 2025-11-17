@@ -133,10 +133,6 @@ const CreateCrossPromotion = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuIndex]);
 
-    const handleClearFilters = () => {
-        toast.info('All filters cleared');
-    };
-
     // Form handlers
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -356,7 +352,6 @@ const CreateCrossPromotion = () => {
                     { value: "active", label: "Active" },
                     { value: "inactive", label: "Inactive" }
                 ]}
-                onClearFilters={handleClearFilters}
             />
 
             {/* Preset Cards */}
