@@ -40,11 +40,13 @@ const SpecialOfferPresetSelector = ({
         fetchPresets();
     }, [existingPresets]);
 
-    // Filter presets based on search
-    const filteredPresets = presets.filter(preset =>
-        preset.presetName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        preset.discountType?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter presets: remove already added ones AND apply search filter
+    const filteredPresets = presets
+        .filter(preset => !existingPresets.includes(preset._id)) // Remove already added presets
+        .filter(preset => 
+            preset.presetName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            preset.discountType?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
     const handleToggleSelect = (preset) => {
         setSelectedItems(prev => {
@@ -99,7 +101,7 @@ const SpecialOfferPresetSelector = ({
                         </div>
 
                         {/* Search Bar */}
-                        {/* <div className="relative">
+                        <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
@@ -108,7 +110,7 @@ const SpecialOfferPresetSelector = ({
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                        </div> */}
+                        </div>
 
                         {/* Selection Info - NO LIMITS */}
                         <div className="flex items-center justify-between mt-4">
@@ -126,7 +128,7 @@ const SpecialOfferPresetSelector = ({
                                 )}
                             </div>
 
-                            {/* {selectedItems.length > 0 && (
+                            {selectedItems.length > 0 && (
                                 <button
                                     onClick={handleAddSelected}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
@@ -134,7 +136,7 @@ const SpecialOfferPresetSelector = ({
                                     <Plus className="w-4 h-4" />
                                     Add {selectedItems.length} Preset{selectedItems.length !== 1 ? 's' : ''}
                                 </button>
-                            )} */}
+                            )}
                         </div>
                     </header>
 
@@ -176,7 +178,7 @@ const SpecialOfferPresetSelector = ({
                                 <p className="text-gray-500 text-sm">
                                     {searchTerm
                                         ? "Try adjusting your search terms"
-                                        : "All your presets are already in special offers"
+                                        : "All presets are already in special offers or no presets available"
                                     }
                                 </p>
                             </div>
@@ -185,16 +187,16 @@ const SpecialOfferPresetSelector = ({
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {filteredPresets.map((preset) => {
                                         const isSelected = selectedItems.find(item => item._id === preset._id);
-                                        const isExisting = existingPresets.includes(preset._id);
 
                                         return (
                                             <div
                                                 key={preset._id}
-                                                className={`p-4 border-2 rounded-xl transition-all duration-200 ${isSelected
-                                                    ? "border-blue-500 bg-blue-50"
-                                                    : "border-gray-200 hover:border-gray-300"
-                                                    } ${isExisting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                                                onClick={() => !isExisting && handleToggleSelect(preset)}
+                                                className={`p-4 border-2 rounded-xl transition-all duration-200 cursor-pointer ${
+                                                    isSelected
+                                                        ? "border-blue-500 bg-blue-50"
+                                                        : "border-gray-200 hover:border-gray-300"
+                                                }`}
+                                                onClick={() => handleToggleSelect(preset)}
                                             >
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex-1">
@@ -202,11 +204,6 @@ const SpecialOfferPresetSelector = ({
                                                             <h3 className="font-semibold text-gray-800">
                                                                 {preset.presetName}
                                                             </h3>
-                                                            {isExisting && (
-                                                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                                                                    Already added
-                                                                </span>
-                                                            )}
                                                         </div>
 
                                                         <div className="space-y-1 text-sm text-gray-600">
@@ -224,29 +221,26 @@ const SpecialOfferPresetSelector = ({
                                                     </div>
 
                                                     <div className="flex items-center gap-2">
-                                                        {!isExisting && (
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleAddSingle(preset);
-                                                                }}
-                                                                className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                                                                title="Add this preset"
-                                                            >
-                                                                <Plus className="w-4 h-4" />
-                                                            </button>
-                                                        )}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleAddSingle(preset);
+                                                            }}
+                                                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                                            title="Add this preset"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>
 
-                                                        {!isExisting && (
-                                                            <div
-                                                                className={`w-5 h-5 border-2 rounded flex items-center justify-center ${isSelected
+                                                        <div
+                                                            className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                                                                isSelected
                                                                     ? "bg-blue-500 border-blue-500"
                                                                     : "border-gray-300"
-                                                                    }`}
-                                                            >
-                                                                {isSelected && <Check className="w-3 h-3 text-white" />}
-                                                            </div>
-                                                        )}
+                                                            }`}
+                                                        >
+                                                            {isSelected && <Check className="w-3 h-3 text-white" />}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
