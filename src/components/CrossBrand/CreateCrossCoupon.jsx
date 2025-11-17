@@ -7,7 +7,8 @@ import FilterBar from '../Common/FilterBar';
 import { useUser } from '../../Context/ContextApt';
 import { Plus } from 'lucide-react';
 import { getAuthToken } from '../../Context/apiService';
-import { toast } from 'react-toastify';
+import MessagePopup from '../Common/MessagePopup';
+
 
 const CreateCrossPromotion = () => {
     // State management
@@ -19,6 +20,8 @@ const CreateCrossPromotion = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingPresetId, setEditingPresetId] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [message, setMessage] = useState({ text: "", type: "" });
 
     // Filter states
     const [search, setSearch] = useState('');
@@ -34,6 +37,14 @@ const CreateCrossPromotion = () => {
     const userRole = userData?.user?.role;
     const { userId } = useParams();
     const API = import.meta.env.VITE_API_URL;
+
+    const showMessage = (text, type = "success") => {
+        setMessage({ text, type });
+    };
+
+    const closeMessage = () => {
+        setMessage({ text: "", type: "" });
+    };
 
     // Memoized URLs
     const getUrl = useMemo(() => (
@@ -97,17 +108,16 @@ const CreateCrossPromotion = () => {
             if (res.ok) {
                 const data = await res.json();
                 const list = data.discount || data.data?.coupon || data.data || [];
-                const onlyCross = Array.isArray(list) 
+                const onlyCross = Array.isArray(list)
                     ? list.filter(p => p.type === 'cross' || p.type === undefined)
                     : [];
                 setPresets(onlyCross);
             } else {
-                toast.error('Failed to load coupons');
+                showMessage('Failed to load coupons', 'error');
                 setPresets([]);
             }
         } catch (err) {
-            console.error('Fetch cross presets error:', err);
-            toast.error('Error loading coupons');
+            showMessage('Error loading coupons', 'error');
             setPresets([]);
         } finally {
             setLoading(false);
@@ -165,7 +175,7 @@ const CreateCrossPromotion = () => {
 
         const { presetName, discountAmount } = form;
         if (!presetName || !discountAmount) {
-            toast.error('Please fill in all required fields');
+            showMessage('Please fill in all required fields', 'error');
             setLoading(false);
             return;
         }
@@ -207,22 +217,30 @@ const CreateCrossPromotion = () => {
 
             if (response.ok) {
                 const successMessage = isEditing ? 'Coupon updated successfully!' : 'Coupon created successfully!';
-                toast.success(successMessage);
+                showMessage(successMessage, 'success');
                 resetForm();
                 fetchPresets();
                 setShowForm(false);
                 setIsEditing(false);
                 setEditingPresetId(null);
             } else {
-                toast.error(data.message || `Failed to ${isEditing ? 'update' : 'create'} coupon.`);
+                showMessage(data.message || `Failed to ${isEditing ? 'update' : 'create'} coupon.`, 'error');
             }
         } catch (err) {
-            console.error(err);
-            toast.error('Error saving coupon.');
+            showMessage('Error saving coupon.', 'error');
         } finally {
             setLoading(false);
         }
     }, [form, isEditing, editingPresetId, API, setUrl, userRole, userId, resetForm, fetchPresets]);
+
+    const handleDeletePresetWithLoader = async (preset) => {
+        try {
+            setIsDeleting(true);
+            await handleDeletePreset(preset);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     // Delete preset
     const handleDeletePreset = useCallback(async (preset) => {
@@ -241,15 +259,14 @@ const CreateCrossPromotion = () => {
             });
 
             if (res.ok) {
-                toast.success('Coupon deleted successfully!');
+                showMessage('Coupon deleted successfully!', 'success');
                 setPresets(prev => prev.filter(p => p._id !== preset._id));
             } else {
                 const data = await res.json();
-                toast.error(data.message || 'Failed to delete coupon.');
+                showMessage(data.message || 'Failed to delete coupon.', 'error');
             }
         } catch (err) {
-            console.error("Delete failed:", err);
-            toast.error('Error deleting coupon.');
+            showMessage('Error deleteing coupon.', 'error');
         } finally {
             setShowDeleteModal(false);
             setPresetToDelete(null);
@@ -278,14 +295,13 @@ const CreateCrossPromotion = () => {
                         isActive: p._id === preset._id
                     }))
                 );
-                toast.success('Status updated successfully!');
+                showMessage('Status updated successfully!', 'success');
             } else {
                 const data = await res.json();
-                toast.error(data.message || 'Failed to update status.');
+                showMessage(data.message || 'Failed to update status.', 'error');
             }
         } catch (err) {
-            console.error("Toggle error:", err);
-            toast.error('Error updating status.');
+            showMessage('Error updating status')
         }
     }, [API, userRole, userId]);
 
@@ -321,6 +337,15 @@ const CreateCrossPromotion = () => {
 
     return (
         <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md min-h-screen">
+            {/* Message Popup */}
+            {message.text && (
+                <MessagePopup
+                    message={message.text}
+                    type={message.type}
+                    onClose={closeMessage}
+                />
+            )}
+
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
                 <h1 className="text-2xl font-bold text-gray-700 flex-shrink-0">Cross Brand Coupons</h1>
@@ -374,9 +399,9 @@ const CreateCrossPromotion = () => {
                             openMenuIndex={openMenuIndex}
                             toggleMenu={toggleMenu}
                             handleEditPreset={handleEditPreset}
-                            handleDeletePreset={(p) => { 
-                                setPresetToDelete(p); 
-                                setShowDeleteModal(true); 
+                            handleDeletePreset={(p) => {
+                                setPresetToDelete(p);
+                                setShowDeleteModal(true);
                             }}
                             setPresetToDelete={setPresetToDelete}
                             setShowDeleteModal={setShowDeleteModal}
@@ -409,7 +434,8 @@ const CreateCrossPromotion = () => {
                 <PresetToggle
                     presetToDelete={presetToDelete}
                     setShowDeleteModal={setShowDeleteModal}
-                    handleDeletePreset={handleDeletePreset}
+                    handleDeletePreset={handleDeletePresetWithLoader}
+                    isLoading={isDeleting}
                     setPresetToDelete={setPresetToDelete}
                 />
             )}

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText, Search, X } from "lucide-react";
 import { apiRequest } from "../../Context/apiService";
 import Pagination from "../Common/Pagination";
+import { Eye } from "lucide-react";
+
 
 export default function MyCategories() {
   const [categories, setCategories] = useState([]);
@@ -10,6 +12,7 @@ export default function MyCategories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Pagination state for categories
   const [currentCategoryPage, setCurrentCategoryPage] = useState(1);
@@ -55,7 +58,7 @@ export default function MyCategories() {
     try {
       setLoading(true);
       const response = await apiRequest(`/api/user/mybanner/${categoryId}?page=${page}&limit=${itemsPerPage}`);
-      
+
       if (response.status === "success") {
         setItems(response.data.banners || []);
         setTotalItemPages(response.data?.totalPages || 1);
@@ -282,6 +285,7 @@ export default function MyCategories() {
                         alt={item.name || "Item"}
                         className="w-full h-full object-cover"
                       />
+
                     ) : item.type === 'video' && item.url ? (
                       <div className="w-full h-full bg-gray-900 flex items-center justify-center">
                         {getYouTubeVideoId(item.url) ? (
@@ -303,6 +307,15 @@ export default function MyCategories() {
                         <span className="text-sm mt-2">No Media</span>
                       </div>
                     )}
+                    {/* Eye icon to preview full size */}
+                    <button
+                      onClick={() => setPreviewImage(item.url)}
+                      className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition"
+                      title="View full image"
+                    >
+                      <Eye size={18} />
+                    </button>
+
 
                     {/* Type Badge */}
                     <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
@@ -403,7 +416,7 @@ export default function MyCategories() {
                   </div>
 
                   {/* Item Counts - Placeholder for now */}
-                  <div className="space-y-3">
+                  {/* <div className="space-y-3">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600 font-medium">Total Items:</span>
                       <span className="font-bold text-gray-900">-</span>
@@ -424,7 +437,7 @@ export default function MyCategories() {
                       </div>
                       <span className="font-semibold text-gray-900">-</span>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Click Hint */}
                   <div className="mt-4 pt-3 border-t border-gray-100">
@@ -448,6 +461,22 @@ export default function MyCategories() {
             </div>
           )}
         </>
+      )}
+      {previewImage && (
+        <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm">
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-6 right-6 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition"
+          >
+            <X size={28} />
+          </button>
+
+          <img
+            src={previewImage}
+            alt="Preview"
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-2xl"
+          />
+        </div>
       )}
     </div>
   );

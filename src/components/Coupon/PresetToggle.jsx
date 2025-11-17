@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 
-const PresetToggle = ({ presetToDelete, setShowDeleteModal, handleDeletePreset, setPresetToDelete }) => {
+const PresetToggle = ({
+  presetToDelete,
+  setShowDeleteModal,
+  handleDeletePreset,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   if (!presetToDelete) return null;
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    await handleDeletePreset(presetToDelete);
+    setShowDeleteModal(false);
+  };
 
   return (
     <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
@@ -18,14 +30,17 @@ const PresetToggle = ({ presetToDelete, setShowDeleteModal, handleDeletePreset, 
             Cancel
           </button>
           <button
-            onClick={async () => {
-              await handleDeletePreset(presetToDelete);
-              setShowDeleteModal(false);
-              setPresetToDelete(null);
-            }}
+            onClick={handleConfirm}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm"
           >
-            Delete
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              "Delete"
+            )}
           </button>
         </div>
       </div>

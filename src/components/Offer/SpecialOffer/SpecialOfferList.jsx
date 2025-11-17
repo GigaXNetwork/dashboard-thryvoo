@@ -202,18 +202,6 @@ const SpecialOfferList = ({ items, openModal, onRemoveItem, error }) => {
                                                         <span className="text-lg font-bold text-gray-800">₹{item.minPurchase}</span>
                                                     </div>
                                                 )}
-
-                                                {item.day && (
-                                                    <div className="flex flex-col items-center text-center bg-gray-50 px-4 py-3 rounded-lg mx-4">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <Calendar size={14} className="text-gray-500" />
-                                                            <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                                                                Valid for
-                                                            </span>
-                                                        </div>
-                                                        <span className="text-lg font-bold text-gray-800">{item.day} Day{item.day !== 1 ? 's' : ''}</span>
-                                                    </div>
-                                                )}
                                             </div>
 
                                             {/* Flip Hint */}

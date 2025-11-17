@@ -89,6 +89,7 @@ const CouponPresetSelector = ({
     }
 
     const selectedPresetObjects = presets.filter(p => selectedPresets.includes(p._id));
+    console.log("selectedPresetObjects:", selectedPresetObjects);
     if (selectedPresetObjects.length > 0 && onAddSpin) {
       onAddSpin(selectedPresetObjects);
     } else {
