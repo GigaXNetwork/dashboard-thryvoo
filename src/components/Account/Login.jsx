@@ -3,6 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import Cookies from "js-cookie";
+import { setAuthToken } from "../../utils/auth";
 
 export default function LoginPage() {
   const [error, setError] = useState(null);
@@ -36,15 +37,19 @@ export default function LoginPage() {
 
       const data = await response.json();
 
+      console.log("login-data--", data)
+      console.log("token--", data.token)
+
       if (response.ok) {
         console.log("Login successful", data);
-        window.open(`${import.meta.env.VITE_FRONTEND_URL}`, "_self")
-        Cookies.set('authToken', data.token, { expires: 30 });
+        setAuthToken(data.token);
         setError(null); // Clear any previous error messages
-        setLoading(false); // Reset loading state
+        setTimeout(() => {
+          setLoading(false);
+          window.open(`${import.meta.env.VITE_FRONTEND_URL}`, "_self");
+        }, 2000);
       } else {
         console.error("Login failed", data.message);
-        // Show error toast or message to user
         setError(data.message || "Login failed. Please try again.");
         setLoading(false); // Reset loading state
       }

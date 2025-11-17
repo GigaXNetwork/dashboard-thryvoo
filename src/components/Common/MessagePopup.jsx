@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 // Message Popup Component
 export default function MessagePopup  ({ message, type, onClose })  {
   useEffect(() => {
-    const timer = setTimeout(onClose, 5000);
+    const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
   }, [onClose]);
 

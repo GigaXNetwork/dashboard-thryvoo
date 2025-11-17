@@ -147,6 +147,7 @@ export const Api = {
   getMySpecialOffers: () => apiRequest("/api/special-offer/my-special-offers", "GET"),
   createSpecialOffer: () => apiRequest("/api/special-offer/create-special-offer", "POST"),
   createSpecialOfferCoupon: (formData) => apiRequest("/api/user/coupon/presets/special-offer", "POST", formData),
+  addSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/add-items", "POST", { itemId }),
   removeSpecialOfferItem: (itemId) => apiRequest("/api/special-offer/remove-items", "POST", { itemId }),
   toggleSpecialOffer: (id) => apiRequest(`/api/special-offer/${id}/toggle`, "POST"),
   getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
