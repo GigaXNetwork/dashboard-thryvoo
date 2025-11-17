@@ -537,11 +537,9 @@ const handleConfirmRedeem = async () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    toast.info(`Loading page ${page}...`);
   };
 
   const handleClearFilters = () => {
-    toast.info('All filters cleared');
     setCurrentPage(1);
   };
 
@@ -585,13 +583,6 @@ const handleConfirmRedeem = async () => {
           { value: "", label: "All Statuses" },
           { value: "active", label: "Active" },
           { value: "redeemed", label: "Redeemed" }
-        ]}
-        quickFilterOptions={[
-          { value: "", label: "Custom / All Time" },
-          { value: "today", label: "Today" },
-          { value: "7days", label: "Last 7 Days" },
-          { value: "15days", label: "Last 15 Days" },
-          { value: "1month", label: "Last 1 Month" }
         ]}
         onClearFilters={handleClearFilters}
       />

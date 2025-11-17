@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import MessagePopup from '../Common/MessagePopup';
 import MediaDetails from './MediaDetails';
 import Cookies from "js-cookie";
-import FilterBar from '../Common/FilterBar'; // Import the FilterBar
+import FilterBar from '../Common/FilterBar';
 
 function MediaRewards() {
   const [filters, setFilters] = useState({

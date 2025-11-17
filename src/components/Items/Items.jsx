@@ -388,7 +388,7 @@ function Items({ role }) {
     { id: 'address', icon: MapPin, label: 'Address', component: AddressSec },
     { id: 'social', icon: Share2, label: 'Social Links', component: SocialSec },
     { id: 'meta', icon: FaGlobe, label: 'Meta Information', component: MetaDataSec },
-    { id: 'brochures', icon: FileText, label: 'Brochures', component: BrochuresSec },
+    { id: 'brochures', icon: FileText, label: 'Price List / Brochures', component: BrochuresSec },
     { id: 'gallery', icon: Image, label: 'Gallery', component: GallerySec },
   ];
 
