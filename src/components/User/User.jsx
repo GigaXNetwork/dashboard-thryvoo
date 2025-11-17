@@ -7,6 +7,8 @@ import { AlertCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Gr
 import { getAuthToken } from "../../Context/apiService";
 import UserListCard from "./UserListCard";
 import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
+
 
 const UserHeader = ({
   filters,
@@ -115,6 +117,9 @@ function User() {
     hasNextPage: false,
     hasPreviousPage: false
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const maxVisiblePages = 5;
 
@@ -558,7 +563,122 @@ function User() {
             </div>
 
             <form onSubmit={handleCreateUser} className="space-y-4" noValidate>
-              {/* ... (modal form content remains the same) ... */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-colors ${formErrors.name
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    }`}
+                />
+                {formErrors.name && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {formErrors.name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-colors ${formErrors.email
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    }`}
+                />
+                {formErrors.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {formErrors.email}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-colors ${formErrors.password
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    }`}
+                />
+                {formErrors.password && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {formErrors.password}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-colors ${formErrors.confirmPassword
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    }`}
+                />
+                {formErrors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {formErrors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {formStatus.message && (
+                <div className={`p-3 rounded-lg ${formStatus.type === "error"
+                  ? "bg-red-50 text-red-700 border border-red-200"
+                  : "bg-green-50 text-green-700 border border-green-200"
+                  }`}>
+                  {formStatus.message}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={handleModalClose}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {creating ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="animate-spin" size={16} />
+                      Creating...
+                    </span>
+                  ) : (
+                    "Create User"
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
