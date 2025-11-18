@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText, Search, X } from "lucide-react";
+import { ArrowLeft, Download, ImageIcon, RefreshCcw, Video, FileText, Search, X, Maximize2 } from "lucide-react";
 import { apiRequest } from "../../Context/apiService";
 import Pagination from "../Common/Pagination";
 import { Eye } from "lucide-react";
@@ -308,13 +308,15 @@ export default function MyCategories() {
                       </div>
                     )}
                     {/* Eye icon to preview full size */}
+                    {item.type === 'image' && (
                     <button
                       onClick={() => setPreviewImage(item.url)}
                       className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition"
                       title="View full image"
                     >
-                      <Eye size={18} />
+                      <Maximize2 size={18} />
                     </button>
+                    )}
 
 
                     {/* Type Badge */}
