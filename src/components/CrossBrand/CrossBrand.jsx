@@ -3,6 +3,7 @@ import { Search, Calendar, ExternalLink, ChevronDown, X } from "lucide-react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import FilterBar from "../Common/FilterBar";
 
 const CrossBrand = () => {
   const [data, setData] = useState(null);
@@ -78,6 +79,45 @@ const CrossBrand = () => {
     }
   }, [categorySearch, categories]);
 
+  // Fetch locations on component mount
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/location`, {
+          headers: { Authorization: `${token}` },
+          withCredentials: true,
+        });
+        if (response.data.status === 'success') {
+          const locs = response.data.data.locations.map(loc => ({
+            id: loc.coordinates._id,
+            display: `${loc.addressLine} (${loc.pin})`,
+            addressLine: loc.addressLine,
+            pin: loc.pin,
+          }));
+          setLocations(locs);
+          setFilteredLocations(locs);
+        }
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+      }
+    };
+
+    fetchLocations();
+  }, [API_URL, token]);
+
+  // Filter location based on search
+  useEffect(() => {
+    if (locationSearch.trim() === '') {
+      setFilteredLocations(locations);
+    } else {
+      const filtered = locations.filter(loc =>
+        loc.display.toLowerCase().includes(locationSearch.toLowerCase())
+      );
+      setFilteredLocations(filtered);
+    }
+  }, [locationSearch, locations]);
+
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -111,6 +151,9 @@ const CrossBrand = () => {
   // Fetch cross brand data with filters
   useEffect(() => {
     const fetchCrossBrandData = async () => {
+      if (search.trim() !== '') {
+        setSearchLoading(true);
+      }
       setFetchLoading(true);
       setError(null);
 
@@ -145,7 +188,7 @@ const CrossBrand = () => {
         }
 
         if (locationFilter) {
-          queryParams.location = locationFilter;
+          queryParams.search = locationFilter;
         }
 
         const queryString = buildQuery(queryParams);
@@ -181,76 +224,6 @@ const CrossBrand = () => {
 
     return () => clearTimeout(timeout);
   }, [API_URL, token, search, statusFilter, typeFilter, startDate, endDate, categoryFilter, locationFilter]);
-
-  // Handle search with separate loading state
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    if (e.target.value.trim()) {
-      setSearchLoading(true);
-    }
-  };
-
-  // Handle category selection
-  const handleCategorySelect = (category) => {
-    setCategoryFilter(category.name);
-    setShowCategoryDropdown(false);
-    setCategorySearch('');
-  };
-
-  // Handle location selection (for now, using mock data)
-  const handleLocationSelect = (location) => {
-    setLocationFilter(location);
-    setShowLocationDropdown(false);
-    setLocationSearch('');
-  };
-
-  // Clear category filter
-  const clearCategoryFilter = () => {
-    setCategoryFilter('');
-    setCategorySearch('');
-  };
-
-  // Clear location filter
-  const clearLocationFilter = () => {
-    setLocationFilter('');
-    setLocationSearch('');
-  };
-
-  // Handle quick date filter changes - send simple date strings
-  const handleQuickDateFilterChange = (value) => {
-    setQuickDateFilter(value);
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-
-    switch (value) {
-      case 'today':
-        setStartDate(todayStr);
-        setEndDate(todayStr);
-        break;
-      case '7days':
-        const sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        setStartDate(sevenDaysAgo.toISOString().split('T')[0]);
-        setEndDate(todayStr);
-        break;
-      case '15days':
-        const fifteenDaysAgo = new Date(today);
-        fifteenDaysAgo.setDate(today.getDate() - 15);
-        setStartDate(fifteenDaysAgo.toISOString().split('T')[0]);
-        setEndDate(todayStr);
-        break;
-      case '1month':
-        const oneMonthAgo = new Date(today);
-        oneMonthAgo.setMonth(today.getMonth() - 1);
-        setStartDate(oneMonthAgo.toISOString().split('T')[0]);
-        setEndDate(todayStr);
-        break;
-      default:
-        setStartDate('');
-        setEndDate('');
-        break;
-    }
-  };
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -315,7 +288,7 @@ const CrossBrand = () => {
       if (response.ok) {
         toast.success("Coupon set successfully!")
       } else {
-        toast.error( result.message || "Failed to set coupon. Please try again.")
+        toast.error(result.message || "Failed to set coupon. Please try again.")
       }
     } catch (err) {
       console.error("Failed to set coupon:", err);
@@ -335,274 +308,43 @@ const CrossBrand = () => {
         </div>
 
         {/* 🔍 Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-md space-y-6 mb-8">
-          {/* 🔍 Search Bar */}
-          <div className="relative mx-auto">
-            <input
-              type="text"
-              placeholder="Search by promotion name..."
-              value={search}
-              onChange={handleSearchChange}
-              className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
-            />
-            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-            {/* Search loading indicator - only shows during search */}
-            {searchLoading && (
-              <div className="absolute right-4 top-3.5">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              </div>
-            )}
-          </div>
-
-          {/* 🔧 Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            {/* Status Filter */}
-            <div className="relative">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-              >
-                <option value="">All Statuses</option>
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </select>
-              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
-
-            {/* Type Filter */}
-            {/* <div className="relative">
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-              >
-                <option value="">All Types</option>
-                <option value="cross">Cross Brand</option>
-                <option value="own">Own Brand</option>
-                <option value="offer">Offer</option>
-              </select>
-              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div> */}
-
-            {/* Start Date */}
-            <div className="relative">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setQuickDateFilter('');
-                  setStartDate(e.target.value);
-                }}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-              />
-            </div>
-
-            {/* End Date */}
-            <div className="relative">
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  setQuickDateFilter('');
-                  setEndDate(e.target.value);
-                }}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-              />
-            </div>
-
-            {/* Quick Filter Dropdown */}
-            <div className="relative">
-              <select
-                value={quickDateFilter}
-                onChange={(e) => handleQuickDateFilterChange(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-              >
-                <option value="">Quick Date Filter</option>
-                <option value="today">Today</option>
-                <option value="7days">Last 7 Days</option>
-                <option value="15days">Last 15 Days</option>
-                <option value="1month">Last 1 Month</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {/* Category Filter */}
-            <div className="relative w-full" ref={categoryDropdownRef}>
-              <button
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200 flex items-center justify-between"
-              >
-                <span className="truncate">
-                  {categoryFilter || "All Categories"}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
-              </button>
-              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-
-              {/* Category Dropdown */}
-              {showCategoryDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-hidden">
-                  {/* Search inside dropdown */}
-                  <div className="p-2 border-b border-gray-200">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search categories..."
-                        value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
-                        className="w-full pl-8 pr-8 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      {categorySearch && (
-                        <button
-                          onClick={() => setCategorySearch('')}
-                          className="absolute right-2 top-3 text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Category list */}
-                  <div className="max-h-48 overflow-y-auto">
-                    {filteredCategories.length > 0 ? (
-                      filteredCategories.map((category) => (
-                        <button
-                          key={category.id}
-                          onClick={() => handleCategorySelect(category)}
-                          className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${categoryFilter === category.name ? 'bg-blue-100 text-blue-700' : ''
-                            }`}
-                        >
-                          {category.name}
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-4 py-2 text-sm text-gray-500 text-center">
-                        No categories found
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Clear category button */}
-              {categoryFilter && (
-                <button
-                  onClick={clearCategoryFilter}
-                  className="absolute right-10 top-4 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Location Filter */}
-            <div className="relative w-full" ref={locationDropdownRef}>
-              <button
-                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200 flex items-center justify-between"
-              >
-                <span className="truncate">
-                  {locationFilter || "All Locations"}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${showLocationDropdown ? 'rotate-180' : ''}`} />
-              </button>
-              <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-
-              {/* Location Dropdown - For now using mock data */}
-              {showLocationDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-hidden">
-                  {/* Search inside dropdown */}
-                  <div className="p-2 border-b border-gray-200">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search locations..."
-                        value={locationSearch}
-                        onChange={(e) => setLocationSearch(e.target.value)}
-                        className="w-full pl-8 pr-8 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      {locationSearch && (
-                        <button
-                          onClick={() => setLocationSearch('')}
-                          className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="max-h-48 overflow-y-auto">
-                    <button
-                      onClick={() => handleLocationSelect('Mumbai')}
-                      className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${locationFilter === 'Mumbai' ? 'bg-blue-100 text-blue-700' : ''
-                        }`}
-                    >
-                      Mumbai
-                    </button>
-                    <button
-                      onClick={() => handleLocationSelect('Delhi')}
-                      className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${locationFilter === 'Delhi' ? 'bg-blue-100 text-blue-700' : ''
-                        }`}
-                    >
-                      Delhi
-                    </button>
-                    <button
-                      onClick={() => handleLocationSelect('Bangalore')}
-                      className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${locationFilter === 'Bangalore' ? 'bg-blue-100 text-blue-700' : ''
-                        }`}
-                    >
-                      Bangalore
-                    </button>
-                    <button
-                      onClick={() => handleLocationSelect('Chennai')}
-                      className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${locationFilter === 'Chennai' ? 'bg-blue-100 text-blue-700' : ''
-                        }`}
-                    >
-                      Chennai
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Clear location button */}
-              {locationFilter && (
-                <button
-                  onClick={clearLocationFilter}
-                  className="absolute right-8 top-3.5 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-          {/* Clear Filters Button */}
-          <div className="flex justify-end">
-            {(search || statusFilter || typeFilter || startDate || endDate || categoryFilter || locationFilter) && (
-              <button
-                onClick={clearAllFilters}
-                className="text-sm text-gray-600 hover:text-blue-500 underline transition duration-200"
-              >
-                Clear All Filters
-              </button>
-            )}
-          </div>
-        </div>
+        <FilterBar
+          search={search}
+          setSearch={setSearch}
+          searchLoading={searchLoading}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          quickDateFilter={quickDateFilter}
+          setQuickDateFilter={setQuickDateFilter}
+          placeholder="Search by promotion name..."
+          statusOptions={[
+            { value: "", label: "All Statuses" },
+            { value: "true", label: "Active" },
+            { value: "false", label: "Inactive" },
+          ]}
+          typeOptions={[
+            { value: "", label: "All Types" },
+            { value: "cross", label: "Cross Brand" },
+            { value: "own", label: "Own Brand" },
+            { value: "offer", label: "Offer" },
+          ]}
+          showTypeFilter={true}
+          showCategoryFilter={true}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          categories={categories}
+          showLocationFilter={true}
+          locationFilter={locationFilter}
+          setLocationFilter={setLocationFilter}
+          locations={locations}
+          onClearFilters={clearAllFilters}
+        />
 
         {/* Global loading indicator */}
         {fetchLoading && (

@@ -231,7 +231,7 @@ const SetDiscountPage = () => {
     }, [form, isEditing, editingPresetId, resetForm, fetchPresets, setUrl, userRole, userId]);
 
     const handleDeletePresetWithLoader = async (preset) => {
-        setIsDeleting(true); 
+        setIsDeleting(true);
         await handleDeletePreset(preset);
         setIsDeleting(false);
     };
@@ -342,26 +342,35 @@ const SetDiscountPage = () => {
                 </button>
             </div>
 
-            {/* FilterBar Component - Enhanced for admin */}
+            {/* FilterBar Component */}
             <FilterBar
+                // Core search
                 search={search}
                 setSearch={setSearch}
                 searchLoading={presetLoading && search}
+                placeholder="Search by coupon name..."
+
+                // Status filter
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
+                showStatus={true}
+                statusOptions={[
+                    { value: "", label: "All Statuses" },
+                    { value: "active", label: "Active" },
+                    { value: "inactive", label: "Inactive" }
+                ]}
+
+                // Date filters
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}
                 setEndDate={setEndDate}
                 quickDateFilter={quickDateFilter}
                 setQuickDateFilter={setQuickDateFilter}
-                placeholder="Search by coupon name..."
-                statusOptions={[
-                    { value: "", label: "All Statuses" },
-                    { value: "active", label: "Active" },
-                    { value: "inactive", label: "Inactive" }
-                ]}
-                // Add type filter for admin
+                showDates={true}
+                showQuickFilter={true}
+
+                // Type filter (admin only)
                 showTypeFilter={userRole === 'admin'}
                 typeFilter={typeFilter}
                 setTypeFilter={setTypeFilter}
@@ -371,7 +380,12 @@ const SetDiscountPage = () => {
                     { value: "cross", label: "Cross Promotion" },
                     { value: "offer", label: "Special Offer" }
                 ]}
+                // Clear all handler
                 onClearFilters={handleClearFilters}
+                // Hide unused filters
+                showCategoryFilter={false}
+                showLocationFilter={false}
+                showSourceFilter={false}
             />
 
             {/* Results Count - Only show when not loading */}

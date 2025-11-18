@@ -7,12 +7,15 @@ import PresetCard from './PresetCard';
 import { useUser } from '../../../Context/ContextApt';
 import Cookies from "js-cookie"
 import { getAuthToken } from '../../../Context/apiService';
+import FilterBar from '../../Common/FilterBar/FilterBar';
+
 
 const FlashHourOffer = () => {
     const [presets, setPresets] = useState([]);
     const [filteredPresets, setFilteredPresets] = useState([]);
     const [loading, setLoading] = useState(false);
     const [fetchLoading, setFetchLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -72,6 +75,9 @@ const FlashHourOffer = () => {
 
     useEffect(() => {
         const fetchPresets = async () => {
+            if (search.trim()) {
+                setSearchLoading(true);
+            }
             setFetchLoading(true);
 
             try {
@@ -112,6 +118,7 @@ const FlashHourOffer = () => {
                 console.error('Failed to fetch presets:', err);
                 setMessage('❌ Error loading offers');
             } finally {
+                setSearchLoading(false);
                 setFetchLoading(false);
             }
         };
@@ -119,43 +126,6 @@ const FlashHourOffer = () => {
         const timeout = setTimeout(fetchPresets, 300);
         return () => clearTimeout(timeout);
     }, [search, statusFilter, startDate, endDate, apiUrls.getUrl, token]);
-
-
-    // Handle quick date filter changes
-    const handleQuickDateFilterChange = useCallback((value) => {
-        setQuickDateFilter(value);
-        const today = new Date();
-
-        switch (value) {
-            case 'today':
-                const todayStr = today.toISOString().split('T')[0];
-                setStartDate(todayStr);
-                setEndDate(todayStr);
-                break;
-            case '7days':
-                const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 7);
-                setStartDate(sevenDaysAgo.toISOString().split('T')[0]);
-                setEndDate(today.toISOString().split('T')[0]);
-                break;
-            case '15days':
-                const fifteenDaysAgo = new Date(today);
-                fifteenDaysAgo.setDate(today.getDate() - 15);
-                setStartDate(fifteenDaysAgo.toISOString().split('T')[0]);
-                setEndDate(today.toISOString().split('T')[0]);
-                break;
-            case '1month':
-                const oneMonthAgo = new Date(today);
-                oneMonthAgo.setMonth(today.getMonth() - 1);
-                setStartDate(oneMonthAgo.toISOString().split('T')[0]);
-                setEndDate(today.toISOString().split('T')[0]);
-                break;
-            default:
-                setStartDate('');
-                setEndDate('');
-                break;
-        }
-    }, []);
 
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -246,7 +216,6 @@ const FlashHourOffer = () => {
             setLoading(false);
         }
     };
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -355,13 +324,13 @@ const FlashHourOffer = () => {
     }, []);
 
     // Clear all filters
-    const clearAllFilters = useCallback(() => {
+    const handleClearFilters = () => {
         setSearch('');
         setStatusFilter('');
         setStartDate('');
         setEndDate('');
         setQuickDateFilter('');
-    }, []);
+    };
 
     return (
         <div className="p-8 mx-auto bg-white rounded-lg shadow-md min-h-screen">
@@ -384,101 +353,35 @@ const FlashHourOffer = () => {
             </div>
 
             {/* 🔍 Filter Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-md space-y-6 mb-5">
-                {/* 🔍 Search Bar */}
-                <div className="relative mx-auto">
-                    <input
-                        type="text"
-                        placeholder="Search by offer name..."
-                        value={search}
-                        onChange={handleSearchChange}
-                        className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 shadow-inner text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
-                    />
-                    <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
-                    </svg>
-                    {/* Loading indicator */}
-                    {fetchLoading && (
-                        <div className="absolute right-4 top-3.5">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                        </div>
-                    )}
-                </div>
-
-                {/* 🔧 Filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Status Filter */}
-                    <div className="relative">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-                        >
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="expired">Expired</option>
-                            <option value="redeemed">Redeemed</option>
-                        </select>
-                        <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </div>
-
-                    {/* Start Date */}
-                    <div className="relative">
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => {
-                                setQuickDateFilter('');
-                                setStartDate(e.target.value);
-                            }}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-                        />
-                    </div>
-
-                    {/* End Date */}
-                    <div className="relative">
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={(e) => {
-                                setQuickDateFilter('');
-                                setEndDate(e.target.value);
-                            }}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm shadow-inner focus:ring-2 focus:ring-blue-500 transition duration-200"
-                        />
-                    </div>
-
-                    {/* Quick Filter Dropdown */}
-                    <div className="relative">
-                        <select
-                            value={quickDateFilter}
-                            onChange={(e) => handleQuickDateFilterChange(e.target.value)}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-inner text-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-                        >
-                            <option value="">Custom / All Time</option>
-                            <option value="today">Today</option>
-                            <option value="7days">Last 7 Days</option>
-                            <option value="15days">Last 15 Days</option>
-                            <option value="1month">Last 1 Month</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Clear Filters Button */}
-                {(search || statusFilter || startDate || endDate) && (
-                    <div className="flex justify-end">
-                        <button
-                            onClick={clearAllFilters}
-                            className="text-sm text-gray-600 hover:text-gray-800 underline transition duration-200"
-                        >
-                            Clear all filters
-                        </button>
-                    </div>
-                )}
-            </div>
+            <FilterBar
+                search={search}
+                setSearch={setSearch}
+                searchLoading={searchLoading}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                startDate={startDate}
+                setStartDate={setStartDate}
+                endDate={endDate}
+                setEndDate={setEndDate}
+                quickDateFilter={quickDateFilter}
+                setQuickDateFilter={setQuickDateFilter}
+                placeholder="Search by offer name..."
+                statusOptions={[
+                    { value: "", label: "All Statuses" },
+                    { value: "active", label: "Active" },
+                    { value: "inactive", label: "Inactive" },
+                    { value: "expired", label: "Expired" },
+                    { value: "redeemed", label: "Redeemed" }
+                ]}
+                onClearFilters={handleClearFilters}
+                showDates={true}
+                showQuickFilter={true}
+                showStatus={true}
+                showTypeFilter={false}
+                showCategoryFilter={false}
+                showLocationFilter={false}
+                showSourceFilter={false}
+            />
 
             {/* Loading State */}
             {fetchLoading && (
