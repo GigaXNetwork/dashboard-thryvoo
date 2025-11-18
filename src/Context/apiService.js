@@ -152,7 +152,8 @@ export const Api = {
   toggleSpecialOffer: (id) => apiRequest(`/api/special-offer/${id}/toggle`, "POST"),
   getAllSpecialOffers: () => apiRequest("/api/card/special-offer", "GET"),
   //assign cross brand coupon to special offer
-  assignToSpecialOffer: (crossBrandId) => apiRequest(`/api/cross-brand/${crossBrandId}/special-offer`, "POST"),
+  assignToSpecialOffer: (crossBrandId) => apiRequest(`/api/cross-brand/${crossBrandId}/assign/special-offer`, "POST"),
+  assignToSpinToWin: (crossBrandId) => apiRequest(`/api/cross-brand/${crossBrandId}/assign/spin-to-win`, "POST"),
   // delete gallery api
   deleteGalleryImage: ({ imageUrl }) => {
     return apiRequest(`/api/user/card/gallery/delete-gallery-image`, "DELETE", { imageUrl })

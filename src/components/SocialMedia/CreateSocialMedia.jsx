@@ -4,10 +4,8 @@ import { FaPlus, FaTimes, FaSpinner, FaSave, FaWhatsapp } from 'react-icons/fa';
 import {
     FaFacebook,
     FaInstagram,
-    FaTwitter,
     FaLinkedin,
     FaYoutube,
-    FaTiktok,
     FaGlobe
 } from 'react-icons/fa';
 import { FaThreads, FaXTwitter } from "react-icons/fa6";
@@ -26,7 +24,7 @@ const CreateSocialMedia = ({
         rewards: ''
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [fieldErrors, setFieldErrors] = useState({});
     const [couponPresets, setCouponPresets] = useState([]);
     const [loadingPresets, setLoadingPresets] = useState(false);
 
@@ -51,12 +49,10 @@ const CreateSocialMedia = ({
                 }
 
                 const data = await response.json();
-                // Handle different possible response structures
                 const presets = data.data?.presetsName || [];
                 setCouponPresets(Array.isArray(presets) ? presets : []);
             } catch (error) {
                 console.error('Error fetching coupon presets:', error);
-                setError('Failed to load rewards');
             } finally {
                 setLoadingPresets(false);
             }
@@ -76,13 +72,6 @@ const CreateSocialMedia = ({
                     : [''],
                 rewards: editingMedia.rewards || ''
             });
-        } else {
-            setFormData({
-                mediaType: '',
-                link: '',
-                conditions: [''],
-                rewards: ''
-            });
         }
     }, [isEditing, editingMedia]);
 
@@ -97,12 +86,55 @@ const CreateSocialMedia = ({
         { value: 'other', label: 'Other', icon: <FaGlobe className="text-gray-600" /> }
     ];
 
+    const validateField = (name, value) => {
+        const errors = { ...fieldErrors };
+
+        switch (name) {
+            case 'mediaType':
+                if (!value) {
+                    errors.mediaType = 'Please select a social media platform';
+                } else {
+                    delete errors.mediaType;
+                }
+                break;
+            case 'link':
+                if (!value) {
+                    errors.link = 'Please provide a valid URL';
+                } else if (!isValidUrl(value)) {
+                    errors.link = 'Please enter a valid URL';
+                } else {
+                    delete errors.link;
+                }
+                break;
+            default:
+                break;
+        }
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const isValidUrl = (string) => {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
+        validateField(name, value);
+    };
+
+    const handleMediaTypeSelect = (mediaType) => {
+        setFormData(prev => ({ ...prev, mediaType }));
+        validateField('mediaType', mediaType);
     };
 
     const handleConditionChange = (index, value) => {
@@ -112,6 +144,18 @@ const CreateSocialMedia = ({
             ...prev,
             conditions: newConditions
         }));
+
+        // Validate conditions in real-time
+        const validConditions = newConditions.filter(condition => condition.trim() !== '');
+        const errors = { ...fieldErrors };
+
+        if (validConditions.length > 0) {
+            delete errors.conditions;
+        } else {
+            errors.conditions = 'Please add at least one condition';
+        }
+
+        setFieldErrors(errors);
     };
 
     const addCondition = () => {
@@ -119,6 +163,10 @@ const CreateSocialMedia = ({
             ...prev,
             conditions: [...prev.conditions, '']
         }));
+
+        const errors = { ...fieldErrors };
+        delete errors.conditions;
+        setFieldErrors(errors);
     };
 
     const removeCondition = (index) => {
@@ -127,40 +175,53 @@ const CreateSocialMedia = ({
             ...prev,
             conditions: newConditions.length > 0 ? newConditions : ['']
         }));
+
+        const validConditions = newConditions.filter(condition => condition.trim() !== '');
+        const errors = { ...fieldErrors };
+
+        if (validConditions.length > 0) {
+            delete errors.conditions;
+        } else {
+            errors.conditions = 'Please add at least one condition';
+        }
+
+        setFieldErrors(errors);
+    };
+
+    const validateForm = () => {
+        const errors = {};
+
+        if (!formData.mediaType) {
+            errors.mediaType = 'Please select a social media platform';
+        }
+
+        if (!formData.link) {
+            errors.link = 'Please provide a valid URL';
+        } else if (!isValidUrl(formData.link)) {
+            errors.link = 'Please enter a valid URL';
+        }
+
+        const validConditions = formData.conditions.filter(condition => condition.trim() !== '');
+        if (validConditions.length === 0) {
+            errors.conditions = 'Please add at least one condition';
+        }
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
         setLoading(true);
-        setError(null);
 
         const filteredConditions = formData.conditions
             .map(condition => condition.trim())
             .filter(condition => condition !== '');
-
-        if (!formData.mediaType) {
-            setError('Please select a social media platform');
-            setLoading(false);
-            return;
-        }
-
-        if (!formData.link) {
-            setError('Please provide a valid link');
-            setLoading(false);
-            return;
-        }
-
-        if (filteredConditions.length === 0) {
-            setError('Please add at least one condition');
-            setLoading(false);
-            return;
-        }
-
-        if (!formData.rewards) {
-            setError('Please select a reward');
-            setLoading(false);
-            return;
-        }
 
         const token = Cookies.get('authToken');
         try {
@@ -180,7 +241,7 @@ const CreateSocialMedia = ({
                     mediaType: formData.mediaType,
                     link: formData.link,
                     conditions: filteredConditions,
-                    rewards: formData.rewards
+                    rewards: formData.rewards || null
                 }),
                 credentials: 'include'
             });
@@ -193,29 +254,26 @@ const CreateSocialMedia = ({
             const data = await response.json();
 
             if (isEditing) {
-                onUpdateSuccess(data.data.socialMedia);
+                onUpdateSuccess?.(data.data.socialMedia);
             } else {
-                onCreateSuccess(data.data.socialMedia);
+                onCreateSuccess?.(data.data.socialMedia);
             }
 
             onClose();
         } catch (error) {
-            setError(error.message);
+            setFieldErrors({ submit: error.message });
         } finally {
             setLoading(false);
         }
     };
 
-    // Safe access to coupon presets
     const getRewardOptions = () => {
-        // Check if couponPresets is an array
         if (Array.isArray(couponPresets) && couponPresets.length > 0) {
             return couponPresets;
         }
         return [];
     };
 
-    // Get current reward value for the select
     const getCurrentRewardValue = () => {
         if (typeof formData.rewards === 'object') {
             return formData.rewards._id;
@@ -223,63 +281,73 @@ const CreateSocialMedia = ({
         return formData.rewards;
     };
 
-    // Check if current reward exists in the preset list
     const currentRewardExistsInPresets = () => {
         const currentValue = getCurrentRewardValue();
         if (!currentValue) return false;
-        
         return getRewardOptions().some(preset => preset._id === currentValue);
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">
-                            {isEditing ? 'Edit Social Media Offer' : 'Create Social Media Offer'}
-                        </h2>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden border border-gray-200">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-800">
+                                {isEditing ? 'Edit Social Media Offer' : 'Create Social Media Offer'}
+                            </h2>
+                            <p className="text-sm text-gray-600 mt-1">
+                                {isEditing ? 'Update your social media offer details' : 'Add a new social media offer to engage customers'}
+                            </p>
+                        </div>
                         <button
                             onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700"
+                            className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white rounded-lg"
                             disabled={loading}
                         >
-                            <FaTimes className="text-xl" />
+                            <FaTimes className="text-lg" />
                         </button>
                     </div>
+                </div>
 
-                    {error && (
-                        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
-                            <div className="flex items-center">
-                                <p className="text-red-700 font-medium">{error}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Social Media Platform
+                {/* Form Content */}
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Social Media Platform Selection */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                Social Media Platform *
                             </label>
                             <div className="grid grid-cols-3 gap-3">
                                 {mediaTypes.map((type) => (
                                     <button
                                         key={type.value}
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, mediaType: type.value }))}
-                                        className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 ${formData.mediaType === type.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                                        onClick={() => handleMediaTypeSelect(type.value)}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${formData.mediaType === type.value
+                                            ? 'border-blue-500 bg-blue-50 shadow-sm'
+                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
+                                            } ${fieldErrors.mediaType ? 'border-red-500' : ''}`}
                                         disabled={loading}
                                     >
-                                        <span className="text-2xl mb-1">{type.icon}</span>
-                                        <span className="text-sm">{type.label}</span>
+                                        <span className="text-2xl mb-2">{type.icon}</span>
+                                        <span className="text-xs font-medium text-gray-700">{type.label}</span>
                                     </button>
                                 ))}
                             </div>
+                            {fieldErrors.mediaType && (
+                                <p className="text-red-600 text-sm mt-2 flex items-center">
+                                    <FaTimes className="mr-1 text-xs" />
+                                    {fieldErrors.mediaType}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="mb-6">
-                            <label htmlFor="link" className="block text-sm font-medium text-gray-700 mb-2">
-                                Profile/Page URL
+                        {/* Profile URL */}
+                        <div>
+                            <label htmlFor="link" className="block text-sm font-semibold text-gray-700 mb-2">
+                                Profile/Page URL *
                             </label>
                             <input
                                 type="url"
@@ -287,15 +355,20 @@ const CreateSocialMedia = ({
                                 name="link"
                                 value={formData.link}
                                 onChange={handleChange}
-                                placeholder="https://example.com/your-page"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                required
+                                placeholder="https://example.com/your-profile"
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${fieldErrors.link ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'}`}
                                 disabled={loading}
                             />
+                            {fieldErrors.link && (
+                                <p className="text-red-600 text-sm mt-2 flex items-center">
+                                    {fieldErrors.link}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="mb-6">
-                            <label htmlFor="rewards" className="block text-sm font-medium text-gray-700 mb-2">
+                        {/* Rewards Selection */}
+                        <div>
+                            <label htmlFor="rewards" className="block text-sm font-semibold text-gray-700 mb-2">
                                 Rewards
                             </label>
                             <select
@@ -303,54 +376,56 @@ const CreateSocialMedia = ({
                                 name="rewards"
                                 value={getCurrentRewardValue()}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors bg-white"
                                 disabled={loading || loadingPresets}
                             >
-                                <option value="">Select a reward</option>
-                                
-                                {/* Show current value first if it exists and isn't in the preset list */}
+                                <option value="">No reward (Default coins)</option>
                                 {formData.rewards && !currentRewardExistsInPresets() && (
                                     <option value={getCurrentRewardValue()}>
                                         {typeof formData.rewards === 'object' ? formData.rewards.presetName : formData.rewards}
                                     </option>
                                 )}
-                                
-                                {/* Show available presets */}
                                 {getRewardOptions().map((preset) => (
                                     <option key={preset._id} value={preset._id}>
                                         {preset.presetName}
                                     </option>
                                 ))}
                             </select>
+                            <p className="text-gray-500 text-sm mt-2">
+                                If no reward is selected, customers will receive default coins
+                            </p>
                             {loadingPresets && (
-                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                <div className="flex items-center text-gray-500 text-sm mt-2">
                                     <FaSpinner className="animate-spin mr-2" />
                                     Loading rewards...
                                 </div>
                             )}
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Terms & Conditions
+                        {/* Terms & Conditions */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                Terms & Conditions *
                             </label>
                             <div className="space-y-3">
                                 {formData.conditions.map((condition, index) => (
-                                    <div key={index} className="flex items-center">
-                                        <input
-                                            type="text"
-                                            value={condition}
-                                            onChange={(e) => handleConditionChange(index, e.target.value)}
-                                            placeholder={`Condition ${index + 1}`}
-                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                            disabled={loading}
-                                        />
+                                    <div key={index} className="flex items-center gap-2">
+                                        <div className="flex-1">
+                                            <input
+                                                type="text"
+                                                value={condition}
+                                                onChange={(e) => handleConditionChange(index, e.target.value)}
+                                                placeholder={`Condition ${index + 1}`}
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${fieldErrors.conditions ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
+                                                    }`}
+                                                disabled={loading}
+                                            />
+                                        </div>
                                         {formData.conditions.length > 1 && (
                                             <button
                                                 type="button"
                                                 onClick={() => removeCondition(index)}
-                                                className="ml-2 p-2 text-red-500 hover:text-red-700"
+                                                className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
                                                 disabled={loading}
                                             >
                                                 <FaTimes />
@@ -358,29 +433,44 @@ const CreateSocialMedia = ({
                                         )}
                                     </div>
                                 ))}
+                                {fieldErrors.conditions && (
+                                    <p className="text-red-600 text-sm mt-2 flex items-center">
+                                        {fieldErrors.conditions}
+                                    </p>
+                                )}
                                 <button
                                     type="button"
                                     onClick={addCondition}
-                                    className="flex items-center text-sm text-blue-600 hover:text-blue-800 mt-2"
+                                    className="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
                                     disabled={loading}
                                 >
-                                    <FaPlus className="mr-1" /> Add Condition
+                                    <FaPlus className="mr-2 text-xs" />
+                                    Add Another Condition
                                 </button>
                             </div>
+
                         </div>
 
-                        <div className="flex justify-end space-x-3">
+                        {/* Submit Error */}
+                        {fieldErrors.submit && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <p className="text-red-700 text-sm font-medium">{fieldErrors.submit}</p>
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
                                 disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center min-w-[100px]"
+                                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px]"
                                 disabled={loading || loadingPresets}
                             >
                                 {loading ? (
@@ -395,7 +485,9 @@ const CreateSocialMedia = ({
                                                 <FaSave className="mr-2" />
                                                 Save Changes
                                             </>
-                                        ) : 'Create Offer'}
+                                        ) : (
+                                            'Create Offer'
+                                        )}
                                     </>
                                 )}
                             </button>

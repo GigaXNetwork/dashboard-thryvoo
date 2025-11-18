@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaTag, FaEllipsisV, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaTag, FaEllipsisV} from 'react-icons/fa';
 import MessagePopup from '../Common/MessagePopup';
-import { FaDeleteLeft } from 'react-icons/fa6';
+import { SquarePen, Trash } from 'lucide-react';
+
 
 const SocialMediaCard = ({
     media,
@@ -50,16 +51,16 @@ const SocialMediaCard = ({
                     <div className="py-1">
                         <button
                             onClick={handleEdit}
-                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            className="flex items-center w-full gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                         >
-                            <FaEdit className="w-4 h-4 mr-3 text-gray-500" />
+                            <SquarePen size={16} />
                             Edit
                         </button>
                         <button
                             onClick={() => onDelete(media)}  // Just call onDelete with the media
-                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                            className="flex items-center w-full px-4 py-2 gap-3 text-sm text-red-600 hover:bg-red-100 transition-colors"
                         >
-                            <FaDeleteLeft className="w-4 h-4 mr-3 text-red-500" />
+                            <Trash size={16}/>
                             Delete
                         </button>
                     </div>
