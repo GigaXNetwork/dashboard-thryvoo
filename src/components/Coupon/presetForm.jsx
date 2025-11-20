@@ -42,7 +42,7 @@ export default function OfferForm({
       handleChange({ target: { name: "type", value: type } });
   }, [form, type, handleChange]);
 
-  // ✅ Fixed Validation - Updated for max discount
+  // Form Validation
   const validateForm = useCallback(() => {
     const e = {};
     const num = (v) => (v === "" || v === null || v === undefined ? NaN : parseFloat(v));
@@ -65,11 +65,18 @@ export default function OfferForm({
     const usage = num(form.usageLimit);
     if (isNaN(usage) || usage <= 0) e.usageLimit = "Usage limit required";
 
+    const days = num(form.day);
+
+    if (isNaN(days) || days === 0) {
+      e.day = "Expiry duration is required";
+    }
+    if (!isNaN(days) && days < 0) e.day = "Days cannot be negative";
+
     setErrors(e);
     return Object.keys(e).length === 0;
   }, [form]);
 
-  // ✅ Input Change Handler
+  // Input Change Handler
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
 
@@ -94,7 +101,7 @@ export default function OfferForm({
     }
   };
 
-  // ✅ Smooth Close
+  // Smooth Close
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -105,12 +112,12 @@ export default function OfferForm({
     }, 300);
   };
 
-  // ✅ Fixed Form Submission - No date conversion needed
+  // Fixed Form Submission - No date conversion needed
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       const firstError = Object.keys(errors)[0];
-      console.log("object", firstError)
+
       if (firstError) {
         const errorElement = formRef.current?.querySelector(`[name="${firstError}"]`);
         errorElement?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -130,7 +137,7 @@ export default function OfferForm({
     }
   };
 
-  // ✅ Condition Handlers
+  // Condition Handlers
   const handleConditionChange = (i, val) => {
     const c = [...(form.conditions || [])];
     c[i] = val;
@@ -205,6 +212,7 @@ export default function OfferForm({
               <InputField
                 label="Offer Name"
                 name="presetName"
+                placeholder="Enter offer name"
                 value={form.presetName || ""}
                 onChange={handleInputChange}
                 error={errors.presetName}
@@ -237,6 +245,7 @@ export default function OfferForm({
                     label="Discount Amount"
                     name="discountAmount"
                     type="number"
+                    placeholder="Enter discount amount"
                     value={form.discountAmount || ""}
                     onChange={handleInputChange}
                     error={errors.discountAmount}
@@ -249,6 +258,7 @@ export default function OfferForm({
                       label="Discount Percentage"
                       name="discountAmount"
                       type="number"
+                      placeholder="Enter discount percentage"
                       value={form.discountAmount || ""}
                       onChange={handleInputChange}
                       error={errors.discountAmount}
@@ -258,6 +268,7 @@ export default function OfferForm({
                       label="Max Discount"
                       name="maxDiscount"
                       type="number"
+                      placeholder="Enter maximum discount amount"
                       value={form.maxDiscount || ""}
                       onChange={handleInputChange}
                       error={errors.maxDiscount}
@@ -273,6 +284,7 @@ export default function OfferForm({
                 label="Minimum Purchase"
                 name="minPurchase"
                 type="number"
+                placeholder="Enter minimum purchase amount"
                 value={form.minPurchase || ""}
                 onChange={handleInputChange}
                 error={errors.minPurchase}
@@ -281,6 +293,7 @@ export default function OfferForm({
                 label="Usage Limit"
                 name="usageLimit"
                 type="number"
+                placeholder="Enter usage limit"
                 value={form.usageLimit || ""}
                 onChange={handleInputChange}
                 error={errors.usageLimit}
@@ -288,44 +301,55 @@ export default function OfferForm({
               />
             </ResponsiveGrid>
 
-            {/* Expiry Duration - Replaced Validity Period */}
-            <div className="border border-gray-200 bg-gray-50 rounded-lg p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-gray-700" />
-                <h3 className="font-semibold text-gray-800">Expiry Duration (Optional)</h3>
+            {/* Expiry Duration */}
+            <div className={`border rounded-lg p-5 space-y-4 transition-colors border-gray-200 bg-gray-50 ${errors.day || errors.hour
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+              : "border-gray-200 bg-gray-50"
+              }`}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gray-700" />
+                  <div className="flex items-center">
+                    <h3 className="font-semibold text-gray-800"
+                    >Expiry Duration</h3>
+                    <span className="text-red-500 ml-1">*</span>
+                  </div>
+                </div>
+                <ResponsiveGrid cols={2}>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block text-gray-800">
+                      Days</label>
+                    <input
+                      type="number"
+                      name="day"
+                      value={form.day || ""}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      min="0"
+                      className="w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block text-gray-800">
+                      Hours</label>
+                    <input
+                      type="number"
+                      name="hour"
+                      value={form.hour || ""}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      min="0"
+                      max="23"
+                      className="w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    />
+                  </div>
+                </ResponsiveGrid>
+                {(errors.day) && (
+                  <p className="text-xs text-red-600 mt-3">
+                    {errors.day}
+                  </p>
+                )}
               </div>
-              <ResponsiveGrid cols={2}>
-                <div>
-                  <label className="text-sm font-medium text-gray-800 mb-2 block">Days</label>
-                  <input
-                    type="number"
-                    name="day"
-                    value={form.day || ""}
-                    onChange={handleInputChange}
-                    placeholder="0"
-                    min="0"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                  />
-                  {errors.day && <p className="text-xs text-red-500 mt-1">{errors.day}</p>}
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-800 mb-2 block">Hours</label>
-                  <input
-                    type="number"
-                    name="hour"
-                    value={form.hour || ""}
-                    onChange={handleInputChange}
-                    placeholder="0"
-                    min="0"
-                    max="23"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                  />
-                  {errors.hour && <p className="text-xs text-red-500 mt-1">{errors.hour}</p>}
-                </div>
-              </ResponsiveGrid>
-              <p className="text-xs text-gray-500 mt-2">
-                The coupon will expire after this duration from creation time. Leave empty for no expiry.
-              </p>
             </div>
 
             {/* Conditions */}

@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import MessagePopup from '../Common/MessagePopup';
 import MediaDetails from './MediaDetails';
 import Cookies from "js-cookie";
-import FilterBar from '../Common/FilterBar';
+import FilterBar from '../Common/FilterBar/FilterBar';
 
 function MediaRewards() {
   const [filters, setFilters] = useState({
@@ -51,7 +51,7 @@ function MediaRewards() {
 
       const response = await axios.get(apiUrl, {
         params,
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           "Authorization": `${token}`
         }
@@ -78,39 +78,6 @@ function MediaRewards() {
       ...prev,
       [name]: value,
       ...(name !== 'page' && { page: 1 })
-    }));
-  };
-
-  // Handler for FilterBar's quick date filter
-  const handleQuickDateFilterChange = (value) => {
-    const today = new Date();
-    let start = '';
-    let end = today.toISOString().split('T')[0];
-
-    switch (value) {
-      case 'today':
-        start = end;
-        break;
-      case '7days':
-        start = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
-        break;
-      case '15days':
-        start = new Date(today.setDate(today.getDate() - 15)).toISOString().split('T')[0];
-        break;
-      case '1month':
-        start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
-        break;
-      default:
-        start = '';
-        end = '';
-    }
-
-    setFilters(prev => ({
-      ...prev,
-      quickDateFilter: value,
-      startDate: start,
-      endDate: end,
-      page: 1
     }));
   };
 
@@ -208,29 +175,24 @@ function MediaRewards() {
         search={filters.search}
         setSearch={(value) => handleFilterChange('search', value)}
         searchLoading={searchLoading}
+        placeholder="Search..."
         statusFilter={filters.status}
         setStatusFilter={(value) => handleFilterChange('status', value)}
+        showStatus={true}
+        statusOptions={mediaStatusOptions}
         startDate={filters.startDate}
         setStartDate={(value) => handleFilterChange('startDate', value)}
         endDate={filters.endDate}
         setEndDate={(value) => handleFilterChange('endDate', value)}
         quickDateFilter={filters.quickDateFilter}
         setQuickDateFilter={(value) => handleFilterChange('quickDateFilter', value)}
-        onQuickDateChange={handleQuickDateFilterChange}
-        onClearFilters={handleClearFilters}
-        placeholder="Search..."
-        statusOptions={mediaStatusOptions}
-        showStatus={true}
         showDates={true}
         showQuickFilter={true}
-        quickFilterOptions={[
-          { value: "", label: "Custom / All Time" },
-          { value: "today", label: "Today" },
-          { value: "7days", label: "Last 7 Days" },
-          { value: "15days", label: "Last 15 Days" },
-          { value: "1month", label: "Last 1 Month" }
-        ]}
-        className="mb-6"
+        onClearFilters={handleClearFilters}
+        showTypeFilter={false}
+        showCategoryFilter={false}
+        showLocationFilter={false}
+        showSourceFilter={false}
       />
 
       {/* Table */}

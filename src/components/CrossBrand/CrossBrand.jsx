@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { Search, Calendar, ExternalLink, ChevronDown, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, ExternalLink } from "lucide-react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { toast } from "react-toastify";
-import FilterBar from "../Common/FilterBar";
+import FilterBar from "../Common/FilterBar/FilterBar";
+import MessagePopup from "../Common/MessagePopup";
+
 
 const CrossBrand = () => {
   const [data, setData] = useState(null);
@@ -11,6 +12,7 @@ const CrossBrand = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingSet, setLoadingSet] = useState(null);
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   // Filter states
   const [search, setSearch] = useState('');
@@ -21,25 +23,21 @@ const CrossBrand = () => {
   const [quickDateFilter, setQuickDateFilter] = useState('');
   const [fetchLoading, setFetchLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-
-  // New filter states
   const [categoryFilter, setCategoryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [filteredCategories, setFilteredCategories] = useState([]);
-  const [categorySearch, setCategorySearch] = useState('');
   const [locations, setLocations] = useState([]);
-  const [filteredLocations, setFilteredLocations] = useState([]);
-  const [locationSearch, setLocationSearch] = useState('');
 
   const token = Cookies.get("authToken");
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Refs for dropdown closing
-  const categoryDropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+  };
+
+  const closeMessage = () => {
+    setMessage({ text: "", type: "" });
+  };
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -51,13 +49,11 @@ const CrossBrand = () => {
         });
 
         if (response.data && response.data.data && response.data.data.category) {
-          // Convert array of category strings to objects with id and name
           const categoryObjects = response.data.data.category.map((cat, index) => ({
-            id: index, // Using index as id since API returns array of strings
+            id: index,
             name: cat
           }));
           setCategories(categoryObjects);
-          setFilteredCategories(categoryObjects);
         }
       } catch (err) {
         console.error("Failed to fetch categories:", err);
@@ -67,75 +63,33 @@ const CrossBrand = () => {
     fetchCategories();
   }, [API_URL, token]);
 
-  // Filter categories based on search
+  // Fetch initial locations
   useEffect(() => {
-    if (categorySearch.trim() === '') {
-      setFilteredCategories(categories);
-    } else {
-      const filtered = categories.filter(category =>
-        category.name?.toLowerCase().includes(categorySearch.toLowerCase())
-      );
-      setFilteredCategories(filtered);
-    }
-  }, [categorySearch, categories]);
-
-  // Fetch locations on component mount
-  useEffect(() => {
-    const fetchLocations = async () => {
+    const fetchInitialLocations = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/location`, {
           headers: { Authorization: `${token}` },
           withCredentials: true,
         });
+
         if (response.data.status === 'success') {
           const locs = response.data.data.locations.map(loc => ({
-            id: loc.coordinates._id,
+            id: loc.coordinates?._id || loc._id,
             display: `${loc.addressLine} (${loc.pin})`,
             addressLine: loc.addressLine,
             pin: loc.pin,
           }));
           setLocations(locs);
-          setFilteredLocations(locs);
         }
       } catch (error) {
         console.error('Error fetching locations:', error);
       }
     };
 
-    fetchLocations();
+    fetchInitialLocations();
   }, [API_URL, token]);
 
-  // Filter location based on search
-  useEffect(() => {
-    if (locationSearch.trim() === '') {
-      setFilteredLocations(locations);
-    } else {
-      const filtered = locations.filter(loc =>
-        loc.display.toLowerCase().includes(locationSearch.toLowerCase())
-      );
-      setFilteredLocations(filtered);
-    }
-  }, [locationSearch, locations]);
-
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
-        setShowCategoryDropdown(false);
-      }
-      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target)) {
-        setShowLocationDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Simple buildQuery function - send dates as YYYY-MM-DD
+  // Simple buildQuery function
   const buildQuery = (params) => {
     const queryParams = new URLSearchParams();
 
@@ -158,10 +112,8 @@ const CrossBrand = () => {
       setError(null);
 
       try {
-        // Build query params object
         const queryParams = {};
 
-        // Add search filter
         if (search) {
           queryParams.search = search.trim();
         }
@@ -182,13 +134,12 @@ const CrossBrand = () => {
           queryParams['createdAt[lt]'] = endDate;
         }
 
-        // Add new filters
         if (categoryFilter) {
           queryParams.category = categoryFilter;
         }
 
         if (locationFilter) {
-          queryParams.search = locationFilter;
+          queryParams.location = locationFilter;
         }
 
         const queryString = buildQuery(queryParams);
@@ -235,8 +186,37 @@ const CrossBrand = () => {
     setQuickDateFilter('');
     setCategoryFilter('');
     setLocationFilter('');
-    setCategorySearch('');
-    setLocationSearch('');
+  };
+
+  // Handle location search
+  const handleLocationSearch = async (searchTerm) => {
+    try {
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+
+      const url = `${API_URL}/api/location${params.toString() ? `?${params.toString()}` : ''}`;
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `${token}` },
+        withCredentials: true,
+      });
+
+      if (response.data.status === 'success') {
+        const locs = response.data.data.locations.map(loc => ({
+          id: loc.coordinates?._id || loc._id,
+          display: `${loc.addressLine} (${loc.pin})`,
+          addressLine: loc.addressLine,
+          pin: loc.pin,
+        }));
+        return locs;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      return [];
+    }
   };
 
   const formatDate = (dateString) => {
@@ -286,9 +266,9 @@ const CrossBrand = () => {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Coupon set successfully!")
+        showMessage("Coupon set successfully!", "success");
       } else {
-        toast.error(result.message || "Failed to set coupon. Please try again.")
+        showMessage(result.message || "Failed to set coupon. Please try again.", "error");
       }
     } catch (err) {
       console.error("Failed to set coupon:", err);
@@ -300,6 +280,14 @@ const CrossBrand = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+      
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
           <h1 className="text-2xl font-bold text-gray-700">
@@ -312,29 +300,32 @@ const CrossBrand = () => {
           search={search}
           setSearch={setSearch}
           searchLoading={searchLoading}
+          placeholder="Search by promotion name..."
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
-          typeFilter={typeFilter}
-          setTypeFilter={setTypeFilter}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          quickDateFilter={quickDateFilter}
-          setQuickDateFilter={setQuickDateFilter}
-          placeholder="Search by promotion name..."
+          showStatus={true}
           statusOptions={[
             { value: "", label: "All Statuses" },
             { value: "true", label: "Active" },
             { value: "false", label: "Inactive" },
           ]}
+          showTypeFilter={true}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
           typeOptions={[
             { value: "", label: "All Types" },
             { value: "cross", label: "Cross Brand" },
             { value: "own", label: "Own Brand" },
             { value: "offer", label: "Offer" },
           ]}
-          showTypeFilter={true}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          quickDateFilter={quickDateFilter}
+          setQuickDateFilter={setQuickDateFilter}
+          showDates={true}
+          showQuickFilter={true}
           showCategoryFilter={true}
           categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
@@ -343,7 +334,9 @@ const CrossBrand = () => {
           locationFilter={locationFilter}
           setLocationFilter={setLocationFilter}
           locations={locations}
+          onLocationSearch={handleLocationSearch}
           onClearFilters={clearAllFilters}
+          showSourceFilter={false}
         />
 
         {/* Global loading indicator */}

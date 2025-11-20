@@ -127,16 +127,6 @@ const SpecialOfferPresetSelector = ({
                                     </button>
                                 )}
                             </div>
-
-                            {selectedItems.length > 0 && (
-                                <button
-                                    onClick={handleAddSelected}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Add {selectedItems.length} Preset{selectedItems.length !== 1 ? 's' : ''}
-                                </button>
-                            )}
                         </div>
                     </header>
 
@@ -148,7 +138,7 @@ const SpecialOfferPresetSelector = ({
                     )}
 
                     {/* Content */}
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center justify-center h-48">
                                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600"></div>

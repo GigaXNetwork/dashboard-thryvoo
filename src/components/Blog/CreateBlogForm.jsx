@@ -3,7 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
+import MessagePopup from '../Common/MessagePopup';
 
 export const getAuthToken = () => {
   const tokenNames = ['authToken', 'token', 'jwt', 'access_token'];
@@ -15,7 +15,7 @@ export const getAuthToken = () => {
 };
 
 export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
-  const isEditMode = Boolean(blog && blog.id);   
+  const isEditMode = Boolean(blog && blog.id);
 
   const getInitialState = () => ({
     b_title: blog?.b_title || '',
@@ -39,6 +39,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
 
   // File states
   const [authorImageFile, setAuthorImageFile] = useState(null);
@@ -66,6 +67,14 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
   const metaTitleRef = useRef(null);
   const metaDescriptionRef = useRef(null);
   const metaTagsRef = useRef(null);
+
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+  }
+
+  const closeMessage = () => {
+    setMessage({ text: '', type: '' });
+  }
 
   useEffect(() => {
     if (isEditMode) {
@@ -342,7 +351,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
   // };
 
 
-    const validateForm = () => {
+  const validateForm = () => {
     const newErrors = {};
 
     if (!formData.b_title.trim()) newErrors.b_title = 'Title is required';
@@ -368,7 +377,7 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
 
     if (!formData.meta_tag.trim()) newErrors.meta_tag = 'Meta Tags are required';
     if (formData.b_tags.length === 0) newErrors.b_tags = 'At least one tag is required';
-    
+
     // Enhanced file validation - check both formData and file states
     const hasFeaturedImage = formData.b_image || featuredImageFile;
     const hasMetaPhoto = formData.meta_photo || metaPhotoFile;
@@ -377,12 +386,12 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
 
     if (!hasFeaturedImage) newErrors.b_image = 'Featured Image is required';
     if (!hasMetaPhoto) newErrors.meta_photo = 'Meta Photo is required';
-    
+
     // Make author image required only for new blogs, not for edits
     if (!isEditMode && !hasAuthorImage) {
       newErrors.author_image = 'Author Image is required';
     }
-    
+
     if (!hasGallery) newErrors.b_gallery = 'At least one gallery image is required';
 
     setErrors(newErrors);
@@ -414,8 +423,8 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
             ref.current.getEditor().root.scrollIntoView({ behavior: "smooth", block: "center" });
             ref.current.getEditor().focus();
           } else {
-            ref.current.scrollIntoView({ 
-              behavior: "smooth", 
+            ref.current.scrollIntoView({
+              behavior: "smooth",
               block: "center",
               inline: "nearest"
             });
@@ -517,10 +526,14 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
       }
 
       const result = await response.json();
-      if (onSuccess) onSuccess(result);
+      showMessage(`Blog ${isEditMode ? 'updated' : 'created'} successfully!`, 'success');
+
+      setTimeout(() => {
+        if (onSuccess) onSuccess(result);
+      }, 500);
     } catch (err) {
       console.error('Upload error:', err);
-      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} blog`);
+      showMessage(`Failed to ${isEditMode ? 'update' : 'create'} blog.`, 'error');
     } finally {
       setLoading(false);
     }
@@ -529,6 +542,15 @@ export const CreateBlogForm = ({ onBack, onSuccess, blog }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8">
+        {/* Message Popup */}
+        {message.text && (
+          <MessagePopup
+            message={message.text}
+            type={message.type}
+            onClose={closeMessage}
+          />
+        )}
+
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onBack}

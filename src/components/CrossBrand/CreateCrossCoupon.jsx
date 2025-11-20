@@ -3,12 +3,11 @@ import { useParams } from 'react-router-dom';
 import PresetForm from '../Coupon/presetForm';
 import PresetToggle from './PresetToggle';
 import PresetCard from '../Coupon/PresetCard';
-import FilterBar from '../Common/FilterBar';
+import FilterBar from '../Common/FilterBar/FilterBar';
 import { useUser } from '../../Context/ContextApt';
 import { Plus } from 'lucide-react';
 import { getAuthToken } from '../../Context/apiService';
 import MessagePopup from '../Common/MessagePopup';
-
 
 const CreateCrossPromotion = () => {
     // State management
@@ -143,6 +142,15 @@ const CreateCrossPromotion = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuIndex]);
 
+    // Clear all filters
+    const handleClearFilters = () => {
+        setSearch('');
+        setStatusFilter('');
+        setStartDate('');
+        setEndDate('');
+        setQuickDateFilter('');
+    };
+
     // Form handlers
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -245,7 +253,6 @@ const CreateCrossPromotion = () => {
     // Delete preset
     const handleDeletePreset = useCallback(async (preset) => {
         try {
-
             const deleteUrl = userRole === 'admin'
                 ? `${API}/api/admin/user/${userId}/presets/${preset._id}`
                 : `${API}/api/user/coupon/presets/${preset._id}`;
@@ -358,26 +365,45 @@ const CreateCrossPromotion = () => {
                 </button>
             </div>
 
-            {/* FilterBar Component */}
+            {/* Updated FilterBar Component */}
             <FilterBar
                 search={search}
                 setSearch={setSearch}
                 searchLoading={loading && search}
+                placeholder="Search by coupon or business name..."
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
+                showStatus={true}
+                statusOptions={[
+                    { value: "", label: "All Statuses" },
+                    { value: "active", label: "Active" },
+                    { value: "inactive", label: "Inactive" }
+                ]}
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}
                 setEndDate={setEndDate}
                 quickDateFilter={quickDateFilter}
                 setQuickDateFilter={setQuickDateFilter}
-                placeholder="Search by coupon or business name..."
-                statusOptions={[
-                    { value: "", label: "All Statuses" },
-                    { value: "active", label: "Active" },
-                    { value: "inactive", label: "Inactive" }
-                ]}
+                showDates={true}
+                showQuickFilter={true}
+                onClearFilters={handleClearFilters}
+                showTypeFilter={false}
+                showCategoryFilter={false}
+                showLocationFilter={false}
+                showSourceFilter={false}
             />
+
+            {/* Results count */}
+            {!loading && (
+                <div className="mb-4 text-sm text-gray-600">
+                    Showing {presets.length} coupon{presets.length !== 1 ? 's' : ''}
+                    {(search || statusFilter || startDate || endDate) && " (filtered)"}
+                    {search && (
+                        <span className="ml-1">for "{search}"</span>
+                    )}
+                </div>
+            )}
 
             {/* Preset Cards */}
             {loading && !searchTerm && !statusFilter && !startDate && !endDate ? (
@@ -387,7 +413,9 @@ const CreateCrossPromotion = () => {
                 </div>
             ) : presets.length === 0 ? (
                 <div className="text-gray-500 col-span-full text-center py-10">
-                    No cross-brand coupons found.
+                    {search || statusFilter || startDate || endDate
+                        ? "No cross-brand coupons match your filters."
+                        : "No cross-brand coupons found."}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 my-6">

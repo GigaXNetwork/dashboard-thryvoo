@@ -6,8 +6,8 @@ import axios from "axios";
 import { AlertCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Grid, LayoutGrid, List, Loader2, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { getAuthToken } from "../../Context/apiService";
 import UserListCard from "./UserListCard";
-import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
+import MessagePopup from "../Common/MessagePopup";
 
 
 const UserHeader = ({
@@ -119,9 +119,15 @@ function User() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-
+  const [message, setMessage] = useState({ text: "", type: "" });
   const maxVisiblePages = 5;
+
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+  };
+  const closeMessage = () => {
+    setMessage({ text: "", type: "" });
+  }
 
   // Build query parameters from filters
   const buildQueryParams = useCallback(() => {
@@ -189,7 +195,7 @@ function User() {
     const timeout = setTimeout(() => {
       fetchUsers();
       initialLoad.current = false;
-    }, filters.search ? 500 : initialLoad.current ? 0 : 500); // No delay for initial load
+    }, filters.search ? 500 : initialLoad.current ? 0 : 500);
 
     return () => clearTimeout(timeout);
   }, [filters.search, filters.page, filters.limit, fetchUsers]);
@@ -345,17 +351,17 @@ function User() {
       const result = response.data;
 
       if (result.status === "success") {
-        toast.success("User created successfully!");
+        showMessage("User created successfully!", "success");
         setShowModal(false);
         setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         setFormErrors({ name: "", email: "", password: "", confirmPassword: "" });
         fetchUsers();
       } else {
-        toast.error(result.message || "Failed to create user.");
+        showMessage(result.message || "Failed to create user.", "error");
       }
     } catch (error) {
       console.error("Create user failed:", error);
-      toast.error(error.response?.data?.message || "An unexpected error occurred.");
+      showMessage(error.response?.data?.message || "An unexpected error occurred.", "error");
     } finally {
       setCreating(false)
     }
@@ -388,6 +394,15 @@ function User() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8">
+      {/* Message Popup */}
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+      
       {/* Header */}
       <UserHeader
         filters={filters}

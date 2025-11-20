@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 import PresetForm from './presetForm';
 import PresetToggle from './PresetToggle';
 import PresetCard from './PresetCard';
-import FilterBar from '../Common/FilterBar';
+import FilterBar from '../Common/FilterBar/FilterBar';
 import { useUser } from '../../Context/ContextApt';
 import { getAuthToken } from '../../Context/apiService';
-import { toast } from 'react-toastify';
+import MessagePopup from '../Common/MessagePopup';
 
 const SetDiscountPage = () => {
     const [presets, setPresets] = useState([]);
@@ -19,6 +19,7 @@ const SetDiscountPage = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingPresetId, setEditingPresetId] = useState(null);
+    const [message, setMessage] = useState({ type: '', text: '' });
 
 
     // Filter states
@@ -35,6 +36,14 @@ const SetDiscountPage = () => {
     const { userData } = useUser();
     const userRole = userData?.user?.role;
     const { userId } = useParams();
+
+    const showMessage = (text, type = "success") => {
+        setMessage({ text, type });
+    }
+
+    const closeMessage = () => {
+        setMessage({ type: '', text: '' });
+    }
 
     // Memoized URLs
     const getUrl = useMemo(() => (
@@ -99,12 +108,12 @@ const SetDiscountPage = () => {
                 const data = await res.json();
                 setPresets(data.discount || []);
             } else {
-                toast.error('Failed to load coupons');
+                showMessage('Failed to load coupons', 'error');
                 setPresets([]);
             }
         } catch (err) {
             console.error('Failed to fetch presets:', err);
-            toast.error('Error loading coupons');
+            showMessage('Error loading coupons', 'error');
             setPresets([]);
         } finally {
             const elapsedTime = Date.now() - startTime;
@@ -172,7 +181,7 @@ const SetDiscountPage = () => {
 
         const { presetName, discountAmount } = form;
         if (!presetName || !discountAmount) {
-            toast.error('Please fill in all required fields');
+            showMessage('Please fill in all required fields', 'error');
             setLoading(false);
             return;
         }
@@ -213,18 +222,18 @@ const SetDiscountPage = () => {
 
             if (response.ok) {
                 const successMessage = isEditing ? 'Coupon updated!' : 'Coupon created successfully!';
-                toast.success(successMessage);
+                showMessage(successMessage, 'success');
                 resetForm();
                 fetchPresets();
                 setShowForm(false);
                 setIsEditing(false);
                 setEditingPresetId(null);
             } else {
-                toast.error(data.message || 'Failed to save coupon.');
+                showMessage(data.message || 'Failed to save coupon.', 'error');
             }
         } catch (err) {
             console.error(err);
-            toast.error('Error saving coupon.');
+            showMessage('Error saving coupon.', 'error');
         } finally {
             setLoading(false);
         }
@@ -252,16 +261,16 @@ const SetDiscountPage = () => {
             });
 
             if (res.ok) {
-                toast.success('Coupon deleted successfully!');
+                showMessage('Coupon deleted successfully!', 'success');
                 setOpenMenuIndex(null)
                 setPresets(prev => prev.filter(p => p._id !== preset._id));
             } else {
                 const data = await res.json();
-                toast.error(data.message || 'Failed to delete coupon.');
+                showMessage(data.message || 'Failed to delete coupon.', 'error');
             }
         } catch (err) {
             console.error("Delete failed:", err);
-            toast.error('Error deleting coupon.');
+            showMessage('Error deleting coupon.', 'error');
         } finally {
             setPresetToDelete(null);
         }
@@ -293,14 +302,14 @@ const SetDiscountPage = () => {
                         isActive: p._id === preset._id ? !isCurrentlyActive : p.isActive
                     }))
                 );
-                toast.success(`✅ Status ${isCurrentlyActive ? 'deactivated' : 'activated'} successfully!`);
+                showMessage(`Coupon ${isCurrentlyActive ? 'deactivated' : 'activated'} successfully!`, 'success');
             } else {
                 const data = await res.json();
-                toast.error(data.message || `❌ Failed to ${isCurrentlyActive ? 'deactivate' : 'activate'} coupon.`);
+                showMessage(data.message || `Failed to ${isCurrentlyActive ? 'deactivate' : 'activate'} coupon.`, 'error');
             }
         } catch (err) {
             console.error("Toggle error:", err);
-            toast.error('Error updating status.');
+            showMessage('Error updating status.', 'error');
         }
     }, [userRole, userId]);
 
@@ -329,6 +338,15 @@ const SetDiscountPage = () => {
 
     return (
         <div className="p-8 mx-auto rounded-lg min-h-screen">
+            {/* Message Popup */}
+            {message.text && (
+                <MessagePopup
+                    message={message.text}
+                    type={message.type}
+                    onClose={closeMessage}
+                />
+            )}
+
             {/* Header */}
             <div className="flex justify-between mb-6 items-center flex-wrap gap-4">
                 <h1 className="text-2xl font-bold text-gray-700">
@@ -344,13 +362,11 @@ const SetDiscountPage = () => {
 
             {/* FilterBar Component */}
             <FilterBar
-                // Core search
+                // onFilterChange={() => setCurrentPage(1)}
                 search={search}
                 setSearch={setSearch}
                 searchLoading={presetLoading && search}
                 placeholder="Search by coupon name..."
-
-                // Status filter
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 showStatus={true}
@@ -359,8 +375,6 @@ const SetDiscountPage = () => {
                     { value: "active", label: "Active" },
                     { value: "inactive", label: "Inactive" }
                 ]}
-
-                // Date filters
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}
@@ -369,8 +383,6 @@ const SetDiscountPage = () => {
                 setQuickDateFilter={setQuickDateFilter}
                 showDates={true}
                 showQuickFilter={true}
-
-                // Type filter (admin only)
                 showTypeFilter={userRole === 'admin'}
                 typeFilter={typeFilter}
                 setTypeFilter={setTypeFilter}

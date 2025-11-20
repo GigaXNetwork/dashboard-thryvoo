@@ -7,7 +7,6 @@ import { useUser } from '../../Context/ContextApt';
 import Pagination from '../Common/Pagination';
 // import FilterBar from '../Common/FilterBar';
 import { getAuthToken } from '../../Context/apiService';
-import { toast } from 'react-toastify';
 import FilterBar from '../Common/FilterBar/FilterBar';
 
 
@@ -18,8 +17,7 @@ function Coupon() {
   const [coupons, setCoupons] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('success');
+  const [message, setMessage] = useState({ text: '', type: '' });
   const [showReviewCard, setShowReviewCard] = useState({});
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -36,6 +34,14 @@ function Coupon() {
 
   const { userData } = useUser();
   const user = userData.user.role;
+
+  const showMessage = (text, type = 'success') => {
+    setMessage({ text, type });
+  }
+
+  const closeMessage = () => {
+    setMessage({ text: '', type: '' });
+  }
 
   const apiUrl = user === "admin"
     ? `${import.meta.env.VITE_API_URL}/api/admin/coupons?user=${userId}`
@@ -107,7 +113,7 @@ function Coupon() {
       } catch (error) {
         console.error('Error fetching coupons:', error);
         setCoupons([]);
-        toast.error('Failed to load coupons');
+        showMessage('Error fetching coupons', 'error');
       } finally {
         const elapsedTime = Date.now() - startTime;
         const minLoadingTime = 500;
@@ -154,11 +160,11 @@ function Coupon() {
         )
       );
 
-      toast.success('Coupon redeemed successfully!');
+      showMessage('Coupon redeemed successfully!', 'success');
       setSearch("");
     } catch (error) {
       console.error("Error redeeming coupon:", error);
-      toast.error('Failed to redeem coupon');
+      showMessage('Failed to redeem coupon', 'error');
     } finally {
       setRedeemLoading(false);
       setDialogOpen(false);
@@ -181,8 +187,27 @@ function Coupon() {
 
   const tableHeaders = ["Sl. No", "Code", "Name", "Source", "Status", "Expiration Date", "Manage"];
 
+  const sourceBarColors = {
+    review: "bg-blue-400",
+    "special-offer": "bg-purple-400",
+    spin: "bg-orange-400",
+    task: "bg-green-400",
+    loyalty: "bg-yellow-400",
+    redemption: "bg-indigo-400",
+    other: "bg-gray-400",
+  };
+
   return (
     <div className="p-8">
+      {/* Message Popup */}
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         {/* Title */}
         <h1 className="text-2xl font-bold text-gray-700 tracking-tight">
@@ -203,6 +228,7 @@ function Coupon() {
 
       {/* FilterBar Component */}
       <FilterBar
+        onFilterChange={() => setCurrentPage(1)}
         search={search}
         setSearch={setSearch}
         searchLoading={searchLoading}
@@ -302,16 +328,22 @@ function Coupon() {
                     ? "text-red-600"
                     : "text-gray-700";
 
-              const sourceType = coupon.source || "other";
+              const sourceType = coupon.source || "Unknown";
               const rowColor = index % 2 === 0 ? "bg-white" : "bg-gray-50"; // striped rows
               const sourceInfo = sourceDisplay[sourceType] || sourceDisplay["other"];
 
               return (
                 <tr
                   key={coupon._id}
-                  className={`${rowColor} hover:bg-blue-50 transition-colors duration-150`}
+                  className="bg-white hover:bg-blue-50 transition-colors duration-150 border-b border-gray-200"
                 >
-                  <td className="px-6 py-4 text-center font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                  <td className="px-6 py-4 text-center font-medium relative">
+                    <span
+                      className={`absolute left-0 top-0 h-full w-1 group-hover:w-1.5 transition-all duration-200 rounded ${sourceBarColors[sourceType]} z-10`}
+                    ></span>
+
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
                   <td className="px-6 py-4 font-medium text-blue-600 hover:underline cursor-pointer break-words text-center">
                     <button onClick={() => setShowReviewCard((prev) => ({ ...prev, [coupon._id]: true }))}>
                       {coupon.code}
@@ -411,15 +443,6 @@ function Coupon() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Message Popup */}
-      {message && (
-        <MessagePopup
-          message={message}
-          type={messageType}
-          onClose={() => setMessage('')}
-        />
       )}
     </div>
   );

@@ -597,7 +597,7 @@ import Pagination from '../Common/Pagination';
 import ExcelUploadModal from './ExcelUploadModal';
 import WhatsAppCampaignModal from './WhatsAppCampaignModal';
 import userLogo from '../../assets/images/default-user.png';
-import { toast } from 'react-toastify';
+import MessagePopup from '../Common/MessagePopup';
 
 const Customers = () => {
   const [leads, setLeads] = useState([]);
@@ -616,6 +616,7 @@ const Customers = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -634,6 +635,14 @@ const Customers = () => {
     email: '',
     phone: ''
   });
+
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+  }
+
+  const closeMessage = () => {
+    setMessage({ text: "", type: "" });
+  }
 
   useEffect(() => {
     const isSearch = searchTerm.trim() !== '';
@@ -706,7 +715,7 @@ const Customers = () => {
       if (response.status === "success") {
         if (setProgress) setProgress(100);
 
-        toast.success(response?.message || 'Excel file uploaded successfully!');
+        showMessage(response?.message || 'Excel file uploaded successfully!', 'success');
         setShowExcelModal(false);
         await fetchLeads();
       } else {
@@ -766,14 +775,14 @@ const Customers = () => {
           window.URL.revokeObjectURL(url);
         }
 
-        toast.success('Excel file downloaded successfully!');
+        showMessage('Excel file downloaded successfully!', 'success');
       } else {
         throw new Error(response.message || 'Failed to export data');
       }
     } catch (err) {
       setError(err.message || 'Failed to export Excel file. Please try again.');
       console.error('Error exporting Excel:', err);
-      toast.error('Failed to export Excel file');
+      showMessage(err.message || 'Failed to export Excel file. Please try again.', 'error');
     } finally {
       setExportLoading(false);
     }
@@ -790,7 +799,7 @@ const Customers = () => {
       });
 
       if (response.status === "success") {
-        toast.success(`✅ WhatsApp message sent to ${messageData.lead.name}!`);
+        showMessage(`WhatsApp message sent to ${messageData.lead.name}!`, 'success');
         setShowWhatsAppModal(false);
         setSelectedLead(null);
       } else {
@@ -919,6 +928,15 @@ const Customers = () => {
 
   return (
     <div className="mx-auto p-8">
+      {/* MessagePopup */}
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>

@@ -7,10 +7,9 @@ import CategoryModal from './CategoryModal';
 import ItemModal from './ItemModal';
 import { Api } from "../../../Context/apiService";
 import Pagination from '../../Common/Pagination';
-import { useUser } from '../../../Context/ContextApt';
 import { useParams } from 'react-router';
-import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '../../Common/DeleteConfirmationModal';
+import MessagePopup from '../../Common/MessagePopup';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -29,6 +28,7 @@ const Categories = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [popupMessage, setPopupMessage] = useState({ text: '', type: '' });
 
   // Pagination state for categories
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +43,14 @@ const Categories = () => {
   const [itemsTotalResults, setItemsTotalResults] = useState(0);
 
   const { userId } = useParams();
+
+  const showMessage = (text, type = 'success') => {
+    setPopupMessage({ text, type });
+  };
+
+  const closeMessage = () => {
+    setPopupMessage({ text: '', type: '' });
+  };
 
   // Fetch categories
   const fetchCategories = async (isSearch = false) => {
@@ -136,12 +144,12 @@ const Categories = () => {
     try {
       setSubmitting(true);
       await Api.createCategory(userId, formData);
-      toast.success('Category created successfully!');
+      showMessage('Category created successfully!', 'success');
       setShowCategoryModal(false);
       fetchCategories();
     } catch (err) {
       console.log(err)
-      toast.error('Failed to create category');
+      showMessage('Failed to create category', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -151,13 +159,13 @@ const Categories = () => {
     try {
       setSubmitting(true);
       await Api.updateCategory(modalCategory._id, formData);
-      toast.success('Category updated successfully!');
+      showMessage('Category updated successfully!', 'success');
       setShowCategoryModal(false);
       setModalCategory(null);
       fetchCategories();
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update category');
+      showMessage('Failed to update category', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -173,14 +181,14 @@ const Categories = () => {
     try {
       setSubmitting(true);
       await Api.addItemToCategory(userId, category._id, formData);
-      toast.success('Item added successfully!');
+      showMessage('Item added successfully!', 'success');
       setShowItemModal(false);
       // Refresh the items for this category and reset to first page
       setItemsCurrentPage(1);
       await fetchCategoryItems(category._id, 1);
     } catch (err) {
       console.error('Error adding item:', err);
-      toast.error('Failed to add item');
+      showMessage('Failed to add item', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -197,7 +205,7 @@ const Categories = () => {
 
     try {
       await Api.deleteItemFromCategory(userId, selectedCategory._id, selectedItem);
-      toast.success('Item deleted successfully!');
+      showMessage('Item deleted successfully!', 'success');
 
       // Check if we need to go back to previous page after deletion
       const currentItems = viewingItems?.items || [];
@@ -211,7 +219,7 @@ const Categories = () => {
       }
     } catch (err) {
       console.error('Error deleting item:', err);
-      toast.error('Failed to delete item');
+      showMessage('Failed to delete item', 'error');
     } finally {
       setShowDeleteModal(false);
     }
@@ -246,7 +254,7 @@ const Categories = () => {
 
   const handleBackToCategories = () => {
     setViewingItems(null);
-    setItemsCurrentPage(1); // Reset items pagination when going back
+    setItemsCurrentPage(1);
   };
 
   const handleModalClose = () => {
@@ -292,6 +300,15 @@ const Categories = () => {
   return (
     <>
       <div className="max-w-7xl mx-auto p-6">
+        {/* Message Popup */}
+        {popupMessage.text && (
+          <MessagePopup
+            message={popupMessage.text}
+            type={popupMessage.type}
+            onClose={closeMessage}
+          />
+        )}
+        
         {/* Header - Always visible */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div>

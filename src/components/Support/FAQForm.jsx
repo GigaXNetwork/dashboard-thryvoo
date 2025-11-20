@@ -1,7 +1,6 @@
 // components/Support/FAQForm.jsx
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 const FAQForm = ({
     isOpen,
