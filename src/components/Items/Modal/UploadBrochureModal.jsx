@@ -113,7 +113,7 @@ export default function UploadBrochureModal({
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
               onChange={handleFileChange}
-              className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-50 file:text-[#2563EB] hover:file:bg-purple-100 cursor-pointer"
+              className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-[#2563EB] hover:file:bg-blue-100 cursor-pointer"
             />
             {errorMessage && (
               <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
@@ -154,9 +154,9 @@ export default function UploadBrochureModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${isSubmitting
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${isSubmitting
                   ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-purple-700"
+                  : "hover:bg-blue-700"
                 }`}
               disabled={isSubmitting}
             >

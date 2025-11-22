@@ -724,7 +724,7 @@ const FilterBar = ({
         {/* Filter Controls - Right side with flex wrap */}
         <div className="flex gap-2 items-center flex-wrap">
           {showCategoryFilter && (
-            <div className="flex-1">
+            <div className="w-full sm:w-auto max-w-full sm:max-w-[260px]">
               <CategoryFilterDropdown
                 show={showCategoryDropdown}
                 toggle={() => setShowCategoryDropdown((v) => !v)}
@@ -740,7 +740,7 @@ const FilterBar = ({
             </div>
           )}
           {showLocationFilter && (
-            <div className="flex-1">
+            <div className="w-full sm:w-auto max-w-full sm:max-w-[260px]">
               <LocationFilterDropdown
                 show={showLocationDropdown}
                 toggle={() => setShowLocationDropdown((v) => !v)}

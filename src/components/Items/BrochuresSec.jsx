@@ -107,14 +107,16 @@ export default function BrochuresSec({ cardData, openModal, setCardData, isExpan
 
   return (
     <div className="w-full">
+      {/* Message Popup */}
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {message.text && (
-          <MessagePopup
-            message={message.text}
-            type={message.type}
-            onClose={closeMessage}
-          />
-        )}
         {/* Add file tile */}
         <div
           className="cursor-pointer border-2 border-dashed border-blue-300 rounded-xl flex flex-col items-center justify-center hover:bg-blue-50 transition-colors min-h-[136px]"

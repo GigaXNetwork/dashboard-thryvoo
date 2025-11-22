@@ -102,7 +102,7 @@ export default function UpdateCategoryModal({
                 onClick={() => setSelectedCategory(cat)}
                 className={`w-full text-center px-4 py-3 rounded-xl font-medium transition border ${
                   selectedCategory === cat
-                    ? "bg-purple-600 text-white border-purple-600"
+                    ? "bg-blue-600 text-white border-blue-600"
                     : "bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100"
                 }`}
               >
@@ -132,10 +132,10 @@ export default function UpdateCategoryModal({
             type="button"
             disabled={isSubmitting || isLoading || !selectedCategory}
             onClick={handleSubmit}
-            className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${
+            className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
               isSubmitting || isLoading || !selectedCategory
                 ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-purple-700"
+                : "hover:bg-blue-700"
             }`}
           >
             {isSubmitting ? "Updating..." : "Save"}

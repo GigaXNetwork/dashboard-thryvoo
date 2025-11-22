@@ -305,7 +305,7 @@ const CrossBrand = () => {
           setStatusFilter={setStatusFilter}
           showStatus={true}
           statusOptions={[
-            { value: "", label: "All Statuses" },
+            { value: "", label: "Statuses" },
             { value: "true", label: "Active" },
             { value: "false", label: "Inactive" },
           ]}
