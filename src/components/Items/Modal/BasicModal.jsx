@@ -98,7 +98,7 @@ export default function UpdateFieldModal({
               <textarea
                 value={value}
                 onChange={(e) => setValue(e.target.value.slice(0, maxChars))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={5}
                 required
               />
@@ -107,7 +107,7 @@ export default function UpdateFieldModal({
                 type={field === "email" ? "email" : "text"}
                 value={value}
                 onChange={(e) => setValue(e.target.value.slice(0, maxChars))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             )}
@@ -132,8 +132,8 @@ export default function UpdateFieldModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700"
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
               }`}
               disabled={isSubmitting}
             >

@@ -138,16 +138,27 @@
 
 
 import { useState } from "react";
-import { Trash2, Loader } from "lucide-react";
+import { Trash2, Loader, Maximize2, Download, X } from "lucide-react";
 import { FaImages } from "react-icons/fa";
 import { useUser } from "../../Context/ContextApt";
 import { Api } from "../../Context/apiService";
+import MessagePopup from "../Common/MessagePopup";
 
 export default function GallerySec({ cardData, setCardData, openModal, isExpanded = false }) {
   const { userData } = useUser();
   const [deletingImage, setDeletingImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const gallery = cardData?.gallery || [];
+
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+  };
+
+  const closeMessage = () => {
+    setMessage({ text: "", type: "" });
+  };
 
   const handleDeleteImage = async (imageUrl, e) => {
     e.stopPropagation(); // Prevent opening image
@@ -164,20 +175,71 @@ export default function GallerySec({ cardData, setCardData, openModal, isExpande
           ...prevData,
           gallery: prevData.gallery.filter((url) => url !== imageUrl),
         }));
+        showMessage(response.message, "success");
       } else {
-        console.error("Failed to delete image:", response.message);
-        alert("Failed to delete image. Please try again.");
+        showMessage(response.message || "Failed to delete image. Please try again.", "error");
       }
     } catch (error) {
-      console.error("Error deleting image:", error);
-      alert("Error deleting image. Please try again.");
+      showMessage("Error deleting image. Please try again.", "error");
     } finally {
       setDeletingImage(null);
     }
   };
 
+  const handleImageClick = (url) => {
+    setPreviewImage(url);
+  };
+
+  const closePreview = () => {
+    setPreviewImage(null);
+  };
+
+  const handleDownload = async (fileUrl, fileName) => {
+    if (!fileUrl) return;
+
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName || fileUrl.split('/').pop();
+
+      link.style.display = 'none';
+      document.body.appendChild(link);
+
+      setTimeout(() => {
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      }, 100);
+
+    } catch (err) {
+      console.error('Download failed:', err);
+      // Fallback: Simple direct download
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = fileName || fileUrl.split('/').pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <div className="w-full">
+      {/* MessagePopup */}
+      {message.text && (
+        <MessagePopup
+          message={message.text}
+          type={message.type}
+          onClose={closeMessage}
+        />
+      )}
+
       {/* Content - Always visible now */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {/* Add photo tile */}
@@ -195,7 +257,8 @@ export default function GallerySec({ cardData, setCardData, openModal, isExpande
           gallery.map((url, idx) => (
             <div
               key={idx}
-              className="group relative border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+              className="group relative border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+              onClick={() => handleImageClick(url)}
             >
               {/* Image Container */}
               <div className="relative overflow-hidden">
@@ -204,6 +267,18 @@ export default function GallerySec({ cardData, setCardData, openModal, isExpande
                   alt={`Gallery ${idx + 1}`}
                   className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+
+                {/* Preview Button - Bottom Right */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleImageClick(url);
+                  }}
+                  className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition opacity-0 group-hover:opacity-100"
+                  title="View full size"
+                >
+                  <Maximize2 size={16} />
+                </button>
 
                 {userData?.user?.role === "user" && (
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
@@ -232,6 +307,37 @@ export default function GallerySec({ cardData, setCardData, openModal, isExpande
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm">
+          {/* Close Button */}
+          <button
+            onClick={closePreview}
+            className="absolute top-6 right-6 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition z-10"
+          >
+            <X size={28} />
+          </button>
+
+          {/* Download Button for Images */}
+          <button
+            onClick={() => handleDownload(previewImage, previewImage.split('/').pop())}
+            className="absolute top-6 right-20 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition z-10"
+            title="Download image"
+          >
+            <Download size={24} />
+          </button>
+
+          {/* Image Content */}
+          <div className="max-w-[90vw] max-h-[90vh] flex items-center justify-center">
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

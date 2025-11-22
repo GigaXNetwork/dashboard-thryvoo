@@ -88,7 +88,7 @@ export default function UpdateSocialModal({
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-purple-100">
+            <div className="p-2 rounded-full bg-blue-100">
               {icons[field]}
             </div>
             <h2 className="text-xl font-bold text-gray-800 tracking-wide">
@@ -111,7 +111,7 @@ export default function UpdateSocialModal({
               placeholder={`Enter your ${label} link`}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errorMessage && (
               <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
@@ -129,7 +129,7 @@ export default function UpdateSocialModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-purple-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700"
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
                 }`}
               disabled={isSubmitting}
             >
