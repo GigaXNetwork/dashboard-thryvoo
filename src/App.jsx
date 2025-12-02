@@ -55,6 +55,7 @@ import SpecialOffer from './components/Offer/SpecialOffer/SpecialOffer';
 import MyCategories from './components/MyCategories/MyCategories';
 import CreateCrossCoupon from './components/CrossBrand/CreateCrossCoupon';
 import Support from './components/Support/Support';
+import Plan from './components/Plans/Plan';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -127,6 +128,7 @@ function App() {
             { path: 'me', element: <Me /> },
             { path: 'card/:cardId', element: <ItemsWrapper role={role} /> },
             { path: 'reviews', element: <Reviews role={role} /> },
+            { path: 'plans', element: <Plan role={role}/> },
 
             // Admin-only routes
             ...(role === 'admin' ? [

@@ -106,7 +106,7 @@ const CreateCrossPromotion = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                const list = data.discount || data.data?.coupon || data.data || [];
+                const list = data.discounts || [];
                 const onlyCross = Array.isArray(list)
                     ? list.filter(p => p.type === 'cross' || p.type === undefined)
                     : [];
