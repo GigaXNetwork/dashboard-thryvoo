@@ -1,3 +1,4 @@
+import { add } from "date-fns/add";
 import Cookies from "js-cookie"
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -161,5 +162,10 @@ export const Api = {
   // delete brochure api
   deleteBrochure: ({ brochureUrl }) => {
     return apiRequest(`/api/user/card/brochures/delete-brochure-file`, "DELETE", { fileUrl: brochureUrl })
-  }
+  },
+
+  //Plans
+  getPlans: () => apiRequest("/api/plans/get-plans", "GET"),
+  createPlan: (planData) => apiRequest("/api/plans/create-plan", "POST", planData),
+  updatePlan: (planId, planData) => apiRequest(`/api/plans/${planId}`, "PATCH", planData),
 };

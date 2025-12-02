@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getAuthToken } from '../../Context/apiService';
 
 function AllCoupon() {
   const [search, setSearch] = useState('');
@@ -28,6 +29,10 @@ function AllCoupon() {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/coupons`, {
           params,
           withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getAuthToken(),
+          },
         });
 
         setCoupons(res.data.data.coupons || []);

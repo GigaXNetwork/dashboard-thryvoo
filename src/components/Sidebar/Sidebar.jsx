@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia, MdOutlineReviews, MdOutlineSupportAgent } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-import { CreditCard, FerrisWheel, FileBox, Handshake, IdCard, Settings, Star, Users } from "lucide-react";
+import { CreditCard, FerrisWheel, FileBox, Handshake, IdCard, IndianRupee, Settings, Star, Tag, Users } from "lucide-react";
 
 
 function Sidebar({ onToggleSidebar }) {
@@ -80,9 +80,10 @@ function Sidebar({ onToggleSidebar }) {
       ]
     },
     { to: "/reviews", icon: <MdOutlineReviews size={18} />, label: "Reviews" },
-    isAdmin && { to: "/support", icon: <MdOutlineSupportAgent size={18} />, label: "Help & Support" },
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
     userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Social Media / Offer Designs" },
+    // { to: "/plans", icon: <Tag size={18} />, label: "Plans" },
+    isAdmin && { to: "/support", icon: <MdOutlineSupportAgent size={18} />, label: "Help & Support" },
   ].filter(Boolean);
 
   const [openMenu, setOpenMenu] = useState(null);

@@ -141,7 +141,7 @@ const MyPreset = () => {
   const handleOpenAssignModal = (preset) => {
     setPresetToAssign(preset);
     setShowAssignModal(true);
-    setAssignType(''); // Reset assign type
+    setAssignType('');
   };
 
   // Handle assign to special offer or spin to win

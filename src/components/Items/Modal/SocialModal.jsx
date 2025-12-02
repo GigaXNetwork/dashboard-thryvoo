@@ -43,8 +43,32 @@ export default function UpdateSocialModal({
     website: <FaGlobe className="text-[#2563EB] text-xl w-8 h-8" />,
   };
 
+  const isWhatsApp = field === "whatsapp";
+  
+  const handleWhatsAppInput = (e) => {
+    const input = e.target.value;
+    
+    if (input === "" || input === "+" || /^\+?[0-9]*$/.test(input)) {
+      setValue(input);
+      setErrorMessage("");
+    }
+  };
+
+  const handleOtherInput = (e) => {
+    setValue(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isWhatsApp) {
+      const whatsappRegex = /^\+?[0-9]{10,15}$/;
+      if (value && !whatsappRegex.test(value)) {
+        setErrorMessage("Please enter a valid WhatsApp number (10-15 digits, optionally starting with +)");
+        return;
+      }
+    }
+    
     const authToken = Cookies.get("authToken");
     setIsSubmitting(true);
     setErrorMessage("");
@@ -81,7 +105,6 @@ export default function UpdateSocialModal({
     }
   };
 
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-[9999] backdrop-blur-sm overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn">
@@ -107,10 +130,10 @@ export default function UpdateSocialModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <input
-              type="url"
-              placeholder={`Enter your ${label} link`}
+              type={isWhatsApp ? "tel" : "url"}
+              placeholder={isWhatsApp ? "Enter WhatsApp number" : `Enter your ${label} link`}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={isWhatsApp ? handleWhatsAppInput : handleOtherInput}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errorMessage && (
@@ -129,8 +152,9 @@ export default function UpdateSocialModal({
             </button>
             <button
               type="submit"
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-                }`}
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-blue-600 transition ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+              }`}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Updating..." : "Save"}
@@ -139,6 +163,5 @@ export default function UpdateSocialModal({
         </form>
       </div>
     </div>
-
   );
 }
