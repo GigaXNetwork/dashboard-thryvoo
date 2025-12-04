@@ -37,9 +37,6 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      console.log("login-data--", data)
-      console.log("token--", data.token)
-
       if (response.ok) {
         console.log("Login successful", data);
         setAuthToken(data.token);

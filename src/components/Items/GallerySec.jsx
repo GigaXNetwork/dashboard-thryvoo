@@ -280,23 +280,22 @@ export default function GallerySec({ cardData, setCardData, openModal, isExpande
                   <Maximize2 size={16} />
                 </button>
 
-                {userData?.user?.role === "user" && (
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                    {/* Delete Button - Top Right */}
-                    <button
-                      onClick={(e) => handleDeleteImage(url, e)}
-                      disabled={deletingImage === url}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 disabled:opacity-70 shadow-lg"
-                      title="Delete image"
-                    >
-                      {deletingImage === url ? (
-                        <Loader className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-3 h-3" />
-                      )}
-                    </button>
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  {/* Delete Button - Top Right */}
+                  <button
+                    onClick={(e) => handleDeleteImage(url, e)}
+                    disabled={deletingImage === url}
+                    className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 disabled:opacity-70 shadow-lg"
+                    title="Delete image"
+                  >
+                    {deletingImage === url ? (
+                      <Loader className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3 h-3" />
+                    )}
+                  </button>
+                </div>
+
               </div>
             </div>
           ))
