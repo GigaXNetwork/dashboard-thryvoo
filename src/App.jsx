@@ -56,6 +56,8 @@ import MyCategories from './components/MyCategories/MyCategories';
 import CreateCrossCoupon from './components/CrossBrand/CreateCrossCoupon';
 import Support from './components/Support/Support';
 import Plan from './components/Plans/Plan';
+import AffiliateManagement from './components/AffiliateUsers/AffiliateManagement';
+import AffiliateDetails from './components/AffiliateUsers/AffiliateDetails';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -152,7 +154,9 @@ function App() {
                   { path: 'categories', element: <Categories /> },
                 ]
               },
-              { path: 'support', element: <Support /> }
+              { path: 'support', element: <Support /> },
+              { path: 'affiliate-users', element: <AffiliateManagement /> },
+              { path: '/affiliate/:id', element: <AffiliateDetails />}
             ] : []),
 
             // User-only routes

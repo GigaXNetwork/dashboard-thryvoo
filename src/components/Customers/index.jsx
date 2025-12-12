@@ -1092,7 +1092,7 @@ const Customers = () => {
         templateUrl="/templates/sample.xlsx"
         templateFileName="leads_template.xlsx"
         uploadLoading={uploadLoading}
-        allowedFileTypes={['.xlsx']}
+        allowedFileTypes={['.xlsx', '.csv']}
         maxFileSize={10 * 1024 * 1024}
         instructions={[
           'Required columns: Name, Email, Phone',

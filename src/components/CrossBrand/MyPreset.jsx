@@ -200,15 +200,12 @@ const MyPreset = () => {
         <h1 className="text-2xl font-bold text-gray-700">Cross-Brand Coupons</h1>
       </div>
 
-      {/* 🔍 Updated FilterBar with Latest Props */}
+      {/* FilterBar */}
       <FilterBar
-        // Core search
         search={search}
         setSearch={setSearch}
         searchLoading={searchLoading}
-        placeholder="Search by coupon name..."
-        
-        // Status filter
+        placeholder="Search by coupon name..."        
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         showStatus={true}
@@ -216,9 +213,7 @@ const MyPreset = () => {
           { value: '', label: 'All Statuses' },
           { value: 'true', label: 'Active' },
           { value: 'false', label: 'Inactive' }
-        ]}
-        
-        // Type filter
+        ]}        
         showTypeFilter={true}
         typeFilter={typeFilter}
         setTypeFilter={setTypeFilter}
@@ -227,9 +222,7 @@ const MyPreset = () => {
           { value: 'cross', label: 'Cross Brand' },
           { value: 'own', label: 'Own Brand' },
           { value: 'offer', label: 'Offer' }
-        ]}
-        
-        // Date filters
+        ]}        
         startDate={startDate}
         setStartDate={setStartDate}
         endDate={endDate}
@@ -238,11 +231,7 @@ const MyPreset = () => {
         setQuickDateFilter={setQuickDateFilter}
         showDates={true}
         showQuickFilter={true}
-        
-        // Clear all handler
         onClearFilters={clearAllFilters}
-        
-        // Hide unused filters
         showCategoryFilter={false}
         showLocationFilter={false}
         showSourceFilter={false}

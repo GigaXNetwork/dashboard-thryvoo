@@ -65,7 +65,7 @@ function Coupon() {
     'spin': { name: 'Spin', badge: 'bg-orange-100 text-orange-800' },
     'task': { name: 'Task', badge: 'bg-green-100 text-green-800' },
     'loyalty': { name: 'Loyalty', badge: 'bg-yellow-100 text-yellow-800' },
-    'redemption': { name: 'Redemption', badge: 'bg-indigo-100 text-indigo-800' },
+    'redemption': { name: 'Redemption', badge: 'bg-pink-100 text-pink-800' },
     'other': { name: 'Other', badge: 'bg-gray-100 text-gray-800' }
   };
 
@@ -92,7 +92,7 @@ function Coupon() {
         const params = {
           page: currentPage,
           limit: itemsPerPage,
-          ...(searchTerm && { code: searchTerm.trim() }),
+          ...(searchTerm && { search: searchTerm.trim() }),
           ...(statusFilter && { status: statusFilter }),
           ...(startDate && { 'createdAt[gt]': startDate }),
           ...(endDate && { 'createdAt[lt]': endDate }),
@@ -193,10 +193,10 @@ function Coupon() {
     spin: "bg-orange-400",
     task: "bg-green-400",
     loyalty: "bg-yellow-400",
-    redemption: "bg-indigo-400",
+    redemption: "bg-pink-400",
     other: "bg-gray-400",
   };
-
+  console.log("searchLoading--", searchLoading)
   return (
     <div className="p-8">
       {/* Message Popup */}
@@ -225,7 +225,7 @@ function Coupon() {
           Coupons
         </NavLink>
       </div>
-
+      
       {/* FilterBar Component */}
       <FilterBar
         onFilterChange={() => setCurrentPage(1)}
@@ -281,7 +281,7 @@ function Coupon() {
       </div> */}
 
       {/* Table */}
-      <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white text-sm">
+      <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white text-sm mb-4">
         <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold select-none">
           <tr>
             {tableHeaders.map((heading, i) => (

@@ -280,7 +280,7 @@ const SetDiscountPage = () => {
     const handleToggleActive = useCallback(async (preset) => {
         try {
             const isCurrentlyActive = preset.isActive;
-            const action = isCurrentlyActive ? 'setDeactive' : 'setActive';
+            const action = 'setActive';
 
             const toggleUrl = userRole === "admin"
                 ? `${import.meta.env.VITE_API_URL}/api/admin/user/${userId}/presets/${preset._id}/${action}`

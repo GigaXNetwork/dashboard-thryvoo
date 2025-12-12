@@ -168,4 +168,24 @@ export const Api = {
   getPlans: () => apiRequest("/api/plans/get-plans", "GET"),
   createPlan: (planData) => apiRequest("/api/plans/create-plan", "POST", planData),
   updatePlan: (planId, planData) => apiRequest(`/api/plans/${planId}`, "PATCH", planData),
+
+  //Affiliate-Users
+  getAffiliateUsers: (page = 1, limit = 10, search = '', status = '') => {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (search && search.trim()) {
+      queryParams.append('search', search.trim());
+    }
+
+    if (status && status.trim()) {
+      queryParams.append('status', status.trim());
+    }
+
+    return apiRequest(`/api/affiliate/admin/all?${queryParams.toString()}`, "GET");
+  },
+  getAffiliateDetail: (id) =>  apiRequest(`/api/affiliate/admin/${id}`, "GET"),
+
 };

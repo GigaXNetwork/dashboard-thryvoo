@@ -104,9 +104,12 @@ const CreateCrossPromotion = () => {
                 }
             });
 
+            console.log("res-->", res)
+
             if (res.ok) {
                 const data = await res.json();
-                const list = data.discounts || [];
+                console.log("data", data)
+                const list = data.discount || [];
                 const onlyCross = Array.isArray(list)
                     ? list.filter(p => p.type === 'cross' || p.type === undefined)
                     : [];

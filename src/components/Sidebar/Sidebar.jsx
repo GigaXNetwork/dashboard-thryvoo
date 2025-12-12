@@ -9,6 +9,7 @@ import { useUser } from "../../Context/ContextApt";
 import { MdOutlinePermMedia, MdOutlineReviews, MdOutlineSupportAgent } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
 import { CreditCard, FerrisWheel, FileBox, Handshake, IdCard, IndianRupee, Settings, Star, Tag, Users } from "lucide-react";
+import { PiUsersThreeBold } from "react-icons/pi";
 
 
 function Sidebar({ onToggleSidebar }) {
@@ -83,6 +84,7 @@ function Sidebar({ onToggleSidebar }) {
     userData.user.role === "user" && { to: "/customers", icon: <Users size={18} />, label: "Customers" },
     userData.user.role === "user" && { to: "/myCategories", icon: <CreditCard size={18} />, label: "Social Media / Offer Designs" },
     // { to: "/plans", icon: <Tag size={18} />, label: "Plans" },
+    isAdmin && { to: "/affiliate-users", icon: <PiUsersThreeBold size={18} />, label: "Affliate Users" },
     isAdmin && { to: "/support", icon: <MdOutlineSupportAgent size={18} />, label: "Help & Support" },
   ].filter(Boolean);
 

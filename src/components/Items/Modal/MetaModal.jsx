@@ -77,12 +77,24 @@ export default function UpdateMetaModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {label}
             </label>
-            <input
-              type="text"
+            <textarea
               placeholder={`Enter ${label}`}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              className="
+                w-full
+                px-4 py-3
+                border border-gray-300 
+                rounded-lg 
+                focus:outline-none 
+                focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB] 
+                text-sm 
+                resize-y
+                overflow-hidden
+                min-h-[3rem] 
+                max-h-[12rem] 
+                leading-relaxed"
+              rows={3}
               required
             />
             {errorMessage && (
@@ -102,9 +114,8 @@ export default function UpdateMetaModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-6 py-2 rounded-lg font-medium text-white bg-[#2563EB] transition ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-              }`}
+              className={`px-6 py-2 rounded-lg font-medium text-white bg-[#2563EB] transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                }`}
             >
               {isSubmitting ? "Updating..." : "Save"}
             </button>

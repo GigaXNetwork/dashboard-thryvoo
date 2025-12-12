@@ -105,7 +105,7 @@ export default function UploadGalleryModal({ cardId, role, onClose, onSubmit }) 
           <div>
             <input
               type="file"
-              accept=".png,.jpg,.jpeg"
+              accept=".png,.jpg,.jpeg,.webp"
               multiple
               onChange={handleFileChange}
               className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 cursor-pointer"

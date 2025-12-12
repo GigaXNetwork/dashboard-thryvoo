@@ -86,7 +86,7 @@ const SpecialOfferList = ({ items, openModal, onRemoveItem, error }) => {
                     <div className="flex items-center gap-3">
                         <Tag className="w-6 h-6" />
                         <h2 className="text-xl font-bold">Special Offer Coupons</h2>
-                        <span className="bg-white bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                             {items.length} {items.length === 1 ? 'Coupon' : 'Coupons'}
                         </span>
                     </div>
@@ -161,7 +161,7 @@ const SpecialOfferList = ({ items, openModal, onRemoveItem, error }) => {
                                                     </h2>
 
                                                     <span className={`${type.color} text-white px-2 py-1 h-6 rounded-full text-xs uppercase`}>
-                                                        {type.text}
+                                                        {type.text} brand 
                                                     </span>
 
                                                     <span className={`${status.color} px-2 py-1 h-6 rounded-full text-xs uppercase`}>

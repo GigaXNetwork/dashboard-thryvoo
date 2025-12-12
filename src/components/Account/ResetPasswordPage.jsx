@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useParams, Link } from "react-router";
 
 export default function ResetPasswordPage() {
-  const { token } = useParams(); // Get token from URL
+  const { token } = useParams();
   const [password, setPassword] = useState("");
-  const [confirmPassword, setconfirmpassword] = useState(""); // ✅ fixed name
+  const [confirmPassword, setconfirmpassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
