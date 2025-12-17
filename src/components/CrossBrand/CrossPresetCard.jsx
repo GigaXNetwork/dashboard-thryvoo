@@ -144,20 +144,20 @@ const CrossPresetCard = ({
 
       {/* Brand Header */}
       <div className="flex items-center gap-3 mb-5">
-        {preset.card.logo ? (
+        {preset.card?.logo ? (
           <img
-            src={preset.card.logo}
-            alt={preset.card.name}
+            src={preset.card?.logo}
+            alt={preset.card?.name}
             className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
           <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-            {preset.card.name?.[0]?.toUpperCase() || "B"}
+            {preset.card?.name?.[0]?.toUpperCase() || "B"}
           </div>
         )}
         <div>
-          <h3 className="text-lg font-bold text-gray-900">{preset.card.name}</h3>
-          <p className="text-xs text-gray-500">{preset.card.address || "No address"}</p>
+          <h3 className="text-lg font-bold text-gray-900">{preset.card?.name}</h3>
+          <p className="text-xs text-gray-500">{preset.card?.address || "No address"}</p>
         </div>
       </div>
 
