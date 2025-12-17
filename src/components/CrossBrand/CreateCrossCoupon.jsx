@@ -104,8 +104,6 @@ const CreateCrossPromotion = () => {
                 }
             });
 
-            console.log("res-->", res)
-
             if (res.ok) {
                 const data = await res.json();
                 console.log("data", data)

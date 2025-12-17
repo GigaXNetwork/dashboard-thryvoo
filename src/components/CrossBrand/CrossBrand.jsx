@@ -385,7 +385,7 @@ const CrossBrand = () => {
                 >
                   {/* Brand Info */}
                   <div className="flex items-center gap-3 mb-4">
-                    {promotion.brandInfo.logo ? (
+                    {promotion.brandInfo?.logo ? (
                       <img
                         src={promotion.brandInfo.logo}
                         alt={promotion.brandInfo.name}
@@ -393,15 +393,15 @@ const CrossBrand = () => {
                       />
                     ) : (
                       <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium">
-                        {promotion.brandInfo.name?.charAt(0) || "B"}
+                        {promotion.brandInfo?.name?.charAt(0) || "B"}
                       </div>
                     )}
                     <div>
                       <h3 className="text-sm font-semibold text-gray-900">
-                        {promotion.brandInfo.name || "Unknown Brand"}
+                        {promotion.brandInfo?.name || "Unknown Brand"}
                       </h3>
                       <p className="text-xs text-gray-500 truncate max-w-[180px]">
-                        {promotion.brandInfo.address || "No address"}
+                        {promotion.brandInfo?.address || "No address"}
                       </p>
                     </div>
                   </div>
