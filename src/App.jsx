@@ -58,6 +58,7 @@ import Support from './components/Support/Support';
 import Plan from './components/Plans/Plan';
 import AffiliateManagement from './components/AffiliateUsers/AffiliateManagement';
 import AffiliateDetails from './components/AffiliateUsers/AffiliateDetails';
+import SponsorshipList from './components/Sponsorship/Sponsorship';
 
 // 🔁 Scroll Wrapper
 function ScrollToTop() {
@@ -156,6 +157,7 @@ function App() {
               },
               { path: 'support', element: <Support /> },
               { path: 'affiliate-users', element: <AffiliateManagement /> },
+              { path: 'sponsorship', element: <SponsorshipList /> },
               { path: '/affiliate/:id', element: <AffiliateDetails />}
             ] : []),
 

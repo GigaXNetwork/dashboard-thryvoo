@@ -186,6 +186,20 @@ export const Api = {
 
     return apiRequest(`/api/affiliate/admin/all?${queryParams.toString()}`, "GET");
   },
-  getAffiliateDetail: (id) =>  apiRequest(`/api/affiliate/admin/${id}`, "GET"),
+  getAffiliateDetail: (id) => apiRequest(`/api/affiliate/admin/${id}`, "GET"),
 
+
+  // Sponsorship APIs
+  getSponsorshipRequests: (page = 1, limit = 10, search = '', startDate = '', endDate = '') => {
+    const params = new URLSearchParams({ page, limit });
+    if (search) params.append('search', search);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    return apiRequest(`/api/coin/sponsorship/requests?${params.toString()}`, "GET");
+  },
+  setSponsorshipPrice: (data) => apiRequest("/api/coin/sponsorship/set-price", "POST", data),
+  approveSponsorship: (requestId, action = "approve") => apiRequest("/api/coin/sponsorship/approve", "POST", {
+    request_id: requestId,
+    action: action
+  }),
 };
